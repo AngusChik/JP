@@ -5,9 +5,10 @@ def home(request):
     cuts = [
         {
             "name": "Skin Fade",
-            "time": "30–40 min",
-            "desc": "Clean fade with sharp finish",
-            "category": "Service",
+            "time": "30-40 min",
+            "price": "$40",
+            "desc": "Clean fade from skin up with a sharp, blended finish. Our most popular cut.",
+            "category": "Fade",
             "image_url": static("Cuts/fade1.webp"),
             "gallery": "|".join([
                 static("Cuts/fade1.webp"),
@@ -16,46 +17,38 @@ def home(request):
         },
         {
             "name": "Buzz Cut",
-            "time": "15–25 min",
-            "desc": "Simple and sharp.",
-            "category": "Service",
+            "time": "15-25 min",
+            "price": "$25",
+            "desc": "Simple, sharp, and low-maintenance. Even length all around with a crisp lineup.",
+            "category": "Classic",
             "image_url": static("Cuts/buzz1.webp"),
             "gallery": "|".join([
                 static("Cuts/buzz1.webp"),
-                static("Cuts/fade1.webp"),   # swap/replace with real buzz pics later
             ]),
         },
         {
             "name": "Classic Taper",
-            "time": "30–40 min",
-            "desc": "Timeless taper + neckline.",
-            "category": "Service",
+            "time": "30-40 min",
+            "price": "$35",
+            "desc": "Timeless taper with a clean neckline. Works with any hair type and length.",
+            "category": "Taper",
             "image_url": static("Cuts/fade2.webp"),
             "gallery": "|".join([
                 static("Cuts/fade2.webp"),
                 static("Cuts/fade1.webp"),
             ]),
         },
-                {
-            "name": "Classic Taper",
-            "time": "30–40 min",
-            "desc": "Timeless taper + neckline.",
-            "category": "Service",
-            "image_url": static("Cuts/fade2.webp"),
+        {
+            "name": "Fade + Beard",
+            "time": "45-55 min",
+            "price": "$55",
+            "desc": "Full fade with detailed beard shaping, lineup, and hot towel finish.",
+            "category": "Combo",
+            "image_url": static("Cuts/fade3.jpg"),
             "gallery": "|".join([
-                static("Cuts/fade2.webp"),
+                static("Cuts/fade3.jpg"),
                 static("Cuts/fade1.webp"),
-            ]),
-        },
-                {
-            "name": "Classic Taper",
-            "time": "30–40 min",
-            "desc": "Timeless taper + neckline.",
-            "category": "Service",
-            "image_url": static("Cuts/fade2.webp"),
-            "gallery": "|".join([
                 static("Cuts/fade2.webp"),
-                static("Cuts/fade1.webp"),
             ]),
         },
     ]
