@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from django.templatetags.static import static
 
@@ -106,6 +107,16 @@ def home(request):
             ],
         },
     ]
+
+    # Pre-serialize barber data to JSON for safe template embedding
+    for barber in barbers:
+        barber["data_json"] = json.dumps({
+            "photo": barber["photo_url"],
+            "name": barber["name"],
+            "title": barber["title"],
+            "bio": barber["bio"],
+            "reviews": barber["reviews"],
+        })
 
     # Background image — replace with your own image in static/bg/
     # Set to empty string to disable background image
