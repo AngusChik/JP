@@ -53,4 +53,66 @@ def home(request):
         },
     ]
 
-    return render(request, "home.html", {"cuts": cuts})
+    barbers = [
+        {
+            "id": "jp",
+            "name": "JP",
+            "title": "Owner / Lead Barber",
+            "photo_url": "https://picsum.photos/800/1100?random=30",
+            "bio": "Started cutting hair at 16 out of my parents' basement. "
+                   "Fifteen years later, I'm still obsessed with getting every "
+                   "fade, lineup, and taper right. I built this shop to be the "
+                   "kind of place I always wanted to walk into — no ego, no rush, "
+                   "just sharp work and good conversation.",
+            "reviews": [
+                {
+                    "author": "Marcus T.",
+                    "text": "Best fade I've ever had. JP actually listens to what "
+                            "you want and delivers every single time.",
+                },
+                {
+                    "author": "David L.",
+                    "text": "Been coming here for two years now. Never once left "
+                            "disappointed. The man is consistent.",
+                },
+                {
+                    "author": "Ryan K.",
+                    "text": "JP fixed a haircut another barber messed up. Didn't "
+                            "even charge extra. That's the kind of guy he is.",
+                },
+            ],
+        },
+        {
+            "id": "mike",
+            "name": "Mike",
+            "title": "Senior Barber",
+            "photo_url": "https://picsum.photos/800/1100?random=31",
+            "bio": "Trained classically, but I stay current. I like working with "
+                   "texture — whether that's a crop, a blowout, or a beard shape. "
+                   "My thing is making sure you leave looking like yourself, just "
+                   "a sharper version. If you're not sure what you want, I'll "
+                   "figure it out with you.",
+            "reviews": [
+                {
+                    "author": "James W.",
+                    "text": "Mike has a gift for figuring out what works with your "
+                            "face shape. I just sit down and trust him.",
+                },
+                {
+                    "author": "Chris P.",
+                    "text": "Always a chill experience. Good music, good "
+                            "conversation, and a clean cut every time.",
+                },
+            ],
+        },
+    ]
+
+    # Background image — replace with your own image in static/bg/
+    # Set to empty string to disable background image
+    background_image = ""  # e.g., static("bg/background.webp")
+
+    return render(request, "home.html", {
+        "cuts": cuts,
+        "barbers": barbers,
+        "background_image": background_image,
+    })
