@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: jp-studio
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "cd jp && gunicorn jp.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.12.0"
