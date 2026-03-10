@@ -167,7 +167,6 @@ a{color:inherit;text-decoration:none}
   background:linear-gradient(to top,rgba(0,0,0,.55),transparent 50%);
   pointer-events:none;transition:opacity .3s ease;
 }
-.barber-card.is-expanded::after{opacity:0}
 .barber-card .photo-label{
   position:absolute;left:14px;bottom:14px;z-index:1;
   font-size:12px;font-weight:600;color:rgba(255,255,255,.8);
@@ -179,40 +178,58 @@ a{color:inherit;text-decoration:none}
   font-size:11px;font-weight:500;color:rgba(255,255,255,.45);
   transition:opacity .2s ease;
 }
-.barber-card.is-expanded .photo-label,
-.barber-card.is-expanded .photo-hint{opacity:0}
 
-/* ── EXPANDED PROFILE ── */
-.barber-expanded{
-  position:absolute;inset:0;z-index:2;
-  background:var(--surface);border-radius:16px;
-  opacity:0;visibility:hidden;transform:scale(.97);
-  transition:opacity .35s ease,transform .35s ease,visibility 0s .35s;
-  overflow:hidden;display:flex;flex-direction:column;
+/* ── BARBER MODAL (full-page) ── */
+.barber-modal{
+  position:fixed;inset:0;z-index:9998;display:none;
+  padding:clamp(16px,3vw,40px);
+  align-items:center;justify-content:center;
 }
-.barber-card.is-expanded .barber-expanded{
-  opacity:1;visibility:visible;transform:scale(1);
-  transition:opacity .35s ease,transform .35s ease,visibility 0s;
+.barber-modal.is-open{display:flex}
+.barber-modal-backdrop{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:0;animation:fadeIn .25s ease forwards;
+  cursor:pointer;
 }
-.barber-close{
-  position:absolute;top:12px;right:12px;z-index:3;
-  width:34px;height:34px;border-radius:8px;
-  border:1px solid var(--border);background:rgba(0,0,0,.5);
-  color:var(--text);cursor:pointer;font-size:18px;
+.barber-modal-panel{
+  position:relative;z-index:1;
+  width:min(880px,100%);
+  max-height:calc(100vh - 80px);
+  border-radius:20px;overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--surface);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);
+  display:grid;grid-template-columns:.42fr .58fr;
+  transform:translateY(12px) scale(.97);opacity:0;
+  animation:modalSlideUp .3s cubic-bezier(.22,.61,.36,1) forwards;
+}
+@keyframes modalSlideUp{to{transform:translateY(0) scale(1);opacity:1}}
+.barber-modal-close{
+  position:absolute;top:14px;right:14px;z-index:3;
+  width:38px;height:38px;border-radius:10px;
+  border:1px solid var(--border);background:rgba(0,0,0,.45);
+  color:var(--text);cursor:pointer;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
   transition:background .15s ease;
 }
-.barber-close:hover{background:rgba(0,0,0,.7)}
-.barber-inner{display:grid;grid-template-columns:.42fr .58fr;height:100%}
-.barber-photo{overflow:hidden}
-.barber-photo img{width:100%;height:100%;object-fit:cover;display:block}
-.barber-info{padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
-.barber-name{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:600}
-.barber-title{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
-.barber-bio{font-size:13px;color:var(--muted);line-height:1.65}
-.reviews-label{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-top:6px}
-.review{padding:10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border)}
-.review-text{font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;font-style:italic}
-.review-author{font-size:11px;color:var(--muted);margin-top:4px}
+.barber-modal-close:hover{background:rgba(0,0,0,.7)}
+.barber-modal-photo{overflow:hidden;min-height:0}
+.barber-modal-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.barber-modal-info{
+  padding:clamp(20px,3vw,36px);overflow-y:auto;
+  display:flex;flex-direction:column;gap:14px;
+}
+.barber-name{font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,3vw,30px);font-weight:600}
+.barber-title{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.2px}
+.barber-bio{font-size:14px;color:var(--muted);line-height:1.7}
+.barber-divider{width:40px;height:1px;background:var(--accent);opacity:.3}
+.reviews-label{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
+.review{padding:14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border)}
+.review-text{font-size:13px;color:rgba(255,255,255,.82);line-height:1.6;font-style:italic}
+.review-author{font-size:12px;color:var(--muted);margin-top:6px}
+.barber-modal-open .scroll-root{overflow:hidden}
 
 /* About bottom info */
 .about-info .wrap{width:100%}
@@ -409,17 +426,25 @@ a{color:inherit;text-decoration:none}
   .gm-thumb{flex:0 0 auto;width:110px;height:66px}
   .gm-nav.right{right:16px}
 }
+@media(max-width:700px){
+  .barber-modal-panel{
+    grid-template-columns:1fr;
+    grid-template-rows:240px 1fr;
+    max-height:calc(100vh - 40px);
+  }
+  .barber-modal-photo{max-height:240px}
+}
 @media(max-width:560px){
   .nav-links{display:none}
   .hamburger{display:flex}
   .nav-cta{display:none}
   .photo-row{gap:10px}
   .barber-card{border-radius:12px}
-  .barber-inner{grid-template-columns:1fr;grid-template-rows:40% 1fr}
-  .barber-photo{border-radius:12px 12px 0 0}
   .section-title{font-size:22px}
   .hero-inner h1{font-size:clamp(30px,7vw,48px)}
   .page-section{padding:40px 0}
+  .barber-modal{padding:10px}
+  .barber-modal-panel{border-radius:14px}
 }
 @media(max-width:390px){
   .photo-row{grid-template-columns:1fr}
@@ -483,27 +508,7 @@ a{color:inherit;text-decoration:none}
                 <img src="{{ barber.photo_url }}" alt="{{ barber.name }}" loading="lazy" />
                 <div class="photo-label">{{ barber.name }}</div>
                 <div class="photo-hint">Tap to view</div>
-
-                <div class="barber-expanded">
-                  <button class="barber-close" type="button" aria-label="Close">&times;</button>
-                  <div class="barber-inner">
-                    <div class="barber-photo">
-                      <img src="{{ barber.photo_url }}" alt="{{ barber.name }}" />
-                    </div>
-                    <div class="barber-info">
-                      <div class="barber-name serif">{{ barber.name }}</div>
-                      <div class="barber-title">{{ barber.title }}</div>
-                      <p class="barber-bio">{{ barber.bio }}</p>
-                      <div class="reviews-label">Client Reviews</div>
-                      {% for review in barber.reviews %}
-                      <div class="review">
-                        <div class="review-text">"{{ review.text }}"</div>
-                        <div class="review-author">&mdash; {{ review.author }}</div>
-                      </div>
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
+                <script type="application/json" class="barber-data">{{ barber.data_json|safe }}</script>
               </div>
               {% endfor %}
             </div>
@@ -651,6 +656,27 @@ a{color:inherit;text-decoration:none}
 
   </div>
 
+  <!-- BARBER MODAL -->
+  <div class="barber-modal" id="barberModal" aria-hidden="true" role="dialog">
+    <div class="barber-modal-backdrop" data-barber-close></div>
+    <div class="barber-modal-panel">
+      <button class="barber-modal-close" type="button" data-barber-close aria-label="Close">&times;</button>
+      <div class="barber-modal-photo">
+        <img id="bmPhoto" src="" alt="" />
+      </div>
+      <div class="barber-modal-info">
+        <div>
+          <div class="barber-name serif" id="bmName"></div>
+          <div class="barber-title" id="bmTitle"></div>
+        </div>
+        <p class="barber-bio" id="bmBio"></p>
+        <div class="barber-divider" aria-hidden="true"></div>
+        <div class="reviews-label">Client Reviews</div>
+        <div id="bmReviews"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- GALLERY MODAL -->
   <div class="gallery-modal" id="galleryModal" aria-hidden="true" role="dialog">
     <div class="gm-backdrop" data-close></div>
@@ -784,20 +810,37 @@ a{color:inherit;text-decoration:none}
   },{root:scrollRoot,threshold:0.08});
   document.querySelectorAll(".fade-in").forEach(el=>fadeObs.observe(el));
 
-  /* ── Barber profile expand/collapse ── */
+  /* ── Barber profile modal ── */
+  const bm=document.getElementById("barberModal");
+  const bmPhoto=document.getElementById("bmPhoto"),bmName=document.getElementById("bmName");
+  const bmTitle=document.getElementById("bmTitle"),bmBio=document.getElementById("bmBio");
+  const bmReviews=document.getElementById("bmReviews");
+  const esc=s=>{const d=document.createElement("div");d.textContent=s;return d.innerHTML};
+  const openBarber=card=>{
+    const script=card.querySelector(".barber-data");
+    let data={};
+    try{data=JSON.parse(script.textContent)}catch(e){return}
+    bmPhoto.src=data.photo||"";bmPhoto.alt=data.name||"";
+    bmName.textContent=data.name||"";
+    bmTitle.textContent=data.title||"";
+    bmBio.textContent=data.bio||"";
+    const reviews=data.reviews||[];
+    bmReviews.innerHTML=reviews.map(r=>
+      `<div class="review"><div class="review-text">\u201C${esc(r.text)}\u201D</div><div class="review-author">&mdash; ${esc(r.author)}</div></div>`
+    ).join("");
+    bm.classList.add("is-open");bm.setAttribute("aria-hidden","false");
+    document.body.classList.add("barber-modal-open");
+  };
+  const closeBarber=()=>{
+    bm.classList.remove("is-open");bm.setAttribute("aria-hidden","true");
+    document.body.classList.remove("barber-modal-open");
+  };
   document.querySelectorAll(".barber-card").forEach(card=>{
-    card.addEventListener("click",e=>{
-      if(e.target.closest(".barber-close"))return;
-      if(card.classList.contains("is-expanded")&&e.target.closest(".barber-expanded"))return;
-      card.classList.add("is-expanded");
-    });
-    const closeBtn=card.querySelector(".barber-close");
-    if(closeBtn){
-      closeBtn.addEventListener("click",e=>{
-        e.stopPropagation();
-        card.classList.remove("is-expanded");
-      });
-    }
+    card.addEventListener("click",()=>openBarber(card));
+  });
+  bm.addEventListener("click",e=>{if(e.target.hasAttribute("data-barber-close"))closeBarber()});
+  window.addEventListener("keydown",e=>{
+    if(bm.classList.contains("is-open")&&e.key==="Escape"){e.preventDefault();closeBarber()}
   });
 
 })();
