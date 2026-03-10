@@ -160,7 +160,7 @@ a{color:inherit;text-decoration:none}
   position:relative;aspect-ratio:3/4;border-radius:16px;overflow:hidden;
   background:var(--surface);cursor:pointer;
 }
-.barber-card>img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
+.barber-card>img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
 .barber-card:hover>img{transform:scale(1.03)}
 .barber-card::after{
   content:"";position:absolute;inset:0;
@@ -181,18 +181,19 @@ a{color:inherit;text-decoration:none}
 
 /* ── BARBER MODAL (full-page) ── */
 .barber-modal{
-  position:fixed;inset:0;z-index:9998;display:none;
-  padding:clamp(16px,3vw,40px);
+  position:fixed;inset:0;z-index:9998;
+  display:flex;padding:clamp(16px,3vw,40px);
   align-items:center;justify-content:center;
+  pointer-events:none;visibility:hidden;
 }
-.barber-modal.is-open{display:flex}
+.barber-modal.is-open{pointer-events:auto;visibility:visible}
 .barber-modal-backdrop{
   position:absolute;inset:0;
-  background:rgba(0,0,0,.78);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  opacity:0;animation:fadeIn .25s ease forwards;
+  background:rgba(0,0,0,.82);
+  opacity:0;transition:opacity .2s ease;
   cursor:pointer;
 }
+.barber-modal.is-open .barber-modal-backdrop{opacity:1}
 .barber-modal-panel{
   position:relative;z-index:1;
   width:min(880px,100%);
@@ -200,12 +201,13 @@ a{color:inherit;text-decoration:none}
   border-radius:20px;overflow:hidden;
   border:1px solid var(--border);
   background:var(--surface);
-  box-shadow:0 30px 80px rgba(0,0,0,.55);
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
   display:grid;grid-template-columns:.42fr .58fr;
-  transform:translateY(12px) scale(.97);opacity:0;
-  animation:modalSlideUp .3s cubic-bezier(.22,.61,.36,1) forwards;
+  transform:translateY(10px);opacity:0;
+  transition:transform .2s ease,opacity .2s ease;
+  will-change:transform,opacity;
 }
-@keyframes modalSlideUp{to{transform:translateY(0) scale(1);opacity:1}}
+.barber-modal.is-open .barber-modal-panel{transform:translateY(0);opacity:1}
 .barber-modal-close{
   position:absolute;top:14px;right:14px;z-index:3;
   width:38px;height:38px;border-radius:10px;
@@ -261,19 +263,19 @@ a{color:inherit;text-decoration:none}
   position:relative;border-radius:18px;overflow:hidden;
   background:var(--surface);aspect-ratio:4/3;
   min-height:clamp(220px,26vh,340px);
-  transition:transform .4s cubic-bezier(.22,.61,.36,1),box-shadow .4s ease;
-  cursor:pointer;
+  transition:transform .3s ease;
+  cursor:pointer;will-change:transform;
 }
-.cut-card:hover{transform:translateY(-5px);box-shadow:0 18px 45px rgba(0,0,0,.35)}
+.cut-card:hover{transform:translateY(-4px)}
 /* Accent line on hover */
 .cut-card::before{
   content:"";position:absolute;bottom:0;left:0;right:0;height:3px;z-index:2;
   background:var(--accent);transform:scaleX(0);transform-origin:left;
-  transition:transform .4s cubic-bezier(.22,.61,.36,1);
+  transition:transform .3s ease;
 }
 .cut-card:hover::before{transform:scaleX(1)}
 .cut-card-img{position:absolute;inset:0}
-.cut-card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.22,.61,.36,1)}
+.cut-card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
 .cut-card:hover .cut-card-img img{transform:scale(1.05)}
 .cut-card::after{
   content:"";position:absolute;inset:0;
@@ -371,17 +373,18 @@ a{color:inherit;text-decoration:none}
 /* =========================
    GALLERY MODAL
    ========================= */
-.gallery-modal{position:fixed;inset:0;z-index:9999;display:none;padding:clamp(12px,2vw,24px)}
-.gallery-modal.is-open{display:flex;align-items:center;justify-content:center}
-.gm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.80);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;animation:fadeIn .2s ease forwards}
-@keyframes fadeIn{to{opacity:1}}
+.gallery-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:clamp(12px,2vw,24px);pointer-events:none;visibility:hidden}
+.gallery-modal.is-open{pointer-events:auto;visibility:visible}
+.gm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.85);opacity:0;transition:opacity .2s ease}
+.gallery-modal.is-open .gm-backdrop{opacity:1}
 .gm-panel{
   position:relative;width:min(1300px,100%);height:min(800px,calc(100vh - 40px));
   border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--surface);
-  box-shadow:0 24px 60px rgba(0,0,0,.5);display:grid;grid-template-rows:auto 1fr;
-  transform:translateY(8px);opacity:0;animation:slideUp .2s ease forwards;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);display:grid;grid-template-rows:auto 1fr;
+  transform:translateY(8px);opacity:0;transition:transform .2s ease,opacity .2s ease;
+  will-change:transform,opacity;
 }
-@keyframes slideUp{to{transform:translateY(0);opacity:1}}
+.gallery-modal.is-open .gm-panel{transform:translateY(0);opacity:1}
 .gm-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.15)}
 .gm-titlewrap{display:flex;align-items:center;gap:10px}
 .gm-title{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
@@ -750,11 +753,25 @@ a{color:inherit;text-decoration:none}
     if(e.key==="ArrowRight"){e.preventDefault();next()}
   });
 
+  /* Open gallery from Gallery button */
   document.addEventListener("click",e=>{
     const btn=e.target.closest(".js-open-gallery");if(!btn)return;e.preventDefault();
     const card=btn.closest(".cut-card");
     const cover=card?.querySelector(".cut-card-img img")?.getAttribute("src")||"";
     openModal({title:btn.dataset.title||"Gallery",gallery:btn.dataset.gallery||"",fallbackSrc:cover});
+  });
+
+  /* Open gallery by clicking anywhere on the card (except Book link) */
+  document.querySelectorAll(".cut-card").forEach(card=>{
+    card.addEventListener("click",e=>{
+      if(e.target.closest(".cut-book"))return;          /* let Book link work normally */
+      if(e.target.closest(".js-open-gallery"))return;   /* already handled above */
+      if(e.target.closest(".cut-thumb"))return;         /* already handled by thumb */
+      e.preventDefault();
+      const btn=card.querySelector(".js-open-gallery");
+      const cover=card.querySelector(".cut-card-img img")?.getAttribute("src")||"";
+      openModal({title:btn?.dataset.title||"Gallery",gallery:btn?.dataset.gallery||"",fallbackSrc:cover});
+    });
   });
 
   /* Tile thumbnails */
