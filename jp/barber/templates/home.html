@@ -811,8 +811,19 @@ a{color:inherit;text-decoration:none}
     }));
   }
 
-  /* ── Active nav ── */
+  /* ── Smooth scroll on nav click ── */
   const scrollRoot=document.getElementById("scrollRoot");
+  document.querySelectorAll('a[href^="#"]').forEach(link=>{
+    link.addEventListener("click",e=>{
+      const id=link.getAttribute("href")?.slice(1);
+      const target=id&&document.getElementById(id);
+      if(!target||!scrollRoot)return;
+      e.preventDefault();
+      target.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  });
+
+  /* ── Active nav ── */
   const navLinks=document.querySelectorAll(".nav-links a[data-section]");
   const setActive=id=>navLinks.forEach(a=>a.classList.toggle("is-active",a.dataset.section===id));
   if(scrollRoot){
