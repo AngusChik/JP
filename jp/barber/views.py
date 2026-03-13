@@ -60,6 +60,7 @@ def home(request):
             "name": "JP",
             "title": "Owner / Lead Barber",
             "photo_url": "https://picsum.photos/800/1100?random=30",
+            "booksy_url": "https://booksy.com/your-link/jp",
             "bio": "Started cutting hair at 16 out of my parents' basement. "
                    "Fifteen years later, I'm still obsessed with getting every "
                    "fade, lineup, and taper right. I built this shop to be the "
@@ -88,6 +89,7 @@ def home(request):
             "name": "Mike",
             "title": "Senior Barber",
             "photo_url": "https://picsum.photos/800/1100?random=31",
+            "booksy_url": "https://booksy.com/your-link/mike",
             "bio": "Trained classically, but I stay current. I like working with "
                    "texture — whether that's a crop, a blowout, or a beard shape. "
                    "My thing is making sure you leave looking like yourself, just "
@@ -115,6 +117,7 @@ def home(request):
             "name": barber["name"],
             "title": barber["title"],
             "bio": barber["bio"],
+            "booksy_url": barber.get("booksy_url", ""),
             "reviews": barber["reviews"],
         })
 
