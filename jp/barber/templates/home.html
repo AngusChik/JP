@@ -616,16 +616,30 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .cuts-strip{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
+    gap:8px;
     overflow:visible;
     scroll-snap-type:none;
     padding:0;
   }
-  .cuts-strip-card{flex:0 0 auto;width:100%}
+  .cuts-strip-card{
+    flex:0 0 auto;width:100%;
+    aspect-ratio:1/1;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .cuts-strip-card:hover{transform:none;box-shadow:0 8px 18px rgba(0,0,0,.22)}
+  .cuts-strip-card::after{
+    background:linear-gradient(to top,rgba(0,0,0,.82) 0%,rgba(0,0,0,.38) 46%,transparent 70%);
+  }
+  .cs-body{padding:8px 10px;gap:2px}
+  .cs-name{font-size:13px}
+  .cs-meta{justify-content:flex-start;gap:8px}
+  .cs-time{display:none}
   .strip-arrow{display:none}
 }
 @media(max-width:480px){
-  .cuts-strip{grid-template-columns:1fr}
+  .cuts-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .cs-name{font-size:12px}
 }
 
 /* =========================
