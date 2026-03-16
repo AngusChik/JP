@@ -33,9 +33,9 @@
   --ease-out-quart:cubic-bezier(.25,1,.5,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;height:100%}
+html{scroll-behavior:smooth;height:100%;overflow-x:hidden}
 body{
-  height:100%;overflow:hidden;position:relative;
+  height:100%;overflow:hidden;overflow-x:hidden;position:relative;
   font-family:'Inter',system-ui,-apple-system,sans-serif;
   background:var(--bg);color:var(--text);
   -webkit-font-smoothing:antialiased;
@@ -181,7 +181,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 /* ── SCROLL ROOT ── */
 .scroll-root{
   height:calc(100vh - var(--nav-h));
-  overflow-y:auto;
+  overflow-y:auto;overflow-x:hidden;
   overscroll-behavior:contain;position:relative;
   -webkit-overflow-scrolling:touch;
   scroll-behavior:smooth;
@@ -550,7 +550,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .cuts-featured:hover::before{transform:scaleX(1)}
 
 /* ── Horizontal scroll strip ── */
-.cuts-strip-wrap{position:relative}
+.cuts-strip-wrap{position:relative;padding:0 44px}
 .cuts-strip{
   display:flex;gap:clamp(10px,1.5vw,16px);
   overflow-x:auto;scroll-snap-type:x mandatory;
@@ -595,17 +595,35 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   opacity:0;transition:opacity .25s ease,transform .25s var(--ease-out-expo);
   pointer-events:none;
 }
-.cuts-strip-wrap:hover .strip-arrow{opacity:1;pointer-events:auto}
+.cuts-strip-wrap:hover .strip-arrow,
+.cuts-strip-wrap:focus-within .strip-arrow{opacity:1;pointer-events:auto}
 .strip-arrow:hover{background:rgba(15,15,15,.95);transform:translateY(-50%) scale(1.08)}
-.strip-arrow.left{left:-12px}
-.strip-arrow.right{right:-12px}
+.strip-arrow.left{left:4px}
+.strip-arrow.right{right:4px}
+@media (hover:none), (pointer:coarse){
+  .strip-arrow{opacity:1;pointer-events:auto}
+  .strip-arrow.left{left:8px}
+  .strip-arrow.right{right:8px}
+}
 
 @media(max-width:700px){
+  .cuts-strip-wrap{padding:0}
   .cuts-featured{aspect-ratio:16/10;min-height:clamp(220px,30vh,320px)}
   .cf-body{padding:18px}
   .cf-name{font-size:20px}
-  .cuts-strip-card{flex:0 0 clamp(160px,55vw,220px)}
+  .cuts-strip{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    overflow:visible;
+    scroll-snap-type:none;
+    padding:0;
+  }
+  .cuts-strip-card{flex:0 0 auto;width:100%}
   .strip-arrow{display:none}
+}
+@media(max-width:480px){
+  .cuts-strip{grid-template-columns:1fr}
 }
 
 /* =========================
@@ -660,39 +678,107 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
    ========================= */
 .gallery-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:clamp(12px,2vw,24px);pointer-events:none;visibility:hidden}
 .gallery-modal.is-open{pointer-events:auto;visibility:visible}
-.gm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.85);opacity:0;transition:opacity .3s ease}
+.gm-backdrop{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 30%, rgba(24,20,15,.48), rgba(0,0,0,.9) 60%);
+  opacity:0;transition:opacity .3s ease;
+}
 .gallery-modal.is-open .gm-backdrop{opacity:1}
 .gm-panel{
-  position:relative;width:min(1300px,100%);height:min(800px,calc(100vh - 40px));
-  border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--surface);
-  box-shadow:0 16px 48px rgba(0,0,0,.5);display:grid;grid-template-rows:auto 1fr;
+  position:relative;width:min(1320px,100%);height:min(840px,calc(100vh - 36px));
+  border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);
+  background:
+    linear-gradient(170deg,rgba(26,24,22,.98) 0%,rgba(18,18,18,.98) 54%,rgba(15,15,15,.98) 100%);
+  box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.04);
+  display:grid;grid-template-rows:auto 1fr;
   transform:translateY(16px) scale(.97);opacity:0;transition:transform .4s var(--ease-out-expo),opacity .3s ease;
 }
 .gallery-modal.is-open .gm-panel{transform:translateY(0) scale(1);opacity:1}
-.gm-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.15)}
-.gm-titlewrap{display:flex;align-items:center;gap:10px}
-.gm-title{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
-.gm-counter{font-size:11px;font-weight:500;color:var(--muted)}
-.gm-close{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-size:16px;transition:background .15s ease}
-.gm-close:hover{background:rgba(255,255,255,.06)}
-.gm-body{display:grid;grid-template-columns:1fr 180px;min-height:0}
-.gm-stage{position:relative;padding:14px;min-height:0;display:flex;align-items:center;justify-content:center}
-.gm-frame{width:100%;height:100%;border-radius:12px;background:rgba(0,0,0,.15);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;padding:clamp(6px,1vw,12px)}
-.gm-image{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:10px;transition:opacity .15s ease}
+.gm-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.07);
+  background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.08));
+}
+.gm-titlewrap{display:flex;align-items:baseline;gap:10px;min-width:0}
+.gm-title{
+  font-weight:700;font-size:20px;letter-spacing:-.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw;
+}
+.gm-counter{
+  font-size:11px;font-weight:700;color:rgba(255,255,255,.75);
+  padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.04);
+}
+.gm-close{
+  width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(0,0,0,.35);color:var(--text);cursor:pointer;font-size:16px;
+  transition:background .18s ease,transform .18s ease,border-color .18s ease;
+}
+.gm-close:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
+.gm-body{display:grid;grid-template-columns:1fr 210px;min-height:0}
+.gm-stage{
+  position:relative;padding:18px;min-height:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.gm-frame{
+  width:100%;height:100%;border-radius:14px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.06), transparent 55%),
+    linear-gradient(180deg,rgba(0,0,0,.56),rgba(0,0,0,.34));
+  border:1px solid rgba(255,255,255,.08);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  padding:clamp(10px,1.2vw,18px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 0 0 1px rgba(0,0,0,.25);
+}
+.gm-image{
+  width:100%;height:100%;max-width:100%;max-height:100%;
+  object-fit:contain;border-radius:10px;background:rgba(0,0,0,.45);transition:opacity .15s ease;
+}
 .gm-image.is-loading{opacity:.3}
-.gm-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.5);color:rgba(255,255,255,.8);cursor:pointer;font-size:20px;font-weight:700;transition:background .15s ease}
-.gm-nav:hover{background:rgba(0,0,0,.7)}
-.gm-nav[disabled]{opacity:.15;cursor:not-allowed}
-.gm-nav.left{left:20px}
-.gm-nav.right{right:calc(180px + 20px)}
-.gm-side{border-left:1px solid var(--border);background:rgba(0,0,0,.1);display:flex;flex-direction:column}
-.gm-sidehead{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
-.gm-sidelabel{font-size:11px;font-weight:600;color:var(--text)}
-.gm-sidesub{font-size:10px;font-weight:500;color:var(--muted)}
-.gm-thumbs{padding:8px;overflow:auto;display:flex;flex-direction:column;gap:6px;min-height:0}
-.gm-thumb{width:100%;height:80px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--surface2);cursor:pointer;opacity:.6;transition:opacity .15s ease,border-color .15s ease}
-.gm-thumb:hover{opacity:.9}
-.gm-thumb.is-active{border-color:var(--accent);opacity:1}
+.gm-controls{
+  position:absolute;left:26px;right:26px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;justify-content:space-between;
+  pointer-events:none;
+}
+.gm-nav{
+  position:static;width:48px;height:48px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.56);color:rgba(255,255,255,.95);
+  cursor:pointer;font-size:22px;font-weight:800;line-height:1;
+  box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.1);
+  transition:background .18s ease,transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+  pointer-events:auto;
+}
+.gm-nav:hover{
+  background:rgba(201,169,110,.2);
+  border-color:rgba(201,169,110,.55);
+  transform:translateY(-2px);
+  box-shadow:0 14px 30px rgba(0,0,0,.42),0 0 0 1px rgba(201,169,110,.2);
+}
+.gm-nav:active{transform:translateY(0)}
+.gm-nav[disabled]{opacity:.28;cursor:not-allowed;transform:none;box-shadow:none}
+.gm-side{
+  border-left:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(0,0,0,.14));
+  display:flex;flex-direction:column;
+}
+.gm-sidehead{
+  padding:12px 12px;display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.gm-sidelabel{font-size:12px;font-weight:700;color:rgba(255,255,255,.9)}
+.gm-sidesub{font-size:11px;font-weight:600;color:rgba(255,255,255,.55)}
+.gm-thumbs{padding:10px;overflow:auto;display:flex;flex-direction:column;gap:8px;min-height:0}
+.gm-thumb{
+  width:100%;height:84px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.1);
+  background:var(--surface2);cursor:pointer;opacity:.72;
+  transition:opacity .15s ease,border-color .15s ease,transform .15s ease,box-shadow .15s ease;
+}
+.gm-thumb:hover{opacity:1;transform:translateY(-1px)}
+.gm-thumb.is-active{
+  border-color:var(--accent);opacity:1;
+  box-shadow:0 0 0 1px rgba(201,169,110,.22),0 8px 18px rgba(0,0,0,.32);
+}
 .gm-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .modal-open .scroll-root{overflow:hidden}
 
@@ -701,15 +787,17 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .info-grid{grid-template-columns:1fr}
   .contact-grid{grid-template-columns:1fr}
   .detail-row{grid-template-columns:1fr}
-  .gm-body{grid-template-columns:1fr 160px}
-  .gm-nav.right{right:calc(160px + 16px)}
+  .gm-body{grid-template-columns:1fr 176px}
 }
 @media(max-width:700px){
   .gm-body{grid-template-columns:1fr;grid-template-rows:1fr auto}
   .gm-side{border-left:0;border-top:1px solid var(--border)}
-  .gm-thumbs{flex-direction:row;gap:6px;overflow-x:auto}
-  .gm-thumb{flex:0 0 auto;width:110px;height:66px}
-  .gm-nav.right{right:16px}
+  .gm-thumbs{flex-direction:row;gap:8px;overflow-x:auto;padding:10px}
+  .gm-thumb{flex:0 0 auto;width:130px;height:78px}
+  .gm-stage{padding:12px}
+  .gm-title{font-size:16px}
+  .gm-controls{left:12px;right:12px}
+  .gm-nav{width:44px;height:44px;font-size:20px}
 }
 @media(max-width:700px){
   .barber-modal-panel{
@@ -726,6 +814,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   /* Sections flow naturally on mobile — no snap */
   .scroll-root{scroll-snap-type:none}
   .page-section{min-height:auto;padding:40px 0;scroll-snap-align:none}
+  body,.scroll-root{touch-action:pan-y}
   .hero{min-height:calc(100vh - var(--nav-h))}
   .nav-links{display:none}
   .hamburger{display:flex}
@@ -1205,9 +1294,11 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       </div>
       <div class="gm-body">
         <div class="gm-stage">
-          <button class="gm-nav left" type="button" id="gmPrev" aria-label="Previous">&#8249;</button>
           <div class="gm-frame"><img class="gm-image" id="gmImage" alt="Gallery image" /></div>
-          <button class="gm-nav right" type="button" id="gmNext" aria-label="Next">&#8250;</button>
+          <div class="gm-controls" role="group" aria-label="Gallery navigation">
+            <button class="gm-nav left" type="button" id="gmPrev" aria-label="Previous">&#8249;</button>
+            <button class="gm-nav right" type="button" id="gmNext" aria-label="Next">&#8250;</button>
+          </div>
         </div>
         <aside class="gm-side">
           <div class="gm-sidehead">
@@ -1276,6 +1367,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
   const origCards=[...document.querySelectorAll(".cuts-strip-card[data-cut-index]")];
   let activeIdx=0;
+  const isHandheld=window.matchMedia("(max-width: 700px)").matches;
 
   const setFeatured=card=>{
     const d=card.dataset;
@@ -1295,25 +1387,44 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   /* Init featured with first card */
   if(origCards.length)setFeatured(origCards[0]);
 
+  let oneSetWidth=0;
+  let absoluteIndex=0;
+  let allLoopCards=[];
+  const normalizeAbsoluteIndex=()=>{
+    const baseLen=origCards.length;
+    if(!baseLen)return;
+    if(absoluteIndex<baseLen)absoluteIndex+=baseLen;
+    else if(absoluteIndex>=baseLen*2)absoluteIndex-=baseLen;
+  };
+  const scrollToAbsoluteIndex=(behavior="smooth")=>{
+    if(!strip||!allLoopCards.length)return;
+    const card=allLoopCards[absoluteIndex];
+    if(!card)return;
+    strip.scrollTo({left:card.offsetLeft,behavior});
+  };
+
   /* Infinite loop: clone cards so scrolling wraps seamlessly */
-  if(strip&&origCards.length>1){
+  if(strip&&origCards.length>1&&!isHandheld){
     const cloneSet=()=>origCards.forEach(c=>{const cl=c.cloneNode(true);strip.appendChild(cl)});
+    cloneSet();
     cloneSet(); /* 3x cards total */
 
-    const getOneSetWidth=()=>origCards.reduce((s,c)=>s+c.offsetWidth+parseFloat(getComputedStyle(strip).gap||0),0);
+    const getOneSetWidth=()=>{
+      const gap=parseFloat(getComputedStyle(strip).gap||0);
+      const totalCardWidth=origCards.reduce((sum,card)=>sum+card.offsetWidth,0);
+      return totalCardWidth + (Math.max(0,origCards.length-1)*gap);
+    };
+    oneSetWidth=getOneSetWidth();
+    allLoopCards=[...strip.querySelectorAll(".cuts-strip-card")];
+    absoluteIndex=origCards.length; /* first card in middle set */
 
     /* Start in middle set so user can scroll both directions */
-    requestAnimationFrame(()=>{strip.scrollLeft=getOneSetWidth()});
+    requestAnimationFrame(()=>{scrollToAbsoluteIndex("auto")});
 
-    /* When scroll settles near boundaries, silently jump to the equivalent position in the middle set */
-    let scrollTimer;
-    strip.addEventListener("scroll",()=>{
-      clearTimeout(scrollTimer);
-      scrollTimer=setTimeout(()=>{
-        const oneSet=getOneSetWidth();
-        if(strip.scrollLeft<oneSet*.25){strip.style.scrollBehavior="auto";strip.scrollLeft+=oneSet;strip.style.scrollBehavior=""}
-        else if(strip.scrollLeft>oneSet*1.75){strip.style.scrollBehavior="auto";strip.scrollLeft-=oneSet;strip.style.scrollBehavior=""}
-      },80);
+    window.addEventListener("resize",()=>{
+      oneSetWidth=getOneSetWidth();
+      normalizeAbsoluteIndex();
+      scrollToAbsoluteIndex("auto");
     },{passive:true});
   }
 
@@ -1326,12 +1437,30 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   /* Strip arrow buttons — scroll one card width, loop wraps via clone sets */
   const scrollStrip=dir=>{
     if(!strip)return;
-    const gap=parseFloat(getComputedStyle(strip).gap||0);
-    const cardW=(strip.querySelector(".cuts-strip-card")?.offsetWidth||250)+gap;
+    if(oneSetWidth&&allLoopCards.length&&origCards.length){
+      const baseLen=origCards.length;
+      normalizeAbsoluteIndex();
+      if(dir<0&&absoluteIndex<=baseLen){
+        absoluteIndex+=baseLen;
+        scrollToAbsoluteIndex("auto");
+      }else if(dir>0&&absoluteIndex>=baseLen*2-1){
+        absoluteIndex-=baseLen;
+        scrollToAbsoluteIndex("auto");
+      }
+      absoluteIndex+=dir;
+      scrollToAbsoluteIndex("smooth");
+      return;
+    }
+
+    const style=getComputedStyle(strip);
+    const parsedGap=parseFloat(style.gap||style.columnGap||"0");
+    const gap=Number.isFinite(parsedGap)?parsedGap:0;
+    const baseCardW=strip.querySelector(".cuts-strip-card")?.getBoundingClientRect().width||250;
+    const cardW=Math.max(120,baseCardW+gap);
     strip.scrollBy({left:dir*cardW,behavior:"smooth"});
   };
-  if(stripPrev)stripPrev.addEventListener("click",()=>scrollStrip(-1));
-  if(stripNext)stripNext.addEventListener("click",()=>scrollStrip(1));
+  if(stripPrev)stripPrev.addEventListener("click",e=>{e.preventDefault();scrollStrip(-1)});
+  if(stripNext)stripNext.addEventListener("click",e=>{e.preventDefault();scrollStrip(1)});
 
   /* Open gallery from featured Gallery button */
   document.addEventListener("click",e=>{
