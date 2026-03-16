@@ -182,7 +182,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .scroll-root{
   height:calc(100vh - var(--nav-h));
   overflow-y:auto;overflow-x:hidden;
-  overscroll-behavior:contain;position:relative;
+  overscroll-behavior:contain;
+  overscroll-behavior-x:none;
+  position:relative;
   -webkit-overflow-scrolling:touch;
   scroll-behavior:smooth;
   scroll-snap-type:none;
@@ -799,6 +801,12 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .gm-controls{left:12px;right:12px}
   .gm-nav{width:44px;height:44px;font-size:20px}
 }
+@media(max-width:900px){
+  html,body{overflow-x:hidden;overscroll-behavior-x:none}
+  .scroll-root{overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y}
+  body,.page-section,.gallery-modal,.barber-modal{touch-action:pan-y}
+  .wrap,.wrap-wide{max-width:100%;width:100%}
+}
 @media(max-width:700px){
   .barber-modal-panel{
     grid-template-columns:1fr;
@@ -814,7 +822,6 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   /* Sections flow naturally on mobile — no snap */
   .scroll-root{scroll-snap-type:none}
   .page-section{min-height:auto;padding:40px 0;scroll-snap-align:none}
-  body,.scroll-root{touch-action:pan-y}
   .hero{min-height:calc(100vh - var(--nav-h))}
   .nav-links{display:none}
   .hamburger{display:flex}
@@ -867,9 +874,12 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
 /* ── FLOATING BOOK (mobile) ── */
 .float-book{
-  display:none;position:fixed;bottom:24px;left:50%;z-index:80;
-  transform:translateX(-50%) translateY(80px);
-  padding:12px 28px;border-radius:50px;
+  display:none;position:fixed;
+  bottom:max(14px,env(safe-area-inset-bottom));
+  left:max(12px,env(safe-area-inset-left));
+  z-index:80;
+  transform:translateY(80px);
+  padding:12px 20px;border-radius:50px;
   background:var(--accent);color:var(--bg);
   font-weight:700;font-size:14px;
   border:none;cursor:pointer;
@@ -878,11 +888,14 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   white-space:nowrap;
   align-items:center;gap:8px;
 }
-.float-book.is-visible{transform:translateX(-50%) translateY(0)}
+.float-book.is-visible{transform:translateY(0)}
 .float-book:hover{box-shadow:0 8px 32px rgba(201,169,110,.35)}
 @media(max-width:560px){
   .float-book{display:inline-flex}
-  .back-to-top{bottom:80px}
+  .back-to-top{
+    right:max(12px,env(safe-area-inset-right));
+    bottom:calc(max(14px,env(safe-area-inset-bottom)) + 62px);
+  }
 }
 
 /* ── SECTION DIVIDERS ── */
