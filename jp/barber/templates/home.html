@@ -702,6 +702,18 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.08));
 }
 .gm-titlewrap{display:flex;align-items:baseline;gap:10px;min-width:0}
+.gm-explore-toggle{
+  display:none;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.88);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.2px;
+  cursor:pointer;
+}
 .gm-title{
   font-weight:700;font-size:20px;letter-spacing:-.2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw;
@@ -718,9 +730,31 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 .gm-close:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
 .gm-body{display:grid;grid-template-columns:1fr 210px;min-height:0}
+.gm-explore{display:none}
 .gm-stage{
   position:relative;padding:18px;min-height:0;
   display:flex;align-items:center;justify-content:center;
+}
+.gm-explore-card{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  overflow:hidden;
+  border:0;
+  border-radius:10px;
+  background:rgba(255,255,255,.06);
+  cursor:pointer;
+}
+.gm-explore-card img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  transition:transform .25s var(--ease-out-expo),filter .25s ease;
+}
+.gm-explore-card:hover img{
+  transform:scale(1.05);
+  filter:saturate(1.04);
 }
 .gm-frame{
   width:100%;height:100%;border-radius:14px;
@@ -814,9 +848,18 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     backdrop-filter:blur(8px);
     -webkit-backdrop-filter:blur(8px);
   }
+  .gm-explore-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .gallery-modal.is-handheld-grid .gm-explore-toggle{
+    opacity:.55;
+    pointer-events:none;
+  }
   .gm-title{
     font-size:15px;
-    max-width:58vw;
+    max-width:48vw;
   }
   .gm-counter{
     font-size:10px;
@@ -827,7 +870,20 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     height:40px;
     border-radius:12px;
   }
-  .gm-body{grid-template-columns:1fr;grid-template-rows:1fr auto}
+  .gm-body{
+    display:block;
+    overflow:auto;
+  }
+  .gm-explore{
+    display:none;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;
+    padding:8px;
+    padding-bottom:calc(8px + env(safe-area-inset-bottom));
+  }
+  .gallery-modal.is-handheld-grid .gm-explore{display:grid}
+  .gallery-modal.is-handheld-grid .gm-stage,
+  .gallery-modal.is-handheld-grid .gm-side{display:none}
   .gm-stage{
     padding:8px;
     align-items:stretch;
@@ -893,11 +949,21 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .scroll-root{scroll-snap-type:none}
   .page-section{min-height:auto;padding:40px 0;scroll-snap-align:none}
   .gm-head{padding:8px 10px}
-  .gm-title{font-size:14px;max-width:54vw}
+  .gm-title{font-size:14px;max-width:44vw}
   .gm-counter{display:none}
   .gm-close{width:36px;height:36px;border-radius:10px}
+  .gm-explore-toggle{
+    font-size:10px;
+    padding:5px 9px;
+  }
   .gm-controls{left:6px;right:6px}
   .gm-nav{width:42px;height:42px;font-size:20px}
+  .gm-explore{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:5px;
+    padding:6px;
+    padding-bottom:calc(10px + env(safe-area-inset-bottom));
+  }
   .gm-thumbs{padding:8px 10px calc(10px + env(safe-area-inset-bottom))}
   .gm-thumb{width:92px;height:62px}
   .hero{min-height:calc(100vh - var(--nav-h))}
@@ -1378,12 +1444,14 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     <div class="gm-panel">
       <div class="gm-head">
         <div class="gm-titlewrap">
+          <button class="gm-explore-toggle" type="button" id="gmExploreToggle" aria-label="Show explore grid">Explore</button>
           <div class="gm-title" id="gmTitle">Gallery</div>
           <div class="gm-counter" id="gmCounter">1 / 1</div>
         </div>
         <button class="gm-close" type="button" data-close aria-label="Close">&times;</button>
       </div>
       <div class="gm-body">
+        <div class="gm-explore" id="gmExplore"></div>
         <div class="gm-stage">
           <div class="gm-frame"><img class="gm-image" id="gmImage" alt="Gallery image" /></div>
           <div class="gm-controls" role="group" aria-label="Gallery navigation">
@@ -1408,18 +1476,32 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   const modal=document.getElementById("galleryModal"),titleE=document.getElementById("gmTitle"),
     countE=document.getElementById("gmCounter"),imgE=document.getElementById("gmImage"),
     thumbs=document.getElementById("gmThumbs"),prevB=document.getElementById("gmPrev"),
-    nextB=document.getElementById("gmNext"),countLabel=document.getElementById("gmCountLabel");
-  if(!modal||!titleE||!countE||!imgE||!thumbs||!prevB||!nextB||!countLabel)return;
+    nextB=document.getElementById("gmNext"),countLabel=document.getElementById("gmCountLabel"),
+    explore=document.getElementById("gmExplore"),exploreToggle=document.getElementById("gmExploreToggle");
+  if(!modal||!titleE||!countE||!imgE||!thumbs||!prevB||!nextB||!countLabel||!explore||!exploreToggle)return;
 
   let images=[],index=0;
+  const handheldGalleryMedia=window.matchMedia("(max-width: 700px)");
+  const isHandheldGallery=()=>handheldGalleryMedia.matches;
   const parse=s=>(s||"").split("|").flatMap(x=>x.split(",")).map(x=>x.trim()).filter(Boolean);
   const setOpen=open=>{modal.classList.toggle("is-open",open);modal.setAttribute("aria-hidden",!open);document.body.classList.toggle("modal-open",open)};
+  const setGalleryMode=mode=>{
+    const handheld=isHandheldGallery();
+    const showGrid=handheld&&mode==="grid";
+    modal.classList.toggle("is-handheld-grid",showGrid);
+    modal.classList.toggle("is-handheld-view",handheld&&!showGrid);
+    exploreToggle.style.display=handheld?"inline-flex":"none";
+    exploreToggle.setAttribute("aria-disabled",showGrid?"true":"false");
+  };
   const setImage=i=>{
     if(!images.length)return;index=Math.max(0,Math.min(i,images.length-1));
     imgE.classList.add("is-loading");imgE.src=images[index];
     imgE.alt=`Image ${index+1} of ${images.length}`;
-    countE.textContent=`${index+1} / ${images.length}`;
+    countE.textContent=isHandheldGallery()&&modal.classList.contains("is-handheld-grid")
+      ?`${images.length} Photos`
+      :`${index+1} / ${images.length}`;
     thumbs.querySelectorAll(".gm-thumb").forEach((t,ti)=>t.classList.toggle("is-active",ti===index));
+    explore.querySelectorAll(".gm-explore-card").forEach((t,ti)=>t.classList.toggle("is-active",ti===index));
     prevB.disabled=nextB.disabled=images.length<=1;
   };
   imgE.addEventListener("load",()=>imgE.classList.remove("is-loading"));
@@ -1428,21 +1510,48 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     const p=parse(gallery);images=p.length?p:fallbackSrc?[fallbackSrc]:[];
     if(!images.length)return;
     titleE.textContent=title||"Gallery";countLabel.textContent=images.length;
-    thumbs.innerHTML="";
-    images.forEach((src,i)=>{const b=document.createElement("button");b.type="button";b.className="gm-thumb";b.innerHTML=`<img src="${src}" alt="" loading="lazy">`;b.addEventListener("click",e=>{e.preventDefault();setImage(i)});thumbs.appendChild(b)});
+    thumbs.innerHTML="";explore.innerHTML="";
+    images.forEach((src,i)=>{
+      const thumb=document.createElement("button");
+      thumb.type="button";thumb.className="gm-thumb";
+      thumb.innerHTML=`<img src="${src}" alt="" loading="lazy">`;
+      thumb.addEventListener("click",e=>{e.preventDefault();setGalleryMode("viewer");setImage(i)});
+      thumbs.appendChild(thumb);
+
+      const card=document.createElement("button");
+      card.type="button";card.className="gm-explore-card";
+      card.innerHTML=`<img src="${src}" alt="" loading="lazy">`;
+      card.addEventListener("click",e=>{e.preventDefault();setGalleryMode("viewer");setImage(i)});
+      explore.appendChild(card);
+    });
     setOpen(true);setImage(startIndex);
+    setGalleryMode(isHandheldGallery()?"grid":"viewer");
+    if(modal.classList.contains("is-handheld-grid"))countE.textContent=`${images.length} Photos`;
   };
-  const closeModal=()=>{setOpen(false);images=[];thumbs.innerHTML="";imgE.removeAttribute("src");countE.textContent="0 / 0";countLabel.textContent="0"};
+  const closeModal=()=>{
+    setOpen(false);images=[];thumbs.innerHTML="";explore.innerHTML="";
+    imgE.removeAttribute("src");countE.textContent="0 / 0";countLabel.textContent="0";
+    modal.classList.remove("is-handheld-grid","is-handheld-view");
+  };
   const prev=()=>{if(images.length>1)setImage((index-1+images.length)%images.length)};
   const next=()=>{if(images.length>1)setImage((index+1)%images.length)};
 
   prevB.addEventListener("click",e=>{e.preventDefault();prev()});
   nextB.addEventListener("click",e=>{e.preventDefault();next()});
+  exploreToggle.addEventListener("click",e=>{e.preventDefault();setGalleryMode("grid");countE.textContent=`${images.length} Photos`});
   modal.addEventListener("click",e=>{if(e.target.hasAttribute("data-close"))closeModal()});
-  imgE.addEventListener("click",e=>{e.preventDefault();next()});
+  imgE.addEventListener("click",e=>{e.preventDefault();if(modal.classList.contains("is-handheld-grid"))return;next()});
+  const onHandheldGalleryChange=()=>{
+    if(!modal.classList.contains("is-open"))return;
+    setGalleryMode(isHandheldGallery()?"grid":"viewer");
+    setImage(index);
+  };
+  if(handheldGalleryMedia.addEventListener)handheldGalleryMedia.addEventListener("change",onHandheldGalleryChange);
+  else if(handheldGalleryMedia.addListener)handheldGalleryMedia.addListener(onHandheldGalleryChange);
   window.addEventListener("keydown",e=>{
     if(!modal.classList.contains("is-open"))return;
     if(e.key==="Escape"){e.preventDefault();closeModal()}
+    if(modal.classList.contains("is-handheld-grid"))return;
     if(e.key==="ArrowLeft"){e.preventDefault();prev()}
     if(e.key==="ArrowRight"){e.preventDefault();next()}
   });
