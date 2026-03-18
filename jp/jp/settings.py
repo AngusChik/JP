@@ -121,11 +121,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.environ.get('APP_TIME_ZONE', 'America/Toronto')
 
 USE_I18N = True
 
 USE_TZ = True
+
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
+TWILIO_FROM_NUMBER = os.environ.get('TWILIO_FROM_NUMBER', '')
 
 
 # Static files (CSS, JavaScript, Images)

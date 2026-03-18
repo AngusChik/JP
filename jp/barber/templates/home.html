@@ -198,6 +198,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   padding:60px 0;position:relative;z-index:1;
   scroll-snap-align:none;
 }
+.page-section > .wrap,
+.page-section > .wrap-wide{width:100%}
 
 /* ── LABELS ── */
 .section-label{
@@ -490,88 +492,26 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
    SERVICES — GALLERY LAYOUT
    ========================= */
 #cuts.page-section{overflow:visible}
-.cuts-layout{overflow:visible}
+.cuts-layout{overflow:visible;width:100%}
 .cuts-header{margin-bottom:20px}
 
-/* ── Featured (big) card ── */
-.cuts-featured{
-  position:relative;border-radius:18px;overflow:hidden;
-  background:var(--surface);aspect-ratio:21/9;
-  min-height:clamp(280px,36vh,440px);
-  margin-bottom:clamp(12px,2vw,20px);
-  cursor:pointer;
-}
-.cuts-featured .cf-img{position:absolute;inset:0}
-.cuts-featured .cf-img img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform .6s var(--ease-out-expo),opacity .4s ease;
-}
-.cuts-featured:hover .cf-img img{transform:scale(1.04)}
-.cuts-featured::after{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.45) 35%,rgba(0,0,0,.06) 55%,transparent 70%);
-  pointer-events:none;
-}
-.cf-category{
-  position:absolute;left:18px;top:18px;z-index:1;
-  padding:7px 14px;border-radius:8px;
-  background:rgba(0,0,0,.6);border:1px solid rgba(201,169,110,.15);
-  font-size:11px;font-weight:600;color:var(--accent);
-  text-transform:uppercase;letter-spacing:.8px;
-}
-.cf-price{
-  position:absolute;right:18px;top:18px;z-index:1;
-  padding:8px 16px;border-radius:8px;background:var(--accent);
-  font-size:15px;font-weight:700;color:var(--bg);letter-spacing:-.2px;
-}
-.cf-body{position:absolute;inset:auto 0 0 0;padding:28px;display:flex;flex-direction:column;gap:8px;z-index:1}
-.cf-name{font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,3vw,30px);font-weight:600;letter-spacing:-.3px}
-.cf-time{font-size:12px;font-weight:500;color:rgba(255,255,255,.5)}
-.cf-desc{color:rgba(255,255,255,.6);font-size:14px;line-height:1.6;max-width:50ch}
-.cf-actions{display:flex;gap:8px;margin-top:6px}
-.cf-actions .cut-book{
-  padding:10px 20px;border-radius:8px;background:var(--accent);color:var(--bg);
-  font-weight:600;font-size:13px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;
-  transition:transform .2s var(--ease-out-expo),box-shadow .2s ease;
-}
-.cf-actions .cut-book:hover{transform:translateY(-2px);box-shadow:0 6px 16px var(--accent-glow)}
-.cf-actions .cut-view{
-  appearance:none;border:1px solid rgba(255,255,255,.12);background:transparent;
-  color:rgba(255,255,255,.85);font-weight:600;font-size:13px;
-  padding:10px 20px;border-radius:8px;cursor:pointer;
-  transition:border-color .25s ease,color .25s ease,background .25s ease,transform .2s ease;
-}
-.cf-actions .cut-view:hover{border-color:var(--accent);color:var(--text);background:rgba(201,169,110,.08);transform:translateY(-2px)}
-
-/* Accent line */
-.cuts-featured::before{
-  content:"";position:absolute;bottom:0;left:0;right:0;height:3px;z-index:2;
-  background:linear-gradient(90deg,var(--accent),#e8d5a8);transform:scaleX(0);transform-origin:left;
-  transition:transform .4s var(--ease-out-expo);
-}
-.cuts-featured:hover::before{transform:scaleX(1)}
-
-/* ── Horizontal scroll strip ── */
-.cuts-strip-wrap{position:relative;padding:0 44px}
+/* ── Haircut explore grid ── */
+.cuts-strip-wrap{padding:0}
 .cuts-strip{
-  display:flex;gap:clamp(10px,1.5vw,16px);
-  overflow-x:auto;scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  padding:4px 0 12px;
-  scrollbar-width:none;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(220px,1fr));
+  gap:clamp(14px,1.5vw,22px);
+  padding:0;
 }
-.cuts-strip::-webkit-scrollbar{display:none}
-
 .cuts-strip-card{
-  flex:0 0 clamp(200px,22vw,280px);
-  aspect-ratio:4/3;position:relative;border-radius:14px;overflow:hidden;
-  background:var(--surface);cursor:pointer;
-  scroll-snap-align:start;
-  transition:transform .35s var(--ease-out-expo),box-shadow .35s ease,border-color .3s ease;
-  border:2px solid transparent;
+  position:relative;border-radius:16px;overflow:hidden;
+  aspect-ratio:5/6;background:var(--surface);cursor:pointer;
+  transition:transform .22s var(--ease-out-expo),box-shadow .22s ease,border-color .22s ease;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
 }
-.cuts-strip-card.is-active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 8px 24px rgba(0,0,0,.3)}
-.cuts-strip-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.3)}
+.cuts-strip-card.is-active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(201,169,110,.5),0 8px 22px rgba(0,0,0,.28)}
+.cuts-strip-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.28)}
 .cuts-strip-card .cs-img{position:absolute;inset:0}
 .cuts-strip-card .cs-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s var(--ease-out-expo)}
 .cuts-strip-card:hover .cs-img img{transform:scale(1.06)}
@@ -580,67 +520,126 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.3) 40%,transparent 65%);
   pointer-events:none;
 }
-.cs-body{position:absolute;inset:auto 0 0 0;padding:12px 14px;z-index:1;display:flex;flex-direction:column;gap:3px}
-.cs-name{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:600;letter-spacing:-.2px}
-.cs-meta{display:flex;justify-content:space-between;align-items:center;gap:6px}
-.cs-price-tag{font-size:12px;font-weight:700;color:var(--accent)}
-.cs-time{font-size:10px;font-weight:500;color:rgba(255,255,255,.45)}
+.cs-body{position:absolute;inset:auto 0 0 0;padding:12px 14px;z-index:1;display:flex;flex-direction:column;gap:4px}
+.cs-name{font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:600;letter-spacing:-.2px}
+.cs-meta{display:flex;justify-content:flex-start;align-items:center;gap:8px}
+.cs-price-tag{font-size:13px;font-weight:700;color:var(--accent)}
+.cs-time{font-size:11px;font-weight:500;color:rgba(255,255,255,.45)}
 
-/* Scroll hint arrows */
-.strip-arrow{
-  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
-  width:36px;height:36px;border-radius:50%;
-  border:1px solid var(--border);background:rgba(15,15,15,.92);
-  color:var(--text);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;font-weight:700;
-  opacity:0;transition:opacity .25s ease,transform .25s var(--ease-out-expo);
-  pointer-events:none;
+/* ── Endless review loop strips ── */
+.review-loop{
+  --loop-gap:14px;
+  --loop-speed:44s;
+  position:relative;
+  width:100vw;
+  margin:22px calc(50% - 50vw) 0;
+  overflow:hidden;
+  padding:6px 0;
+  mask-image:linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
 }
-.cuts-strip-wrap:hover .strip-arrow,
-.cuts-strip-wrap:focus-within .strip-arrow{opacity:1;pointer-events:auto}
-.strip-arrow:hover{background:rgba(15,15,15,.95);transform:translateY(-50%) scale(1.08)}
-.strip-arrow.left{left:4px}
-.strip-arrow.right{right:4px}
-@media (hover:none), (pointer:coarse){
-  .strip-arrow{opacity:1;pointer-events:auto}
-  .strip-arrow.left{left:8px}
-  .strip-arrow.right{right:8px}
+.review-loop-track{
+  display:flex;align-items:stretch;
+  gap:var(--loop-gap);width:max-content;
+  will-change:transform;
+  animation:reviewLoop var(--loop-speed) linear infinite;
+}
+.review-loop--reverse{--loop-speed:52s}
+.review-loop--reverse .review-loop-track{animation-direction:reverse}
+.review-loop-group{
+  display:flex;align-items:stretch;gap:var(--loop-gap);
+  flex-shrink:0;
+}
+.review-card{
+  min-width:clamp(220px,24vw,340px);
+  max-width:clamp(220px,24vw,340px);
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.1);
+  background:linear-gradient(170deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+  box-shadow:0 10px 26px rgba(0,0,0,.24);
+  padding:14px 16px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.review-card p{
+  font-size:13px;line-height:1.5;color:rgba(255,255,255,.9);
+}
+.review-meta{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:11px;
+}
+.review-name{font-weight:700;color:var(--text)}
+.review-stars{letter-spacing:.8px;color:var(--accent)}
+@keyframes reviewLoop{
+  from{transform:translateX(0)}
+  to{transform:translateX(calc(-50% - (var(--loop-gap) / 2)))}
 }
 
-@media(max-width:700px){
-  .cuts-strip-wrap{padding:0}
-  .cuts-featured{display:none}
-  .cf-body{padding:18px}
-  .cf-name{font-size:20px}
-  .cuts-header{margin-bottom:4px}
+/* Tablet */
+@media(max-width:1024px){
   .cuts-strip{
-    display:grid;
+    gap:12px;
+  }
+  .cuts-strip-card{border-radius:14px}
+  .cs-body{padding:10px 11px}
+  .cs-name{font-size:15px}
+}
+@media(max-width:820px){
+  .cuts-strip{
     grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-    overflow:visible;
-    scroll-snap-type:none;
-    padding:0;
   }
   .cuts-strip-card{
-    flex:0 0 auto;width:100%;
     aspect-ratio:1/1;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.08);
+  }
+}
+@media(max-width:700px){
+  .cuts-strip-wrap{padding:0}
+  .cuts-header{margin-bottom:8px}
+  .cuts-strip{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .cuts-strip-card{
+    width:100%;
+    border-radius:11px;
+    aspect-ratio:4/5;
   }
   .cuts-strip-card:hover{transform:none;box-shadow:0 8px 18px rgba(0,0,0,.22)}
   .cuts-strip-card::after{
     background:linear-gradient(to top,rgba(0,0,0,.82) 0%,rgba(0,0,0,.38) 46%,transparent 70%);
   }
-  .cs-body{padding:8px 10px;gap:2px}
-  .cs-name{font-size:13px}
+  .cs-body{padding:8px 9px;gap:2px}
+  .cs-name{font-size:13px;line-height:1.1}
   .cs-meta{justify-content:flex-start;gap:8px}
   .cs-time{display:none}
-  .strip-arrow{display:none}
+  .review-loop{
+    --loop-gap:10px;
+    --loop-speed:38s;
+    margin-top:16px;
+    mask-image:none;
+    -webkit-mask-image:none;
+  }
+  .review-loop--reverse{--loop-speed:44s}
+  .review-card{
+    min-width:74vw;
+    max-width:74vw;
+    border-radius:12px;
+    padding:12px 13px;
+  }
+  .review-card p{font-size:12px}
 }
 @media(max-width:480px){
   .cuts-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   .cs-name{font-size:12px}
+  .cs-price-tag{font-size:11px}
+  .review-card{
+    min-width:82vw;
+    max-width:82vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .review-loop{overflow-x:auto;scroll-behavior:auto}
+  .review-loop-track{animation:none}
 }
 
 /* =========================
@@ -734,7 +733,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .gm-close:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
 .gm-body{display:grid;grid-template-columns:1fr 210px;min-height:0}
 .gm-stage{
-  position:relative;padding:18px;min-height:0;
+  --gm-stage-pad:18px;
+  --gm-frame-pad:clamp(10px,1.2vw,18px);
+  position:relative;padding:var(--gm-stage-pad);min-height:0;
   display:flex;align-items:center;justify-content:center;
 }
 .gm-frame{
@@ -744,7 +745,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     linear-gradient(180deg,rgba(0,0,0,.56),rgba(0,0,0,.34));
   border:1px solid rgba(255,255,255,.08);
   overflow:hidden;display:flex;align-items:center;justify-content:center;
-  padding:clamp(10px,1.2vw,18px);
+  padding:var(--gm-frame-pad);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 0 0 1px rgba(0,0,0,.25);
 }
 .gm-image{
@@ -753,14 +754,20 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 .gm-image.is-loading{opacity:.3}
 .gm-controls{
-  position:absolute;left:26px;right:26px;top:50%;transform:translateY(-50%);
+  position:absolute;
+  left:calc(var(--gm-stage-pad) + var(--gm-frame-pad) + 6px);
+  right:calc(var(--gm-stage-pad) + var(--gm-frame-pad) + 6px);
+  top:50%;transform:translateY(-50%);
   display:flex;align-items:center;justify-content:space-between;
+  z-index:2;
   pointer-events:none;
 }
 .gm-nav{
-  position:static;width:48px;height:48px;border-radius:12px;
-  border:1px solid rgba(255,255,255,.18);
-  background:rgba(0,0,0,.56);color:rgba(255,255,255,.95);
+  position:static;width:50px;height:50px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.28);
+  background:rgba(8,8,8,.72);color:rgba(255,255,255,.98);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
   cursor:pointer;font-size:22px;font-weight:800;line-height:1;
   box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.1);
   transition:background .18s ease,transform .18s ease,border-color .18s ease,box-shadow .18s ease;
@@ -844,17 +851,15 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   }
   .gm-body{grid-template-columns:1fr;grid-template-rows:1fr auto}
   .gm-stage{
-    padding:8px;
+    --gm-stage-pad:8px;
+    --gm-frame-pad:8px;
+    padding:var(--gm-stage-pad);
     align-items:stretch;
   }
   .gm-frame{
     border-radius:12px;
-    padding:8px;
+    padding:var(--gm-frame-pad);
     min-height:clamp(240px,56vh,420px);
-  }
-  .gm-controls{
-    left:8px;
-    right:8px;
   }
   .gm-nav{
     width:46px;
@@ -911,7 +916,10 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .gm-title{font-size:14px;max-width:54vw}
   .gm-counter{display:none}
   .gm-close{width:36px;height:36px;border-radius:10px}
-  .gm-controls{left:6px;right:6px}
+  .gm-controls{
+    left:calc(var(--gm-stage-pad) + var(--gm-frame-pad) + 4px);
+    right:calc(var(--gm-stage-pad) + var(--gm-frame-pad) + 4px);
+  }
   .gm-nav{width:42px;height:42px;font-size:20px}
   .gm-thumbs{padding:8px 10px calc(10px + env(safe-area-inset-bottom))}
   .gm-thumb{width:92px;height:62px}
@@ -937,9 +945,6 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   /* Contact */
   .detail-row{grid-template-columns:1fr 1fr 1fr}
   .map-frame{aspect-ratio:4/3}
-  /* Featured cut */
-  .cf-actions{flex-direction:column}
-  .cf-actions .cut-book,.cf-actions .cut-view{text-align:center;justify-content:center}
 }
 @media(max-width:390px){
   .photo-row{grid-template-columns:1fr}
@@ -1034,6 +1039,97 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 /* ── MAP LINK ── */
 .map-link{transition:background .2s ease,transform .2s ease}
 .map-link:hover{background:var(--accent-dim);transform:translateY(-1px)}
+
+/* IN-HOUSE BOOKING */
+.booking-choice-modal,.inhouse-modal{position:fixed;inset:0;z-index:220;display:none}
+.booking-choice-modal.is-open,.inhouse-modal.is-open{display:block}
+.booking-choice-backdrop,.inhouse-backdrop{
+  position:absolute;inset:0;background:rgba(5,5,5,.66);backdrop-filter:blur(3px);
+}
+.booking-choice-panel,.inhouse-panel{
+  position:relative;z-index:1;width:min(860px,calc(100vw - 24px));margin:40px auto;
+  border:1px solid var(--border);border-radius:14px;background:linear-gradient(180deg,#171717,#111);
+  box-shadow:0 24px 64px rgba(0,0,0,.5);
+}
+.booking-choice-panel{max-width:560px;padding:20px}
+.booking-choice-title{font-size:22px;letter-spacing:-.3px}
+.booking-choice-sub{color:var(--muted);font-size:13px;line-height:1.5;margin-top:8px}
+.booking-choice-actions{display:grid;gap:10px;margin-top:16px}
+.book-path{
+  width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--border);text-align:left;
+  font-size:14px;cursor:pointer;transition:transform .2s var(--ease-out-expo),border-color .2s ease;
+  background:var(--surface2);color:var(--text);display:flex;justify-content:space-between;align-items:center;
+}
+.book-path:hover{transform:translateY(-2px);border-color:rgba(201,169,110,.35)}
+.book-path.inhouse{background:linear-gradient(135deg,rgba(201,169,110,.22),rgba(201,169,110,.06))}
+.book-path.booksy{background:rgba(255,255,255,.03)}
+.book-note{color:var(--muted);font-size:12px}
+.booking-close{
+  position:absolute;right:14px;top:14px;background:transparent;border:1px solid var(--border);
+  color:var(--text);width:30px;height:30px;border-radius:8px;cursor:pointer;
+}
+.booking-meta{margin-top:12px;font-size:12px;color:var(--muted)}
+.book-account-link{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:13px;margin-top:10px}
+.inhouse-panel{padding:18px 18px 14px;max-width:1080px}
+.inhouse-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.inhouse-title{font-size:22px;letter-spacing:-.3px}
+.inhouse-sub{font-size:12px;color:var(--muted)}
+.inhouse-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;align-items:start}
+.card{border:1px solid var(--border);border-radius:12px;background:var(--surface2);padding:14px}
+.card h4{font-size:13px;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.field input,.field select,.field textarea{
+  border:1px solid var(--border);background:#111;color:var(--text);border-radius:8px;padding:9px 10px;font-size:13px;
+}
+.field textarea{min-height:68px;resize:vertical}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{
+  border:1px solid var(--border);background:var(--surface);color:var(--text);padding:9px 12px;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;transition:transform .2s var(--ease-out-expo),border-color .2s ease;
+}
+.btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.22)}
+.btn.primary{background:var(--accent);color:var(--bg);border-color:transparent}
+.btn.primary[disabled]{opacity:.5;cursor:not-allowed}
+.otp-note{font-size:12px;color:var(--muted);margin-top:8px}
+.state-message{font-size:12px;margin-top:8px;min-height:16px}
+.state-message.error{color:#ff9b9b}
+.state-message.ok{color:#99e3b1}
+.week-toolbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:center;margin-bottom:10px}
+.week-label{font-size:12px;color:var(--muted);text-align:center}
+.calendar-wrap{overflow:auto;border:1px solid var(--border);border-radius:10px;max-height:430px}
+.week-table{width:100%;border-collapse:collapse;font-size:12px;min-width:760px}
+.week-table th,.week-table td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:7px;vertical-align:top}
+.week-table th{position:sticky;top:0;background:#171717;z-index:2;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.week-time{font-weight:600;color:var(--muted);width:90px;background:#151515}
+.slot-btn{
+  width:100%;border:1px solid rgba(255,255,255,.08);background:#121212;color:var(--text);border-radius:6px;padding:6px 5px;
+  cursor:pointer;font-size:11px;transition:transform .18s var(--ease-out-expo),border-color .2s ease,background .2s ease;
+}
+.slot-btn:hover{transform:translateY(-1px);border-color:rgba(201,169,110,.35)}
+.slot-btn.is-selected{border-color:var(--accent);background:rgba(201,169,110,.14)}
+.slot-busy{opacity:.26;font-size:10px;text-align:center;display:block;padding:4px 0}
+.tabs{display:flex;gap:8px;margin-bottom:10px}
+.tab-btn{flex:1}
+.tab-btn.is-active{background:var(--accent-dim);border-color:rgba(201,169,110,.4);color:var(--accent)}
+.booking-list{display:grid;gap:8px;max-height:348px;overflow:auto}
+.booking-item{border:1px solid var(--border);border-radius:10px;padding:10px;background:#121212}
+.booking-item h5{font-size:13px;margin-bottom:4px}
+.booking-item p{font-size:12px;color:var(--muted);line-height:1.4}
+.badge{
+  display:inline-block;padding:3px 6px;border-radius:999px;font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.08);margin-right:6px;
+}
+.badge.confirmed,.badge.rescheduled{background:rgba(153,227,177,.16);color:#99e3b1}
+.badge.completed{background:rgba(120,192,255,.15);color:#98cfff}
+.badge.cancelled{background:rgba(255,155,155,.16);color:#ffb2b2}
+.badge.missed{background:rgba(255,204,145,.16);color:#ffd3a2}
+
+@media (max-width: 980px){
+  .inhouse-panel{margin:14px auto;padding:14px}
+  .inhouse-grid{grid-template-columns:1fr}
+}
 
 @media (prefers-reduced-motion: reduce){
   html,.scroll-root{scroll-behavior:auto}
@@ -1194,32 +1290,15 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
     <!-- SERVICES -->
     <section id="cuts" class="page-section">
-      <div class="wrap cuts-layout">
+      <div class="wrap-wide cuts-layout">
         <div class="cuts-header">
           <div class="section-label fade-in">Services</div>
           <div class="section-title fade-in">What we do best.</div>
           <div class="section-desc fade-in">Clean cuts, sharp fades, and detailed beard work.</div>
         </div>
 
-        <!-- Featured big card -->
-        <div class="cuts-featured fade-in" id="cutsFeatured">
-          <div class="cf-img"><img id="cfImg" src="" alt="" /></div>
-          <div class="cf-category" id="cfCategory"></div>
-          <div class="cf-price" id="cfPrice"></div>
-          <div class="cf-body">
-            <div class="cf-name" id="cfName"></div>
-            <div class="cf-time" id="cfTime"></div>
-            <div class="cf-desc" id="cfDesc"></div>
-            <div class="cf-actions">
-              <button type="button" class="cut-view js-open-gallery" id="cfGalleryBtn" data-title="" data-gallery="">Gallery</button>
-              <a class="cut-book" href="https://booksy.com/your-link" target="_blank" rel="noopener">Book Now</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Horizontal scroll strip -->
+        <!-- Haircut explore grid -->
         <div class="cuts-strip-wrap fade-in">
-          <button class="strip-arrow left" id="stripPrev" type="button" aria-label="Scroll left">&#8249;</button>
           <div class="cuts-strip" id="cutsStrip">
             {% for c in cuts %}
             <div class="cuts-strip-card" data-cut-index="{{ forloop.counter0 }}"
@@ -1240,7 +1319,47 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
             </div>
             {% endfor %}
           </div>
-          <button class="strip-arrow right" id="stripNext" type="button" aria-label="Scroll right">&#8250;</button>
+        </div>
+
+        <div class="review-loop fade-in" aria-label="Client reviews under services">
+          <div class="review-loop-track">
+            <div class="review-loop-group">
+              <article class="review-card">
+                <p>"Best fade I have had in years. Clean line-up and attention to detail was next level."</p>
+                <div class="review-meta"><span class="review-name">Jordan M.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"Exactly what I asked for, no rush, and great vibe in the shop. Booking again this week."</p>
+                <div class="review-meta"><span class="review-name">Amin R.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"Beard shape and taper both came out sharp. You can tell they care about consistency."</p>
+                <div class="review-meta"><span class="review-name">Chris D.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"First time visiting and it felt like my regular barbershop. Super professional service."</p>
+                <div class="review-meta"><span class="review-name">Malik T.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+            </div>
+            <div class="review-loop-group" aria-hidden="true">
+              <article class="review-card">
+                <p>"Best fade I have had in years. Clean line-up and attention to detail was next level."</p>
+                <div class="review-meta"><span class="review-name">Jordan M.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"Exactly what I asked for, no rush, and great vibe in the shop. Booking again this week."</p>
+                <div class="review-meta"><span class="review-name">Amin R.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"Beard shape and taper both came out sharp. You can tell they care about consistency."</p>
+                <div class="review-meta"><span class="review-name">Chris D.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"First time visiting and it felt like my regular barbershop. Super professional service."</p>
+                <div class="review-meta"><span class="review-name">Malik T.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1314,6 +1433,47 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
                 <div class="action-text"><small>Instagram</small><strong>@jpstudio</strong></div>
                 <span class="action-badge">Follow</span>
               </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-loop review-loop--reverse fade-in" aria-label="Client reviews under contact">
+          <div class="review-loop-track">
+            <div class="review-loop-group">
+              <article class="review-card">
+                <p>"Reply was quick, appointment was on time, and the cut came out exactly like the reference."</p>
+                <div class="review-meta"><span class="review-name">Evan P.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"Great customer service and even better results. Took his time and nailed every detail."</p>
+                <div class="review-meta"><span class="review-name">Rico S.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"I needed a last-minute cut before an event and they delivered. Highly recommend."</p>
+                <div class="review-meta"><span class="review-name">Tariq L.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"Shop is clean, team is friendly, and the quality is always there. Worth every dollar."</p>
+                <div class="review-meta"><span class="review-name">Sam K.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+            </div>
+            <div class="review-loop-group" aria-hidden="true">
+              <article class="review-card">
+                <p>"Reply was quick, appointment was on time, and the cut came out exactly like the reference."</p>
+                <div class="review-meta"><span class="review-name">Evan P.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"Great customer service and even better results. Took his time and nailed every detail."</p>
+                <div class="review-meta"><span class="review-name">Rico S.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"I needed a last-minute cut before an event and they delivered. Highly recommend."</p>
+                <div class="review-meta"><span class="review-name">Tariq L.</span><span class="review-stars">★★★★★</span></div>
+              </article>
+              <article class="review-card">
+                <p>"Shop is clean, team is friendly, and the quality is always there. Worth every dollar."</p>
+                <div class="review-meta"><span class="review-name">Sam K.</span><span class="review-stars">★★★★★</span></div>
+              </article>
             </div>
           </div>
         </div>
@@ -1417,6 +1577,117 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     </div>
   </div>
 
+  <div class="booking-choice-modal" id="bookingChoiceModal" aria-hidden="true" role="dialog">
+    <div class="booking-choice-backdrop" data-booking-close></div>
+    <div class="booking-choice-panel">
+      <button type="button" class="booking-close" data-booking-close aria-label="Close">&times;</button>
+      <div class="booking-choice-title serif">Choose Your Booking Path</div>
+      <p class="booking-choice-sub">Book instantly in-house with your phone number, or jump directly to Booksy.</p>
+      <div class="booking-choice-actions">
+        <button type="button" class="book-path inhouse" id="continueInhouseBooking">
+          <span>Continue In-House Booking</span>
+          <span class="book-note">Weekly calendar + account</span>
+        </button>
+        <a class="book-path booksy booking-direct-link" id="continueBooksyBooking" href="{{ booksy_global_url }}" target="_blank" rel="noopener">
+          <span>Go To Booksy</span>
+          <span class="book-note">External booking</span>
+        </a>
+      </div>
+      <div class="booking-meta">Your in-house profile stores upcoming appointments and previous visits, including completed, cancelled, and missed sessions.</div>
+      <button type="button" class="book-account-link" id="openInhouseAccount">Open My In-House Account</button>
+    </div>
+  </div>
+
+  <div class="inhouse-modal" id="inhouseModal" aria-hidden="true" role="dialog">
+    <div class="inhouse-backdrop" data-inhouse-close></div>
+    <div class="inhouse-panel">
+      <button type="button" class="booking-close" data-inhouse-close aria-label="Close">&times;</button>
+      <div class="inhouse-head">
+        <div>
+          <div class="inhouse-title serif">In-House Booking</div>
+          <div class="inhouse-sub">Phone OTP sign-in, weekly spreadsheet calendar, and booking history</div>
+        </div>
+      </div>
+
+      <div class="card" id="authStep">
+        <h4>Sign In</h4>
+        <div class="form-row">
+          <div class="field">
+            <label for="otpPhoneInput">Phone Number</label>
+            <input id="otpPhoneInput" type="tel" placeholder="(416) 555-0123" autocomplete="tel" />
+          </div>
+          <div class="field">
+            <label for="otpCodeInput">Verification Code</label>
+            <input id="otpCodeInput" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit code" />
+          </div>
+        </div>
+        <div class="row-actions">
+          <button type="button" class="btn" id="sendOtpBtn">Send Code</button>
+          <button type="button" class="btn primary" id="verifyOtpBtn">Verify & Continue</button>
+        </div>
+        <div class="otp-note" id="otpDebugNote"></div>
+        <div class="state-message" id="authStateMessage"></div>
+      </div>
+
+      <div id="inhouseAppStep" style="display:none">
+        <div class="inhouse-grid">
+          <section class="card">
+            <h4>Weekly Booking Calendar</h4>
+            <div class="form-row">
+              <div class="field">
+                <label for="inhouseBarberSelect">Barber</label>
+                <select id="inhouseBarberSelect"></select>
+              </div>
+              <div class="field">
+                <label for="inhouseServiceSelect">Service</label>
+                <select id="inhouseServiceSelect"></select>
+              </div>
+            </div>
+            <div class="week-toolbar">
+              <button type="button" class="btn" id="prevWeekBtn">Prev Week</button>
+              <div class="field">
+                <label for="monthPicker">Month</label>
+                <input id="monthPicker" type="month" />
+              </div>
+              <div class="week-label" id="weekLabel">Week</div>
+              <button type="button" class="btn" id="nextWeekBtn">Next Week</button>
+              <button type="button" class="btn" id="refreshWeekBtn">Refresh</button>
+            </div>
+            <div class="calendar-wrap">
+              <table class="week-table" id="weekTable"></table>
+            </div>
+            <div class="row-actions">
+              <button type="button" class="btn primary" id="confirmBookingBtn" disabled>Confirm Selected Slot</button>
+            </div>
+            <div class="state-message" id="bookingStateMessage"></div>
+          </section>
+
+          <section class="card">
+            <h4>My Account</h4>
+            <div class="field">
+              <label for="profileNameInput">Full Name</label>
+              <input id="profileNameInput" type="text" placeholder="Your name" />
+            </div>
+            <div class="field">
+              <label for="profileEmailInput">Email (optional)</label>
+              <input id="profileEmailInput" type="email" placeholder="you@example.com" />
+            </div>
+            <div class="row-actions">
+              <button type="button" class="btn" id="saveProfileBtn">Save Profile</button>
+            </div>
+            <div class="state-message" id="profileStateMessage"></div>
+
+            <div class="tabs">
+              <button type="button" class="btn tab-btn is-active" data-scope="upcoming">Upcoming</button>
+              <button type="button" class="btn tab-btn" data-scope="history">History</button>
+            </div>
+            <div class="booking-list" id="dashboardBookingList"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
 (() => {
   /* ── Gallery Modal ── */
@@ -1472,132 +1743,34 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
   /* ── Services gallery strip ── */
   const strip=document.getElementById("cutsStrip");
-  const cfImg=document.getElementById("cfImg"),cfName=document.getElementById("cfName");
-  const cfCategory=document.getElementById("cfCategory"),cfPrice=document.getElementById("cfPrice");
-  const cfTime=document.getElementById("cfTime"),cfDesc=document.getElementById("cfDesc");
-  const cfGalleryBtn=document.getElementById("cfGalleryBtn");
-  const cutsFeatured=document.getElementById("cutsFeatured");
-  const stripPrev=document.getElementById("stripPrev"),stripNext=document.getElementById("stripNext");
+  const cutCards=[...document.querySelectorAll(".cuts-strip-card[data-cut-index]")];
 
-  const origCards=[...document.querySelectorAll(".cuts-strip-card[data-cut-index]")];
-  let activeIdx=0;
-  const isHandheld=window.matchMedia("(max-width: 700px)").matches;
-
-  const setFeatured=card=>{
-    const d=card.dataset;
-    cfImg.src=d.img||"";cfImg.alt=d.name||"";
-    cfName.textContent=d.name||"";
-    cfCategory.textContent=d.category||"";
-    if(d.price){cfPrice.textContent=d.price;cfPrice.style.display=""}else{cfPrice.style.display="none"}
-    cfTime.textContent=d.time||"";
-    cfDesc.textContent=d.desc||"";
-    cfGalleryBtn.dataset.title=d.name||"";
-    cfGalleryBtn.dataset.gallery=d.gallery||"";
-    /* highlight active strip card */
-    strip.querySelectorAll(".cuts-strip-card").forEach(c=>c.classList.toggle("is-active",c.dataset.cutIndex===card.dataset.cutIndex));
-    activeIdx=parseInt(card.dataset.cutIndex)||0;
+  const setActiveCard=card=>{
+    if(!strip||!card)return;
+    strip.querySelectorAll(".cuts-strip-card").forEach(c=>c.classList.toggle("is-active",c===card));
   };
 
-  /* Init featured with first card */
-  if(origCards.length)setFeatured(origCards[0]);
+  if(cutCards.length)setActiveCard(cutCards[0]);
 
-  let oneSetWidth=0;
-  let absoluteIndex=0;
-  let allLoopCards=[];
-  const normalizeAbsoluteIndex=()=>{
-    const baseLen=origCards.length;
-    if(!baseLen)return;
-    if(absoluteIndex<baseLen)absoluteIndex+=baseLen;
-    else if(absoluteIndex>=baseLen*2)absoluteIndex-=baseLen;
-  };
-  const scrollToAbsoluteIndex=(behavior="smooth")=>{
-    if(!strip||!allLoopCards.length)return;
-    const card=allLoopCards[absoluteIndex];
-    if(!card)return;
-    strip.scrollTo({left:card.offsetLeft,behavior});
-  };
-
-  /* Infinite loop: clone cards so scrolling wraps seamlessly */
-  if(strip&&origCards.length>1&&!isHandheld){
-    const cloneSet=()=>origCards.forEach(c=>{const cl=c.cloneNode(true);strip.appendChild(cl)});
-    cloneSet();
-    cloneSet(); /* 3x cards total */
-
-    const getOneSetWidth=()=>{
-      const gap=parseFloat(getComputedStyle(strip).gap||0);
-      const totalCardWidth=origCards.reduce((sum,card)=>sum+card.offsetWidth,0);
-      return totalCardWidth + (Math.max(0,origCards.length-1)*gap);
-    };
-    oneSetWidth=getOneSetWidth();
-    allLoopCards=[...strip.querySelectorAll(".cuts-strip-card")];
-    absoluteIndex=origCards.length; /* first card in middle set */
-
-    /* Start in middle set so user can scroll both directions */
-    requestAnimationFrame(()=>{scrollToAbsoluteIndex("auto")});
-
-    window.addEventListener("resize",()=>{
-      oneSetWidth=getOneSetWidth();
-      normalizeAbsoluteIndex();
-      scrollToAbsoluteIndex("auto");
-    },{passive:true});
-  }
 
   /* Click strip card → set featured */
   if(strip){strip.addEventListener("click",e=>{
     const card=e.target.closest(".cuts-strip-card");if(!card)return;
     e.preventDefault();
-    setFeatured(card);
+    setActiveCard(card);
     const d=card.dataset;
     openModal({
       title:d.name||"Gallery",
       gallery:d.gallery||"",
-      fallbackSrc:d.img||cfImg?.src||""
+      fallbackSrc:d.img||""
     });
   })}
 
   /* Strip arrow buttons — scroll one card width, loop wraps via clone sets */
-  const scrollStrip=dir=>{
-    if(!strip)return;
-    if(oneSetWidth&&allLoopCards.length&&origCards.length){
-      const baseLen=origCards.length;
-      normalizeAbsoluteIndex();
-      if(dir<0&&absoluteIndex<=baseLen){
-        absoluteIndex+=baseLen;
-        scrollToAbsoluteIndex("auto");
-      }else if(dir>0&&absoluteIndex>=baseLen*2-1){
-        absoluteIndex-=baseLen;
-        scrollToAbsoluteIndex("auto");
-      }
-      absoluteIndex+=dir;
-      scrollToAbsoluteIndex("smooth");
-      return;
-    }
-
-    const style=getComputedStyle(strip);
-    const parsedGap=parseFloat(style.gap||style.columnGap||"0");
-    const gap=Number.isFinite(parsedGap)?parsedGap:0;
-    const baseCardW=strip.querySelector(".cuts-strip-card")?.getBoundingClientRect().width||250;
-    const cardW=Math.max(120,baseCardW+gap);
-    strip.scrollBy({left:dir*cardW,behavior:"smooth"});
-  };
-  if(stripPrev)stripPrev.addEventListener("click",e=>{e.preventDefault();scrollStrip(-1)});
-  if(stripNext)stripNext.addEventListener("click",e=>{e.preventDefault();scrollStrip(1)});
 
   /* Open gallery from featured Gallery button */
-  document.addEventListener("click",e=>{
-    const btn=e.target.closest(".js-open-gallery");if(!btn)return;e.preventDefault();
-    const cover=cfImg?.src||"";
-    openModal({title:btn.dataset.title||"Gallery",gallery:btn.dataset.gallery||"",fallbackSrc:cover});
-  });
 
   /* Click featured card → open gallery */
-  if(cutsFeatured){cutsFeatured.addEventListener("click",e=>{
-    if(e.target.closest(".cut-book"))return;
-    if(e.target.closest(".js-open-gallery"))return;
-    e.preventDefault();
-    const cover=cfImg?.src||"";
-    openModal({title:cfGalleryBtn?.dataset.title||"Gallery",gallery:cfGalleryBtn?.dataset.gallery||"",fallbackSrc:cover});
-  })}
 
   /* ── Scroll root (used by multiple features) ── */
   const scrollRoot=document.getElementById("scrollRoot");
@@ -1753,6 +1926,439 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     if(bm.classList.contains("is-open")&&e.key==="Escape"){e.preventDefault();closeBarber()}
   });
 
+})();
+</script>
+
+<script>
+(() => {
+  const BOOKSY_GLOBAL_URL = "{{ booksy_global_url|escapejs }}";
+  const BOOKING_DEFAULTS = {{ booking_defaults_json|safe }};
+
+  const bookingChoiceModal = document.getElementById("bookingChoiceModal");
+  const inhouseModal = document.getElementById("inhouseModal");
+  const continueInhouseBooking = document.getElementById("continueInhouseBooking");
+  const continueBooksyBooking = document.getElementById("continueBooksyBooking");
+  const openInhouseAccount = document.getElementById("openInhouseAccount");
+
+  const authStep = document.getElementById("authStep");
+  const inhouseAppStep = document.getElementById("inhouseAppStep");
+  const otpPhoneInput = document.getElementById("otpPhoneInput");
+  const otpCodeInput = document.getElementById("otpCodeInput");
+  const sendOtpBtn = document.getElementById("sendOtpBtn");
+  const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+  const otpDebugNote = document.getElementById("otpDebugNote");
+  const authStateMessage = document.getElementById("authStateMessage");
+
+  const inhouseBarberSelect = document.getElementById("inhouseBarberSelect");
+  const inhouseServiceSelect = document.getElementById("inhouseServiceSelect");
+  const monthPicker = document.getElementById("monthPicker");
+  const prevWeekBtn = document.getElementById("prevWeekBtn");
+  const nextWeekBtn = document.getElementById("nextWeekBtn");
+  const refreshWeekBtn = document.getElementById("refreshWeekBtn");
+  const weekLabel = document.getElementById("weekLabel");
+  const weekTable = document.getElementById("weekTable");
+  const confirmBookingBtn = document.getElementById("confirmBookingBtn");
+  const bookingStateMessage = document.getElementById("bookingStateMessage");
+  const profileNameInput = document.getElementById("profileNameInput");
+  const profileEmailInput = document.getElementById("profileEmailInput");
+  const saveProfileBtn = document.getElementById("saveProfileBtn");
+  const profileStateMessage = document.getElementById("profileStateMessage");
+  const dashboardBookingList = document.getElementById("dashboardBookingList");
+  const tabButtons = [...document.querySelectorAll(".tab-btn[data-scope]")];
+
+  if (!bookingChoiceModal || !inhouseModal) return;
+
+  const state = {
+    selectedBooksyUrl: BOOKSY_GLOBAL_URL,
+    account: null,
+    weekStart: getMonday(new Date()),
+    selectedBarberId: BOOKING_DEFAULTS.default_barber_id || null,
+    selectedServiceId: BOOKING_DEFAULTS.default_service_id || null,
+    selectedSlot: null,
+    activeScope: "upcoming",
+  };
+
+  function showMessage(el, message, tone) {
+    if (!el) return;
+    el.textContent = message || "";
+    el.classList.remove("ok", "error");
+    if (tone) el.classList.add(tone);
+  }
+
+  function getMonday(dateObj) {
+    const value = new Date(dateObj);
+    const day = value.getDay();
+    const diff = value.getDate() - ((day + 6) % 7);
+    value.setDate(diff);
+    value.setHours(0, 0, 0, 0);
+    return value;
+  }
+
+  function toDateInput(dateObj) {
+    return new Date(dateObj).toISOString().slice(0, 10);
+  }
+
+  function monthValue(dateObj) {
+    const d = new Date(dateObj);
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    return `${d.getFullYear()}-${m}`;
+  }
+
+  function formatRange(dateObj) {
+    const start = new Date(dateObj);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    const fmt = { month: "short", day: "numeric" };
+    return `${start.toLocaleDateString([], fmt)} - ${end.toLocaleDateString([], fmt)}`;
+  }
+
+  async function apiCall(url, options = {}) {
+    const config = {
+      credentials: "same-origin",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    };
+    if (!config.body) delete config.headers["Content-Type"];
+    const response = await fetch(url, config);
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || `Request failed (${response.status})`);
+    return payload;
+  }
+
+  function openChoiceModal(booksyUrl) {
+    state.selectedBooksyUrl = booksyUrl || BOOKSY_GLOBAL_URL;
+    continueBooksyBooking.href = state.selectedBooksyUrl;
+    bookingChoiceModal.classList.add("is-open");
+    bookingChoiceModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeChoiceModal() {
+    bookingChoiceModal.classList.remove("is-open");
+    bookingChoiceModal.setAttribute("aria-hidden", "true");
+  }
+
+  function openInhouseModal() {
+    inhouseModal.classList.add("is-open");
+    inhouseModal.setAttribute("aria-hidden", "false");
+    tryLoadAccount();
+  }
+
+  function closeInhouseModal() {
+    inhouseModal.classList.remove("is-open");
+    inhouseModal.setAttribute("aria-hidden", "true");
+    state.selectedSlot = null;
+    showMessage(bookingStateMessage, "", "");
+  }
+
+  function renderAuthStep() {
+    authStep.style.display = "";
+    inhouseAppStep.style.display = "none";
+  }
+
+  function renderAppStep() {
+    authStep.style.display = "none";
+    inhouseAppStep.style.display = "";
+  }
+
+  async function tryLoadAccount() {
+    try {
+      const payload = await apiCall("/api/account/me");
+      state.account = payload.account;
+      profileNameInput.value = state.account.full_name || "";
+      profileEmailInput.value = state.account.email || "";
+      renderAppStep();
+      await Promise.all([loadAvailability(), loadBookings(state.activeScope)]);
+    } catch (_error) {
+      renderAuthStep();
+    }
+  }
+
+  function populateSelect(selectEl, options, valueKey, labelBuilder, selectedValue) {
+    const previous = String(selectedValue || "");
+    selectEl.innerHTML = options
+      .map((option) => {
+        const value = String(option[valueKey]);
+        const selected = value === previous ? "selected" : "";
+        return `<option value="${value}" ${selected}>${labelBuilder(option)}</option>`;
+      })
+      .join("");
+    if (!selectEl.value && options[0]) selectEl.value = String(options[0][valueKey]);
+  }
+
+  function buildWeekTable(days) {
+    const dayHeaders = days.map((dayObj) => {
+      const dayDate = new Date(`${dayObj.date}T12:00:00`);
+      return {
+        key: dayObj.date,
+        title: dayDate.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" }),
+        slots: dayObj.slots || [],
+      };
+    });
+
+    const slotTimes = new Map();
+    dayHeaders.forEach((dayObj) => {
+      dayObj.slots.forEach((slot) => {
+        const date = new Date(slot.start);
+        const timeKey = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+        if (!slotTimes.has(timeKey)) slotTimes.set(timeKey, slot.label);
+      });
+    });
+    const orderedTimeKeys = [...slotTimes.keys()].sort();
+
+    const headHtml = `
+      <thead>
+        <tr>
+          <th>Time</th>
+          ${dayHeaders.map((dayObj) => `<th>${dayObj.title}</th>`).join("")}
+        </tr>
+      </thead>
+    `;
+
+    const rowHtml = orderedTimeKeys
+      .map((timeKey) => {
+        const cells = dayHeaders
+          .map((dayObj) => {
+            const slot = dayObj.slots.find((candidate) => {
+              const date = new Date(candidate.start);
+              const key = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+              return key === timeKey;
+            });
+            if (!slot) return "<td></td>";
+            if (!slot.available) return "<td><span class='slot-busy'>Busy</span></td>";
+            const activeClass = state.selectedSlot === slot.start ? "is-selected" : "";
+            return `<td><button class="slot-btn ${activeClass}" data-slot="${slot.start}">${slot.label}</button></td>`;
+          })
+          .join("");
+        return `<tr><td class="week-time">${slotTimes.get(timeKey)}</td>${cells}</tr>`;
+      })
+      .join("");
+
+    weekTable.innerHTML = `${headHtml}<tbody>${rowHtml}</tbody>`;
+    confirmBookingBtn.disabled = !state.selectedSlot;
+    weekTable.querySelectorAll(".slot-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.selectedSlot = button.dataset.slot;
+        buildWeekTable(days);
+      });
+    });
+  }
+
+  async function loadAvailability() {
+    const params = new URLSearchParams({
+      week_start: toDateInput(state.weekStart),
+    });
+    if (state.selectedBarberId) params.set("barber_id", String(state.selectedBarberId));
+    if (state.selectedServiceId) params.set("service_id", String(state.selectedServiceId));
+
+    const payload = await apiCall(`/api/availability?${params.toString()}`);
+    state.selectedBarberId = payload.selected_barber_id;
+    state.selectedServiceId = payload.selected_service_id;
+
+    populateSelect(
+      inhouseBarberSelect,
+      payload.barbers,
+      "id",
+      (barber) => barber.title ? `${barber.name} - ${barber.title}` : barber.name,
+      state.selectedBarberId
+    );
+    populateSelect(
+      inhouseServiceSelect,
+      payload.services,
+      "id",
+      (service) => `${service.name} (${service.duration_minutes} min)`,
+      state.selectedServiceId
+    );
+
+    weekLabel.textContent = formatRange(state.weekStart);
+    monthPicker.value = monthValue(state.weekStart);
+    buildWeekTable(payload.days || []);
+  }
+
+  function bookingCardHtml(booking, showCancel) {
+    const startDate = new Date(booking.start_time);
+    const dateLabel = startDate.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    return `
+      <div class="booking-item" data-booking-id="${booking.id}">
+        <h5><span class="badge ${booking.status}">${booking.status}</span>${booking.service.name}</h5>
+        <p>${dateLabel} with ${booking.barber.name}</p>
+        ${showCancel && booking.can_cancel ? '<div class="row-actions"><button class="btn cancel-booking-btn">Cancel</button></div>' : ""}
+      </div>
+    `;
+  }
+
+  async function loadBookings(scope) {
+    state.activeScope = scope;
+    tabButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.scope === scope));
+    const payload = await apiCall(`/api/bookings?scope=${scope}`);
+    if (!payload.bookings || !payload.bookings.length) {
+      dashboardBookingList.innerHTML = "<div class='booking-item'><p>No bookings found for this view yet.</p></div>";
+      return;
+    }
+    dashboardBookingList.innerHTML = payload.bookings
+      .map((booking) => bookingCardHtml(booking, scope === "upcoming"))
+      .join("");
+    dashboardBookingList.querySelectorAll(".cancel-booking-btn").forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        const item = event.target.closest(".booking-item");
+        if (!item) return;
+        const bookingId = item.dataset.bookingId;
+        try {
+          await apiCall(`/api/bookings/${bookingId}/cancel`, { method: "POST", body: JSON.stringify({ reason: "Cancelled by customer" }) });
+          showMessage(profileStateMessage, "Booking cancelled.", "ok");
+          await Promise.all([loadBookings("upcoming"), loadAvailability()]);
+        } catch (error) {
+          showMessage(profileStateMessage, error.message, "error");
+        }
+      });
+    });
+  }
+
+  async function sendOtp() {
+    showMessage(authStateMessage, "", "");
+    otpDebugNote.textContent = "";
+    try {
+      const payload = await apiCall("/api/auth/send-otp", {
+        method: "POST",
+        body: JSON.stringify({ phone: otpPhoneInput.value }),
+      });
+      showMessage(authStateMessage, "Code sent. Check your phone and verify below.", "ok");
+      if (payload.debug_code) {
+        otpDebugNote.textContent = `Debug code: ${payload.debug_code}`;
+      }
+    } catch (error) {
+      showMessage(authStateMessage, error.message, "error");
+    }
+  }
+
+  async function verifyOtp() {
+    showMessage(authStateMessage, "", "");
+    try {
+      const payload = await apiCall("/api/auth/verify-otp", {
+        method: "POST",
+        body: JSON.stringify({ phone: otpPhoneInput.value, code: otpCodeInput.value }),
+      });
+      state.account = payload.account;
+      profileNameInput.value = state.account.full_name || "";
+      profileEmailInput.value = state.account.email || "";
+      showMessage(authStateMessage, "Signed in successfully.", "ok");
+      renderAppStep();
+      await Promise.all([loadAvailability(), loadBookings(state.activeScope)]);
+    } catch (error) {
+      showMessage(authStateMessage, error.message, "error");
+    }
+  }
+
+  async function saveProfile() {
+    try {
+      const payload = await apiCall("/api/account/me", {
+        method: "PATCH",
+        body: JSON.stringify({
+          full_name: profileNameInput.value,
+          email: profileEmailInput.value,
+        }),
+      });
+      state.account = payload.account;
+      showMessage(profileStateMessage, "Profile updated.", "ok");
+    } catch (error) {
+      showMessage(profileStateMessage, error.message, "error");
+    }
+  }
+
+  async function confirmBooking() {
+    if (!state.selectedSlot) return;
+    try {
+      await apiCall("/api/bookings", {
+        method: "POST",
+        body: JSON.stringify({
+          barber_id: Number(state.selectedBarberId),
+          service_id: Number(state.selectedServiceId),
+          start_time: state.selectedSlot,
+        }),
+      });
+      showMessage(bookingStateMessage, "Booking confirmed.", "ok");
+      state.selectedSlot = null;
+      await Promise.all([loadAvailability(), loadBookings("upcoming")]);
+    } catch (error) {
+      showMessage(bookingStateMessage, error.message, "error");
+    }
+  }
+
+  document.addEventListener("click", (event) => {
+    const anchor = event.target.closest("a");
+    if (!anchor) return;
+    if (anchor.classList.contains("booking-direct-link")) return;
+    if (anchor.closest("#bookingChoiceModal")) return;
+
+    const href = anchor.getAttribute("href") || "";
+    if (anchor.id === "bmBooksy") {
+      event.preventDefault();
+      openChoiceModal(anchor.href && anchor.href !== "#" ? anchor.href : BOOKSY_GLOBAL_URL);
+      return;
+    }
+    if (href.includes("booksy.com")) {
+      event.preventDefault();
+      openChoiceModal(anchor.href || href);
+    }
+  });
+
+  bookingChoiceModal.addEventListener("click", (event) => {
+    if (event.target.hasAttribute("data-booking-close")) closeChoiceModal();
+  });
+  inhouseModal.addEventListener("click", (event) => {
+    if (event.target.hasAttribute("data-inhouse-close")) closeInhouseModal();
+  });
+
+  continueInhouseBooking.addEventListener("click", () => {
+    closeChoiceModal();
+    openInhouseModal();
+  });
+  openInhouseAccount.addEventListener("click", () => {
+    closeChoiceModal();
+    openInhouseModal();
+  });
+
+  sendOtpBtn.addEventListener("click", sendOtp);
+  verifyOtpBtn.addEventListener("click", verifyOtp);
+  saveProfileBtn.addEventListener("click", saveProfile);
+  confirmBookingBtn.addEventListener("click", confirmBooking);
+
+  prevWeekBtn.addEventListener("click", async () => {
+    state.weekStart.setDate(state.weekStart.getDate() - 7);
+    await loadAvailability();
+  });
+  nextWeekBtn.addEventListener("click", async () => {
+    state.weekStart.setDate(state.weekStart.getDate() + 7);
+    await loadAvailability();
+  });
+  refreshWeekBtn.addEventListener("click", loadAvailability);
+  monthPicker.addEventListener("change", async () => {
+    if (!monthPicker.value) return;
+    const selected = new Date(`${monthPicker.value}-01T12:00:00`);
+    state.weekStart = getMonday(selected);
+    await loadAvailability();
+  });
+  inhouseBarberSelect.addEventListener("change", async () => {
+    state.selectedBarberId = Number(inhouseBarberSelect.value);
+    state.selectedSlot = null;
+    await loadAvailability();
+  });
+  inhouseServiceSelect.addEventListener("change", async () => {
+    state.selectedServiceId = Number(inhouseServiceSelect.value);
+    state.selectedSlot = null;
+    await loadAvailability();
+  });
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", () => loadBookings(button.dataset.scope));
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (inhouseModal.classList.contains("is-open")) closeInhouseModal();
+    if (bookingChoiceModal.classList.contains("is-open")) closeChoiceModal();
+  });
 })();
 </script>
 

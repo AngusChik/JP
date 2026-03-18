@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JP Studio Ops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#0b1013;
+      --panel:#12191f;
+      --panel-soft:#182129;
+      --muted:#8fa0ae;
+      --text:#edf3f7;
+      --accent:#e0a449;
+      --accent-soft:rgba(224,164,73,.16);
+      --line:rgba(255,255,255,.08);
+      --ok:#9dd8ae;
+      --warn:#f4c485;
+      --bad:#f3a0a0;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;background:
+        radial-gradient(circle at top left, rgba(224,164,73,.12), transparent 30%),
+        linear-gradient(180deg,#0a0f12,#0b1013 30%,#10161b 100%);
+      color:var(--text);font-family:"Inter",system-ui,sans-serif;
+    }
+    .wrap{max-width:1320px;margin:0 auto;padding:28px 22px 48px}
+    .topbar{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:24px}
+    .eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+    h1{margin:8px 0 0;font-family:"Fraunces",serif;font-size:clamp(32px,5vw,54px);line-height:1}
+    .sub{color:var(--muted);max-width:68ch;font-size:14px;line-height:1.6}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn,.link-btn,button{
+      border:1px solid var(--line);background:var(--panel-soft);color:var(--text);border-radius:12px;
+      padding:10px 14px;font:600 13px "Inter",system-ui,sans-serif;cursor:pointer;text-decoration:none;
+    }
+    .btn.primary{background:var(--accent);color:#17130d;border-color:transparent}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+    .metric{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
+    .metric small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+    .metric strong{display:block;margin-top:8px;font-size:28px}
+    .layout{display:grid;grid-template-columns:1.1fr 1.4fr 1.1fr;gap:16px;align-items:start}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px}
+    .card h2{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .search{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#0d1317;color:var(--text)}
+    .list{display:grid;gap:10px;max-height:700px;overflow:auto;padding-right:4px}
+    .person{
+      width:100%;text-align:left;padding:13px;border-radius:14px;border:1px solid var(--line);
+      background:linear-gradient(180deg,#131a20,#10161b);
+    }
+    .person.is-active{border-color:rgba(224,164,73,.45);box-shadow:0 0 0 1px rgba(224,164,73,.18) inset}
+    .person strong{display:block;font-size:14px}
+    .person span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+    input,select,textarea{
+      width:100%;padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:#0d1317;color:var(--text)
+    }
+    textarea{min-height:112px;resize:vertical}
+    .note{margin-top:10px;color:var(--muted);font-size:12px}
+    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+    .stat{padding:12px;border-radius:14px;background:var(--panel-soft);border:1px solid var(--line)}
+    .stat small{display:block;color:var(--muted);font-size:11px}
+    .stat strong{display:block;margin-top:6px;font-size:20px}
+    .history,.recent{display:grid;gap:10px}
+    .item{padding:12px;border-radius:14px;background:var(--panel-soft);border:1px solid var(--line)}
+    .item strong{display:block}
+    .item p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+    .badge{display:inline-block;margin-right:6px;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase}
+    .badge.confirmed,.badge.rescheduled{background:rgba(157,216,174,.12);color:var(--ok)}
+    .badge.completed{background:rgba(111,199,255,.12);color:#9bd7ff}
+    .badge.cancelled{background:rgba(243,160,160,.12);color:var(--bad)}
+    .badge.missed{background:rgba(244,196,133,.12);color:var(--warn)}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .msg{min-height:18px;margin-top:10px;font-size:12px}
+    .msg.ok{color:var(--ok)}
+    .msg.error{color:var(--bad)}
+    @media (max-width: 1120px){
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .layout{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      .grid{grid-template-columns:1fr}
+      .detail-grid,.stats{grid-template-columns:1fr}
+      .topbar{align-items:start;flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="eyebrow">Staff Operations</div>
+        <h1>Client Records and Shop Pulse</h1>
+        <p class="sub">Run the shop from Python: search clients, store barber notes, review visit history, complete checkouts, and track no-shows and revenue without leaving the site.</p>
+      </div>
+      <div class="actions">
+        <a class="link-btn" href="/api/admin/bookings/export.csv">Export CSV</a>
+        <a class="link-btn" href="/api/admin/bookings/export.ics">Export ICS</a>
+        <a class="link-btn" href="/">View Site</a>
+      </div>
+    </div>
+
+    <section class="grid" id="metricGrid"></section>
+
+    <section class="layout">
+      <div class="card">
+        <h2>Clients</h2>
+        <input id="customerSearch" class="search" type="search" placeholder="Search name, phone, email, or style" />
+        <div class="list" id="customerList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Client Record</h2>
+        <div class="detail-grid">
+          <div>
+            <label for="recordName">Full Name</label>
+            <input id="recordName" type="text" />
+          </div>
+          <div>
+            <label for="recordPhone">Phone</label>
+            <input id="recordPhone" type="text" readonly />
+          </div>
+          <div>
+            <label for="recordEmail">Email</label>
+            <input id="recordEmail" type="email" />
+          </div>
+          <div>
+            <label for="recordBarber">Preferred Barber</label>
+            <select id="recordBarber"></select>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <label for="recordStyle">Preferred Cut / Style</label>
+          <input id="recordStyle" type="text" placeholder="Low taper, line-up, beard cleanup..." />
+        </div>
+        <div style="margin-top:10px">
+          <label for="recordNotes">Internal Barber Notes</label>
+          <textarea id="recordNotes" placeholder="Clipper guard, hair texture, conversation preferences, no-show context..."></textarea>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn primary" id="saveRecordBtn" type="button">Save Client Record</button>
+        </div>
+        <div class="msg" id="recordMsg"></div>
+
+        <div class="stats" id="recordStats"></div>
+
+        <h2 style="margin-top:18px">Visit History</h2>
+        <div class="history" id="historyList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Recent Activity</h2>
+        <div class="recent" id="recentList"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const barbers = {{ barbers_json|safe }};
+      const state = {
+        customers: [],
+        selectedCustomerId: null,
+      };
+
+      const metricGrid = document.getElementById("metricGrid");
+      const customerSearch = document.getElementById("customerSearch");
+      const customerList = document.getElementById("customerList");
+      const recentList = document.getElementById("recentList");
+      const recordName = document.getElementById("recordName");
+      const recordPhone = document.getElementById("recordPhone");
+      const recordEmail = document.getElementById("recordEmail");
+      const recordBarber = document.getElementById("recordBarber");
+      const recordStyle = document.getElementById("recordStyle");
+      const recordNotes = document.getElementById("recordNotes");
+      const saveRecordBtn = document.getElementById("saveRecordBtn");
+      const recordMsg = document.getElementById("recordMsg");
+      const recordStats = document.getElementById("recordStats");
+      const historyList = document.getElementById("historyList");
+
+      function money(cents) {
+        return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format((cents || 0) / 100);
+      }
+
+      async function api(url, options = {}) {
+        const config = {
+          credentials: "same-origin",
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        };
+        if (!config.body) delete config.headers["Content-Type"];
+        const response = await fetch(url, config);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Request failed");
+        return payload;
+      }
+
+      function setMsg(message, tone) {
+        recordMsg.textContent = message || "";
+        recordMsg.className = `msg ${tone || ""}`.trim();
+      }
+
+      function renderMetricGrid(summary) {
+        const cards = [
+          ["Upcoming", summary.upcoming_bookings],
+          ["Revenue This Month", money(summary.monthly_revenue_cents)],
+          ["Missed This Month", summary.missed_this_month],
+          ["Repeat Clients", summary.repeat_clients],
+        ];
+        metricGrid.innerHTML = cards.map(([label, value]) => `
+          <div class="metric">
+            <small>${label}</small>
+            <strong>${value}</strong>
+          </div>
+        `).join("");
+      }
+
+      function renderCustomers() {
+        customerList.innerHTML = state.customers.map((customer) => `
+          <button type="button" class="person ${state.selectedCustomerId === customer.id ? "is-active" : ""}" data-customer-id="${customer.id}">
+            <strong>${customer.full_name || "Unnamed client"}</strong>
+            <span>${customer.phone}</span>
+            <span>${customer.preferred_style || "No preferred style saved yet"}</span>
+          </button>
+        `).join("");
+        customerList.querySelectorAll("[data-customer-id]").forEach((button) => {
+          button.addEventListener("click", () => loadCustomer(Number(button.dataset.customerId)));
+        });
+      }
+
+      function renderCustomerDetail(payload) {
+        const customer = payload.customer;
+        state.selectedCustomerId = customer.id;
+        renderCustomers();
+        recordName.value = customer.full_name || "";
+        recordPhone.value = customer.phone || "";
+        recordEmail.value = customer.email || "";
+        recordStyle.value = customer.preferred_style || "";
+        recordNotes.value = customer.profile_notes || "";
+
+        recordBarber.innerHTML = [`<option value="">No preference</option>`]
+          .concat(barbers.map((barber) => {
+            const selected = customer.preferred_barber && customer.preferred_barber.id === barber.id ? "selected" : "";
+            return `<option value="${barber.id}" ${selected}>${barber.name}</option>`;
+          }))
+          .join("");
+
+        const stats = customer.stats;
+        recordStats.innerHTML = [
+          ["Completed visits", stats.completed_visits],
+          ["Cancelled", stats.cancelled_visits],
+          ["Missed", stats.missed_visits],
+          ["Lifetime spend", money(stats.total_spend_cents)],
+        ].map(([label, value]) => `
+          <div class="stat"><small>${label}</small><strong>${value}</strong></div>
+        `).join("");
+
+        historyList.innerHTML = payload.bookings.length ? payload.bookings.map((booking) => `
+          <div class="item">
+            <strong><span class="badge ${booking.status}">${booking.status}</span>${booking.service.name}</strong>
+            <p>${new Date(booking.start_time).toLocaleString()} with ${booking.barber.name}</p>
+            <p>${money(booking.amount_paid_cents)} collected${booking.notes ? ` | ${booking.notes}` : ""}</p>
+          </div>
+        `).join("") : `<div class="item"><p>No visits yet for this client.</p></div>`;
+      }
+
+      function renderRecent(bookings) {
+        recentList.innerHTML = bookings.map((booking) => `
+          <div class="item" data-booking-id="${booking.id}">
+            <strong><span class="badge ${booking.status}">${booking.status}</span>${booking.service.name}</strong>
+            <p>${booking.barber.name} | ${new Date(booking.start_time).toLocaleString()}</p>
+            <p>${money(booking.amount_paid_cents)} collected</p>
+            <div class="row" style="margin-top:8px">
+              ${booking.status === "confirmed" || booking.status === "rescheduled" ? `<button type="button" class="btn complete-btn">Complete / Checkout</button><button type="button" class="btn miss-btn">Mark Missed</button>` : ""}
+            </div>
+          </div>
+        `).join("");
+
+        recentList.querySelectorAll(".complete-btn").forEach((button) => {
+          button.addEventListener("click", async (event) => {
+            const container = event.target.closest("[data-booking-id]");
+            const bookingId = container.dataset.bookingId;
+            const amount = window.prompt("Amount collected in cents", "4000");
+            if (amount === null) return;
+            await api(`/api/admin/bookings/${bookingId}/complete`, {
+              method: "POST",
+              body: JSON.stringify({ amount_paid_cents: Number(amount) || 0 }),
+            });
+            await loadOverview();
+            if (state.selectedCustomerId) await loadCustomer(state.selectedCustomerId);
+          });
+        });
+
+        recentList.querySelectorAll(".miss-btn").forEach((button) => {
+          button.addEventListener("click", async (event) => {
+            const container = event.target.closest("[data-booking-id]");
+            const bookingId = container.dataset.bookingId;
+            await api(`/api/admin/bookings/${bookingId}/mark-missed`, { method: "POST", body: "{}" });
+            await loadOverview();
+            if (state.selectedCustomerId) await loadCustomer(state.selectedCustomerId);
+          });
+        });
+      }
+
+      async function loadOverview() {
+        const payload = await api("/api/admin/overview");
+        renderMetricGrid(payload.summary);
+        renderRecent(payload.recent_bookings || []);
+      }
+
+      async function loadCustomers(query = "") {
+        const suffix = query ? `?search=${encodeURIComponent(query)}` : "";
+        const payload = await api(`/api/admin/customers${suffix}`);
+        state.customers = payload.customers || [];
+        renderCustomers();
+        if (!state.selectedCustomerId && state.customers[0]) {
+          await loadCustomer(state.customers[0].id);
+        }
+      }
+
+      async function loadCustomer(customerId) {
+        const payload = await api(`/api/admin/customers/${customerId}`);
+        renderCustomerDetail(payload);
+      }
+
+      customerSearch.addEventListener("input", async () => {
+        await loadCustomers(customerSearch.value);
+      });
+
+      saveRecordBtn.addEventListener("click", async () => {
+        if (!state.selectedCustomerId) return;
+        try {
+          const payload = await api(`/api/admin/customers/${state.selectedCustomerId}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              full_name: recordName.value,
+              email: recordEmail.value,
+              preferred_barber_id: recordBarber.value || null,
+              preferred_style: recordStyle.value,
+              profile_notes: recordNotes.value,
+            }),
+          });
+          renderCustomerDetail(payload);
+          setMsg("Client record saved.", "ok");
+        } catch (error) {
+          setMsg(error.message, "error");
+        }
+      });
+
+      Promise.all([loadOverview(), loadCustomers()]).catch((error) => {
+        setMsg(error.message, "error");
+      });
+    })();
+  </script>
+</body>
+</html>

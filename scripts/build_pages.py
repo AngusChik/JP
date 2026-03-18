@@ -26,10 +26,11 @@ def build_index_html() -> None:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jp.settings")
 
     import django  # pylint: disable=import-outside-toplevel
-    from django.test import RequestFactory  # pylint: disable=import-outside-toplevel
-    from barber.views import home  # pylint: disable=import-outside-toplevel
 
     django.setup()
+
+    from django.test import RequestFactory  # pylint: disable=import-outside-toplevel
+    from barber.views import home  # pylint: disable=import-outside-toplevel
 
     request = RequestFactory().get("/")
     response = home(request)
