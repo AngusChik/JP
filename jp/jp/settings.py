@@ -130,6 +130,15 @@ USE_TZ = True
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
 TWILIO_FROM_NUMBER = os.environ.get('TWILIO_FROM_NUMBER', '')
+BOOKSY_GLOBAL_URL = os.environ.get(
+    'BOOKSY_GLOBAL_URL',
+    'https://booksy.com/en-ca/21963_jp-barber-studio_barbershop_870806_mississauga#ba_s=sh_1',
+)
+BOOKSY_WIDGET_SCRIPT_URL = os.environ.get(
+    'BOOKSY_WIDGET_SCRIPT_URL',
+    'https://booksy.com/widget/code.js?id=21963&country=ca&lang=en',
+)
+GOOGLE_BOOKING_URL = os.environ.get('GOOGLE_BOOKING_URL', '')
 
 
 # Static files (CSS, JavaScript, Images)

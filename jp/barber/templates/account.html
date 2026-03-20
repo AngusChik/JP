@@ -1,0 +1,804 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Log in to JP Studio as a customer with phone verification or as staff with secure admin credentials." />
+  <title>JP Studio | Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#090909;
+      --surface:rgba(16,16,16,.86);
+      --surface-strong:rgba(20,20,20,.94);
+      --surface-soft:rgba(255,255,255,.04);
+      --text:#ede9e0;
+      --muted:#a3998d;
+      --accent:#cfac6a;
+      --accent-soft:rgba(207,172,106,.14);
+      --accent-glow:rgba(207,172,106,.24);
+      --line:rgba(255,255,255,.08);
+      --ok:#98d5ae;
+      --bad:#f1a5a5;
+      --shadow:0 24px 60px rgba(0,0,0,.38);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
+      font-family:"Inter",system-ui,sans-serif;
+      background:
+        linear-gradient(120deg, rgba(0,0,0,.78), rgba(0,0,0,.9)),
+        radial-gradient(circle at top left, rgba(207,172,106,.16), transparent 30%),
+        url("{% static 'Cuts/BG2.jpg' %}") center/cover no-repeat fixed;
+    }
+    a{color:inherit;text-decoration:none}
+    button,input{font:inherit}
+    .shell{
+      min-height:100vh;
+      padding:20px;
+      display:grid;
+      place-items:center;
+    }
+    .frame{
+      width:min(1220px,100%);
+      border:1px solid var(--line);
+      border-radius:32px;
+      overflow:hidden;
+      background:linear-gradient(180deg, rgba(13,13,13,.88), rgba(9,9,9,.96));
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(18px);
+    }
+    .utility{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:18px 20px 0;
+    }
+    .back-link{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      min-height:50px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      font-weight:700;
+      transition:transform .2s ease,border-color .2s ease,background .2s ease;
+    }
+    .back-link:hover{
+      transform:translateY(-1px);
+      border-color:rgba(255,255,255,.22);
+      background:rgba(255,255,255,.07);
+    }
+    .back-link svg{
+      width:16px;
+      height:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+      letter-spacing:.04em;
+    }
+    .brand-mark{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background:var(--accent);
+      color:#111;
+      box-shadow:0 12px 28px var(--accent-glow);
+    }
+    .content{
+      display:grid;
+      grid-template-columns:minmax(0,1.06fr) minmax(380px,.94fr);
+    }
+    .story{
+      position:relative;
+      padding:30px 40px 40px;
+      display:flex;
+      flex-direction:column;
+      gap:26px;
+      background:
+        linear-gradient(180deg, rgba(18,18,18,.46), rgba(10,10,10,.86)),
+        radial-gradient(circle at top, rgba(207,172,106,.1), transparent 42%);
+    }
+    .story::after{
+      content:"";
+      position:absolute;
+      inset:20px 18px 18px 18px;
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.04);
+      pointer-events:none;
+    }
+    .eyebrow{
+      color:var(--accent);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .hero{
+      position:relative;
+      z-index:1;
+      display:grid;
+      gap:16px;
+      max-width:630px;
+    }
+    .hero h1{
+      margin:0;
+      font-family:"Playfair Display",Georgia,serif;
+      font-size:clamp(40px,5.4vw,72px);
+      line-height:.95;
+      letter-spacing:-.04em;
+    }
+    .hero p{
+      margin:0;
+      max-width:48ch;
+      color:#d7d0c6;
+      font-size:15px;
+      line-height:1.78;
+    }
+    .feature-band{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+    .feature{
+      padding:18px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      min-height:190px;
+    }
+    .feature-index{
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      background:var(--accent-soft);
+      color:var(--accent);
+      font-weight:800;
+      font-size:12px;
+    }
+    .feature strong{
+      display:block;
+      margin:14px 0 8px;
+      font-size:18px;
+      line-height:1.2;
+    }
+    .feature p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:13px;
+    }
+    .profile-note{
+      position:relative;
+      z-index:1;
+      display:grid;
+      gap:8px;
+      padding:18px 20px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.025);
+    }
+    .profile-note strong{
+      font-size:16px;
+    }
+    .profile-note p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:13px;
+    }
+    .panel{
+      padding:30px 28px 34px;
+      display:grid;
+      align-content:center;
+      background:linear-gradient(180deg, rgba(18,18,18,.94), rgba(9,9,9,.98));
+    }
+    .panel-card{
+      padding:28px;
+      border-radius:28px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.014));
+      box-shadow:0 18px 40px rgba(0,0,0,.24);
+    }
+    .panel-card h2{
+      margin:8px 0 10px;
+      font-size:32px;
+      letter-spacing:-.03em;
+    }
+    .panel-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.72;
+      font-size:14px;
+    }
+    .mode-switch{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:24px;
+      padding:6px;
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+    }
+    .mode-button{
+      min-height:48px;
+      border:0;
+      border-radius:14px;
+      background:transparent;
+      color:var(--muted);
+      font-weight:800;
+      letter-spacing:.01em;
+      cursor:pointer;
+      transition:background .2s ease,color .2s ease,transform .2s ease;
+    }
+    .mode-button:hover{
+      transform:translateY(-1px);
+      color:var(--text);
+    }
+    .mode-button.active{
+      background:var(--accent);
+      color:#16120d;
+      box-shadow:0 14px 28px rgba(207,172,106,.22);
+    }
+    .auth-pane{
+      display:none;
+      margin-top:22px;
+    }
+    .auth-pane.is-active{
+      display:block;
+    }
+    .field-grid{
+      display:grid;
+      gap:14px;
+      margin-top:24px;
+    }
+    .field{
+      display:grid;
+      gap:8px;
+    }
+    .field label{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:var(--muted);
+      font-weight:800;
+    }
+    .input-wrap input{
+      width:100%;
+      min-height:58px;
+      padding:0 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      outline:none;
+      transition:border-color .2s ease,box-shadow .2s ease,background .2s ease;
+    }
+    .input-wrap input:focus{
+      border-color:rgba(207,172,106,.45);
+      box-shadow:0 0 0 4px rgba(207,172,106,.12);
+      background:rgba(255,255,255,.05);
+    }
+    .field-hint{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.65;
+    }
+    .button-row{
+      display:grid;
+      gap:10px;
+      margin-top:20px;
+    }
+    .button{
+      width:100%;
+      min-height:56px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      cursor:pointer;
+      transition:transform .2s ease,background .2s ease,border-color .2s ease,opacity .2s ease;
+    }
+    .button:hover:not(:disabled){
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.07);
+    }
+    .button:disabled{
+      cursor:progress;
+      opacity:.65;
+    }
+    .button.primary{
+      background:var(--accent);
+      border-color:transparent;
+      color:#16120d;
+      font-weight:800;
+      box-shadow:0 16px 30px rgba(207,172,106,.2);
+    }
+    .button.ghost{
+      background:transparent;
+    }
+    .stage-note{
+      display:grid;
+      grid-template-columns:1fr auto;
+      align-items:center;
+      gap:12px;
+      margin-top:16px;
+      padding:15px 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:#d7d1c9;
+      font-size:13px;
+      line-height:1.6;
+    }
+    .stage-pill{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:var(--accent);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .state{
+      min-height:20px;
+      margin-top:16px;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .state.ok{color:var(--ok)}
+    .state.error{color:var(--bad)}
+    .debug{
+      min-height:20px;
+      margin-top:10px;
+      color:var(--accent);
+      font-size:12px;
+      line-height:1.6;
+    }
+    .delivery-card{
+      display:grid;
+      gap:10px;
+      margin-top:18px;
+      padding:16px 18px;
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.025);
+    }
+    .delivery-card strong{
+      font-size:15px;
+    }
+    .delivery-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.7;
+    }
+    .staff-lockup{
+      display:grid;
+      gap:12px;
+    }
+    .staff-lockup strong{
+      font-size:17px;
+    }
+    .staff-lockup p{
+      margin:0;
+    }
+    @media (max-width:1100px){
+      .content{
+        grid-template-columns:1fr;
+      }
+      .story,.panel{
+        padding:24px;
+      }
+    }
+    @media (max-width:760px){
+      .shell{
+        padding:12px;
+      }
+      .frame{
+        border-radius:24px;
+      }
+      .utility{
+        padding:14px 14px 0;
+      }
+      .story,.panel{
+        padding:18px;
+      }
+      .feature-band{
+        grid-template-columns:1fr;
+      }
+      .hero h1{
+        font-size:clamp(34px,12vw,48px);
+      }
+      .panel-card{
+        padding:22px;
+        border-radius:22px;
+      }
+      .story::after{
+        inset:14px;
+        border-radius:18px;
+      }
+      .stage-note{
+        grid-template-columns:1fr;
+        justify-items:start;
+      }
+      .back-link{
+        min-height:46px;
+        padding:0 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="frame">
+      <div class="utility">
+        <a class="back-link" href="{{ home_url }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"></path>
+            <path d="M21 12H9"></path>
+          </svg>
+          <span>Back to Main Site</span>
+        </a>
+        <div class="brand">
+          <div class="brand-mark">JP</div>
+          <span>JP Studio</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="story">
+          <div class="hero">
+            <div class="eyebrow">Account Access</div>
+            <h1>One polished entry for clients, staff, and admin.</h1>
+            <p>Customers sign in with their phone number and one-time code. Staff and admins use their secure username and password to reach the internal operations dashboard without mixing customer profiles and staff settings.</p>
+          </div>
+
+          <div class="feature-band">
+            <article class="feature">
+              <div class="feature-index">01</div>
+              <strong>Phone-first login</strong>
+              <p>Enter the number you use with the shop so we can connect you to the right customer record.</p>
+            </article>
+            <article class="feature">
+              <div class="feature-index">02</div>
+              <strong>Real OTP ready</strong>
+              <p>The backend is already wired for real SMS verification and still exposes the debug code while you are developing.</p>
+            </article>
+            <article class="feature">
+              <div class="feature-index">03</div>
+              <strong>Separate staff access</strong>
+              <p>Staff sign-in uses protected admin credentials and opens the ops side of the business without exposing customer dashboard shortcuts here.</p>
+            </article>
+          </div>
+
+          <div class="profile-note">
+            <strong>What happens after sign-in</strong>
+            <p>Customer verification creates or reuses a profile record in the backend database. Staff sign-in uses Django authentication and opens the internal dashboard with separate session access and settings.</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <section class="panel-card">
+            <div class="eyebrow">Sign In</div>
+            <h2>Choose your entrance</h2>
+            <p>Customers use phone verification. Staff and admins use their secure account credentials to reach the operations dashboard.</p>
+
+            <div class="mode-switch" role="tablist" aria-label="Choose sign-in type">
+              <button type="button" class="mode-button active" id="customerModeBtn" data-mode-target="customer" aria-pressed="true">Customer</button>
+              <button type="button" class="mode-button" id="staffModeBtn" data-mode-target="staff" aria-pressed="false">Staff / Admin</button>
+            </div>
+
+            <div class="auth-pane is-active" id="customerPane">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="otpPhoneInput">Phone Number</label>
+                  <div class="input-wrap">
+                    <input id="otpPhoneInput" type="tel" placeholder="(416) 555-0123" autocomplete="tel" />
+                  </div>
+                  <div class="field-hint">Use the mobile number you book with so we can attach the right profile record.</div>
+                </div>
+
+                <div class="field">
+                  <label for="otpCodeInput">Verification Code</label>
+                  <div class="input-wrap">
+                    <input id="otpCodeInput" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code" />
+                  </div>
+                  <div class="field-hint">Codes expire after 10 minutes. Request a fresh one any time if you need another attempt.</div>
+                </div>
+              </div>
+
+              <div class="button-row">
+                <button type="button" class="button primary" id="sendOtpBtn">Send Verification Code</button>
+                <button type="button" class="button primary" id="verifyOtpBtn">Continue to My Account</button>
+                <button type="button" class="button ghost" id="createAccountBtn">I'm New Here, Create My Account</button>
+              </div>
+
+              <div class="stage-note">
+                <span id="stageMessage">Request your code to begin. We will switch to verification mode once the code is sent.</span>
+                <span class="stage-pill" id="stagePill">Step 1</span>
+              </div>
+
+              <div class="state" id="authMsg"></div>
+              <div class="debug" id="otpDebug"></div>
+
+              <div class="delivery-card">
+                <strong>Delivery mode</strong>
+                <p id="deliveryMessage">Production SMS delivery is wired on the backend. In local debug mode, the code will still appear here so you can test quickly.</p>
+              </div>
+            </div>
+
+            <div class="auth-pane" id="staffPane" hidden>
+              <div class="staff-lockup">
+                <strong>Staff and admin sign-in</strong>
+                <p>Use your staff username and password here. Successful sign-in opens the internal ops dashboard and keeps customer account access separate.</p>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label for="staffUsernameInput">Username</label>
+                  <div class="input-wrap">
+                    <input id="staffUsernameInput" type="text" placeholder="staff username" autocomplete="username" />
+                  </div>
+                  <div class="field-hint">This must be a Django staff or superuser account.</div>
+                </div>
+
+                <div class="field">
+                  <label for="staffPasswordInput">Password</label>
+                  <div class="input-wrap">
+                    <input id="staffPasswordInput" type="password" placeholder="Enter password" autocomplete="current-password" />
+                  </div>
+                  <div class="field-hint">Customer phone verification does not grant access to the ops dashboard.</div>
+                </div>
+              </div>
+
+              <div class="button-row">
+                <button type="button" class="button primary" id="staffLoginBtn">Continue to Staff Dashboard</button>
+              </div>
+
+              <div class="stage-note">
+                <span>After sign-in we will send you straight to the protected staff dashboard and settings area.</span>
+                <span class="stage-pill">Staff</span>
+              </div>
+
+              <div class="state" id="staffAuthMsg"></div>
+
+              <div class="delivery-card">
+                <strong>Admin access rules</strong>
+                <p>Only accounts with <code>is_staff=True</code> can continue from this panel. The traditional Django admin at <code>/admin/</code> still works as a fallback.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const DASHBOARD_URL = "{{ dashboard_url|escapejs }}";
+      const STAFF_DASHBOARD_URL = "{{ staff_dashboard_url|escapejs }}";
+      const STAFF_NEXT_URL = "{{ staff_next_url|escapejs }}";
+      const INITIAL_MODE = "{{ initial_mode|escapejs }}";
+      const authMsg = document.getElementById("authMsg");
+      const staffAuthMsg = document.getElementById("staffAuthMsg");
+      const otpDebug = document.getElementById("otpDebug");
+      const phoneInput = document.getElementById("otpPhoneInput");
+      const codeInput = document.getElementById("otpCodeInput");
+      const staffUsernameInput = document.getElementById("staffUsernameInput");
+      const staffPasswordInput = document.getElementById("staffPasswordInput");
+      const stageMessage = document.getElementById("stageMessage");
+      const stagePill = document.getElementById("stagePill");
+      const deliveryMessage = document.getElementById("deliveryMessage");
+      const sendButton = document.getElementById("sendOtpBtn");
+      const verifyButton = document.getElementById("verifyOtpBtn");
+      const createButton = document.getElementById("createAccountBtn");
+      const staffLoginButton = document.getElementById("staffLoginBtn");
+      const customerModeButton = document.getElementById("customerModeBtn");
+      const staffModeButton = document.getElementById("staffModeBtn");
+      const customerPane = document.getElementById("customerPane");
+      const staffPane = document.getElementById("staffPane");
+
+      function show(message, tone) {
+        authMsg.textContent = message || "";
+        authMsg.className = `state ${tone || ""}`.trim();
+      }
+
+      function showStaff(message, tone) {
+        staffAuthMsg.textContent = message || "";
+        staffAuthMsg.className = `state ${tone || ""}`.trim();
+      }
+
+      function setStage(step, message) {
+        stagePill.textContent = step;
+        if (message) {
+          stageMessage.textContent = message;
+        }
+      }
+
+      function setCustomerBusy(isBusy) {
+        [sendButton, verifyButton, createButton].forEach((button) => {
+          button.disabled = isBusy;
+        });
+      }
+
+      function setStaffBusy(isBusy) {
+        staffLoginButton.disabled = isBusy;
+      }
+
+      function activateMode(mode) {
+        const isStaff = mode === "staff";
+        customerPane.hidden = isStaff;
+        staffPane.hidden = !isStaff;
+        customerPane.classList.toggle("is-active", !isStaff);
+        staffPane.classList.toggle("is-active", isStaff);
+        customerModeButton.classList.toggle("active", !isStaff);
+        staffModeButton.classList.toggle("active", isStaff);
+        customerModeButton.setAttribute("aria-pressed", String(!isStaff));
+        staffModeButton.setAttribute("aria-pressed", String(isStaff));
+        if (isStaff) {
+          staffUsernameInput.focus();
+        } else {
+          phoneInput.focus();
+        }
+      }
+
+      async function api(url, options = {}) {
+        const config = {
+          credentials: "same-origin",
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        };
+        if (!config.body) {
+          delete config.headers["Content-Type"];
+        }
+        const response = await fetch(url, config);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || `Request failed (${response.status})`);
+        }
+        return payload;
+      }
+
+      async function sendOtp(mode) {
+        const isCreate = mode === "create";
+        setCustomerBusy(true);
+        show("");
+        otpDebug.textContent = "";
+        try {
+          const payload = await api("/api/auth/send-otp", {
+            method: "POST",
+            body: JSON.stringify({ phone: phoneInput.value }),
+          });
+          setStage(
+            "Step 2",
+            isCreate
+              ? "Your account setup code is on the way. Enter the 6 digits below to create your profile."
+              : "Code sent. Enter the 6 digits below and we will take you into your account."
+          );
+          show(
+            isCreate
+              ? "Verification code sent. Enter it below to create your account."
+              : "Verification code sent. Enter it below to continue.",
+            "ok"
+          );
+          if (payload.debug_code) {
+            otpDebug.textContent = `Debug code: ${payload.debug_code}`;
+            deliveryMessage.textContent = "Real SMS delivery is already wired in the backend. Because debug mode is enabled, the verification code is also shown here for faster testing.";
+          } else if (payload.sms_sent) {
+            deliveryMessage.textContent = "Code sent by SMS. The production-ready verification path is active.";
+          } else {
+            deliveryMessage.textContent = "SMS credentials are not active yet, so use the debug-code flow while developing.";
+          }
+          codeInput.focus();
+        } catch (error) {
+          show(error.message, "error");
+        } finally {
+          setCustomerBusy(false);
+        }
+      }
+
+      async function verifyOtp() {
+        setCustomerBusy(true);
+        show("");
+        try {
+          await api("/api/auth/verify-otp", {
+            method: "POST",
+            body: JSON.stringify({ phone: phoneInput.value, code: codeInput.value }),
+          });
+          setStage("Step 3", "Verified. Opening your JP Studio account now.");
+          window.location.href = DASHBOARD_URL;
+        } catch (error) {
+          show(error.message, "error");
+        } finally {
+          setCustomerBusy(false);
+        }
+      }
+
+      async function signInStaff() {
+        setStaffBusy(true);
+        showStaff("");
+        try {
+          const payload = await api("/api/staff/login", {
+            method: "POST",
+            body: JSON.stringify({
+              username: staffUsernameInput.value,
+              password: staffPasswordInput.value,
+              next: STAFF_NEXT_URL || STAFF_DASHBOARD_URL,
+            }),
+          });
+          showStaff("Staff sign-in successful. Opening the dashboard now.", "ok");
+          window.location.href = payload.redirect_url || STAFF_DASHBOARD_URL;
+        } catch (error) {
+          showStaff(error.message, "error");
+        } finally {
+          setStaffBusy(false);
+        }
+      }
+
+      codeInput.addEventListener("input", () => {
+        codeInput.value = codeInput.value.replace(/\D/g, "").slice(0, 6);
+      });
+
+      phoneInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendOtp();
+        }
+      });
+
+      codeInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          verifyOtp();
+        }
+      });
+
+      [staffUsernameInput, staffPasswordInput].forEach((input) => {
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            signInStaff();
+          }
+        });
+      });
+
+      sendButton.addEventListener("click", () => sendOtp());
+      createButton.addEventListener("click", () => sendOtp("create"));
+      verifyButton.addEventListener("click", verifyOtp);
+      staffLoginButton.addEventListener("click", signInStaff);
+      customerModeButton.addEventListener("click", () => activateMode("customer"));
+      staffModeButton.addEventListener("click", () => activateMode("staff"));
+
+      activateMode(INITIAL_MODE === "staff" ? "staff" : "customer");
+    })();
+  </script>
+</body>
+</html>

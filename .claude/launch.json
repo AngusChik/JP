@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "barber-site",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["C:\\Users\\Angus\\Documents\\projects\\barber-site\\manage.py", "runserver", "8001"],
+      "port": 8001
+    }
+  ]
+}

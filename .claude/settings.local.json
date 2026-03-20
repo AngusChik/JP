@@ -1,7 +1,25 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python jp/manage.py check)"
+      "Bash(python jp/manage.py check)",
+      "Bash(mkdir -p /c/Users/Angus/Documents/projects/barber-site)",
+      "Read(//c/Users/Angus/Documents/projects/**)",
+      "Bash(python -m django startproject barbersite .)",
+      "Bash(python -m django startproject config .)",
+      "Bash(python manage.py startapp shop)",
+      "Bash(python manage.py makemigrations shop)",
+      "Bash(pip install:*)",
+      "Bash(python manage.py migrate)",
+      "Bash(python -c \":*)",
+      "Bash(python manage.py check)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s http://localhost:8001/api/slots/?date=2026-03-19)",
+      "Bash(curl -s -X POST http://localhost:8001/api/book/ -H \"Content-Type: application/json\" -d '{\"\"date\"\":\"\"2026-03-19\"\",\"\"time\"\":\"\"10:00\"\",\"\"service_id\"\":1,\"\"customer_name\"\":\"\"Test\"\",\"\"customer_phone\"\":\"\"555-1234\"\"}')",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:blog.furas.pl)",
+      "WebFetch(domain:alpha.docs.booksy.net)",
+      "WebFetch(domain:www.postman.com)"
     ]
   }
 }

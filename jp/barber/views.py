@@ -4,11 +4,12 @@ import csv
 import io
 import json
 import random
-from datetime import datetime, timedelta, timezone as dt_timezone
+from datetime import datetime, timedelta
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from django.conf import settings
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import IntegrityError, transaction
 from django.db.utils import OperationalError, ProgrammingError
@@ -28,11 +29,15 @@ from .models import (
     BookingAudit,
     CustomerAccount,
     OTPChallenge,
+    StaffProfile,
     Service,
 )
 
 
-BOOKSY_GLOBAL_URL = "https://booksy.com/your-link"
+BOOKSY_GLOBAL_URL = getattr(settings, "BOOKSY_GLOBAL_URL", "https://booksy.com/your-link")
+BOOKSY_WIDGET_SCRIPT_URL = getattr(settings, "BOOKSY_WIDGET_SCRIPT_URL", "")
+GOOGLE_BOOKING_URL = getattr(settings, "GOOGLE_BOOKING_URL", "")
+MILO_BOOKSY_URL = "https://booksy.com/en-ca/26938_milo-cuts_barbershop_870806_mississauga#ba_s=seo"
 SESSION_ACCOUNT_KEY = "customer_account_id"
 OTP_PURPOSE_LOGIN = "login"
 OTP_TTL_MINUTES = 10
@@ -51,12 +56,27 @@ def _parse_json_body(request: HttpRequest) -> dict:
         return {}
 
 
+def _safe_next_path(value: str | None, default: str) -> str:
+    candidate = str(value or "").strip()
+    if candidate.startswith("/") and not candidate.startswith("//"):
+        return candidate
+    return default
+
+
 def _serialize_account(account: CustomerAccount) -> dict:
     return {
         "id": account.id,
         "phone": account.phone_e164,
         "full_name": account.full_name,
         "email": account.email,
+        "preferred_barber_id": account.preferred_barber_id,
+        "preferred_style": account.preferred_style,
+        "profile_notes": account.profile_notes,
+        "is_profile_complete": bool(account.full_name.strip()),
+        "is_inhouse_blocked": account.is_inhouse_blocked,
+        "booking_policy_note": account.booking_policy_note,
+        "blocked_at": account.blocked_at.isoformat() if account.blocked_at else None,
+        "missed_appointments_count": account.missed_appointments_count,
         "created_at": account.created_at.isoformat(),
     }
 
@@ -72,6 +92,12 @@ def _serialize_booking(booking: Booking) -> dict:
             "slug": booking.barber.slug,
             "name": booking.barber.name,
         },
+        "customer": {
+            "id": booking.customer_id,
+            "full_name": booking.customer.full_name,
+            "phone": booking.customer.phone_e164,
+            "is_inhouse_blocked": booking.customer.is_inhouse_blocked,
+        },
         "service": {
             "id": booking.service.id,
             "name": booking.service.name,
@@ -80,6 +106,10 @@ def _serialize_booking(booking: Booking) -> dict:
         "price_cents": booking.price_cents,
         "amount_paid_cents": booking.amount_paid_cents,
         "payment_status": booking.payment_status,
+        "origin": booking.origin,
+        "external_booking_id": booking.external_booking_id,
+        "last_synced_at": booking.last_synced_at.isoformat() if booking.last_synced_at else None,
+        "sync_status": booking.sync_status,
         "notes": booking.notes,
         "cancellation_reason": booking.cancellation_reason,
         "can_cancel": booking.status in {Booking.STATUS_CONFIRMED, Booking.STATUS_RESCHEDULED},
@@ -95,6 +125,14 @@ def _payment_status_for_amount(price_cents: int, amount_paid_cents: int) -> str:
     return Booking.PAYMENT_PAID
 
 
+def _coerce_bool(value, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _customer_record_summary(account: CustomerAccount) -> dict:
     bookings = account.bookings.all()
     completed = bookings.filter(status=Booking.STATUS_COMPLETED)
@@ -107,6 +145,9 @@ def _customer_record_summary(account: CustomerAccount) -> dict:
         "email": account.email,
         "preferred_style": account.preferred_style,
         "profile_notes": account.profile_notes,
+        "is_inhouse_blocked": account.is_inhouse_blocked,
+        "booking_policy_note": account.booking_policy_note,
+        "blocked_at": account.blocked_at.isoformat() if account.blocked_at else None,
         "preferred_barber": (
             {
                 "id": account.preferred_barber.id,
@@ -121,6 +162,7 @@ def _customer_record_summary(account: CustomerAccount) -> dict:
             "completed_visits": completed.count(),
             "cancelled_visits": bookings.filter(status=Booking.STATUS_CANCELLED).count(),
             "missed_visits": bookings.filter(status=Booking.STATUS_MISSED).count(),
+            "missed_appointments_count": account.missed_appointments_count,
             "upcoming_visits": bookings.filter(
                 status__in=[Booking.STATUS_CONFIRMED, Booking.STATUS_RESCHEDULED],
                 start_time__gte=timezone.now(),
@@ -129,6 +171,47 @@ def _customer_record_summary(account: CustomerAccount) -> dict:
             "last_visit_at": last_visit.start_time.isoformat() if last_visit else None,
         },
     }
+
+
+def _serialize_staff_profile(profile: StaffProfile) -> dict:
+    user = profile.user
+    full_name = " ".join(part for part in [user.first_name, user.last_name] if part).strip()
+    return {
+        "id": profile.id,
+        "username": user.username,
+        "full_name": full_name,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "phone": profile.phone,
+        "title": profile.title,
+        "bio": profile.bio,
+        "linked_barber": (
+            {
+                "id": profile.linked_barber.id,
+                "name": profile.linked_barber.name,
+                "slug": profile.linked_barber.slug,
+            }
+            if profile.linked_barber
+            else None
+        ),
+        "is_staff": user.is_staff,
+        "is_superuser": user.is_superuser,
+        "joined_at": user.date_joined.isoformat(),
+        "last_login": user.last_login.isoformat() if user.last_login else None,
+    }
+
+
+def _month_start(value: datetime) -> datetime:
+    localized = timezone.localtime(value)
+    return localized.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+
+def _shift_month(month_start: datetime, offset: int) -> datetime:
+    month = month_start.month - 1 + offset
+    year = month_start.year + month // 12
+    month = month % 12 + 1
+    return month_start.replace(year=year, month=month, day=1)
 
 
 def _get_authenticated_account(request: HttpRequest) -> CustomerAccount | None:
@@ -159,6 +242,16 @@ def _parse_iso_datetime(value: str) -> datetime:
     parsed = datetime.fromisoformat(normalized)
     if timezone.is_naive(parsed):
         parsed = timezone.make_aware(parsed, timezone.get_current_timezone())
+    return parsed
+
+
+def _parse_iso_date_boundary(value: str, end_of_day: bool = False) -> datetime:
+    parsed = datetime.fromisoformat(value.strip())
+    if timezone.is_naive(parsed):
+        parsed = timezone.make_aware(parsed, timezone.get_current_timezone())
+    if len(value.strip()) == 10:
+        if end_of_day:
+            parsed = parsed + timedelta(days=1)
     return parsed
 
 
@@ -225,14 +318,76 @@ def _send_sms(phone_number: str, message: str) -> bool:
         return False
 
 
-def _escape_ics_text(value: str) -> str:
-    return (
-        (value or "")
-        .replace("\\", "\\\\")
-        .replace(";", "\\;")
-        .replace(",", "\\,")
-        .replace("\n", "\\n")
+def _build_reports_payload() -> dict:
+    now = timezone.now()
+    current_month = _month_start(now)
+    months = [_shift_month(current_month, offset) for offset in range(-5, 1)]
+    labels = [month.strftime("%b") for month in months]
+    appointments_series = []
+    occupancy_series = []
+    revenue_series = []
+    for month_start in months:
+        month_end = _shift_month(month_start, 1)
+        month_bookings = Booking.objects.filter(start_time__gte=month_start, start_time__lt=month_end)
+        active_count = month_bookings.filter(
+            status__in=[
+                Booking.STATUS_CONFIRMED,
+                Booking.STATUS_RESCHEDULED,
+                Booking.STATUS_COMPLETED,
+                Booking.STATUS_MISSED,
+            ]
+        ).count()
+        completed = month_bookings.filter(status=Booking.STATUS_COMPLETED)
+        completed_count = completed.count()
+        booked_minutes = sum(
+            booking.service.duration_minutes
+            for booking in completed.select_related("service")
+        )
+        capacity_minutes = (
+            AvailabilityRule.objects.filter(is_active=True).count()
+            * 60
+            * 4
+        )
+        occupancy = 0
+        if capacity_minutes:
+            occupancy = round(min(100, (booked_minutes / capacity_minutes) * 100), 1)
+        appointments_series.append(active_count)
+        occupancy_series.append(occupancy)
+        revenue_series.append((completed.aggregate(total=Sum("amount_paid_cents"))["total"] or 0) / 100)
+
+    thirty_days_ago = now - timedelta(days=30)
+    recent_bookings = Booking.objects.filter(start_time__gte=thirty_days_ago)
+    returning_clients = (
+        Booking.objects.filter(status=Booking.STATUS_COMPLETED)
+        .values("customer_id")
+        .annotate(visits=Count("id"))
+        .filter(visits__gt=1)
+        .count()
     )
+    new_clients = CustomerAccount.objects.filter(created_at__gte=thirty_days_ago).count()
+    return {
+        "labels": labels,
+        "appointments": appointments_series,
+        "occupancy": occupancy_series,
+        "revenue": revenue_series,
+        "cards": {
+            "appointments": recent_bookings.count(),
+            "time_booked_hours": round(sum(
+                booking.service.duration_minutes
+                for booking in recent_bookings.select_related("service")
+            ) / 60, 1),
+            "confirmed": recent_bookings.filter(status=Booking.STATUS_CONFIRMED).count(),
+            "finished": recent_bookings.filter(status=Booking.STATUS_COMPLETED).count(),
+            "no_shows": recent_bookings.filter(status=Booking.STATUS_MISSED).count(),
+            "cancelled": recent_bookings.filter(status=Booking.STATUS_CANCELLED).count(),
+            "services_revenue": recent_bookings.filter(status=Booking.STATUS_COMPLETED).aggregate(
+                total=Sum("amount_paid_cents")
+            )["total"] or 0,
+            "clients_total": CustomerAccount.objects.count(),
+            "new_clients": new_clients,
+            "returning_clients": returning_clients,
+        },
+    }
 
 
 def _build_home_data() -> tuple[list[dict], list[dict]]:
@@ -301,7 +456,7 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "name": "JP",
             "title": "Owner / Lead Barber",
             "photo_url": "https://picsum.photos/800/1100?random=30",
-            "booksy_url": "https://booksy.com/your-link/jp",
+            "booksy_url": BOOKSY_GLOBAL_URL,
             "bio": "Started cutting hair at 16 out of my parents' basement. "
             "Fifteen years later, I'm still obsessed with getting every "
             "fade, lineup, and taper right. I built this shop to be the "
@@ -324,23 +479,21 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
         },
         {
             "id": "mike",
-            "name": "Mike",
-            "title": "Senior Barber",
+            "name": "Milo",
+            "title": "Barber",
             "photo_url": "https://picsum.photos/800/1100?random=31",
-            "booksy_url": "https://booksy.com/your-link/mike",
-            "bio": "Trained classically, but I stay current. I like working with "
-            "texture - whether that's a crop, a blowout, or a beard shape. "
-            "My thing is making sure you leave looking like yourself, just "
-            "a sharper version. If you're not sure what you want, I'll "
-            "figure it out with you.",
+            "booksy_url": MILO_BOOKSY_URL,
+            "bio": "Milo focuses on clean blends, crisp outlines, and sharp everyday cuts "
+            "that stay easy to manage between visits. His chair is about consistent work, "
+            "good energy, and making sure you leave looking polished without overcomplicating it.",
             "reviews": [
                 {
                     "author": "James W.",
-                    "text": "Mike has a gift for figuring out what works with your face shape. I just sit down and trust him.",
+                    "text": "Milo dialed in exactly the look I wanted and made the whole appointment feel easy.",
                 },
                 {
                     "author": "Chris P.",
-                    "text": "Always a chill experience. Good music, good conversation, and a clean cut every time.",
+                    "text": "Super consistent. Clean fade, good conversation, and no wasted time.",
                 },
             ],
         },
@@ -387,12 +540,48 @@ def home(request: HttpRequest) -> HttpResponse:
             "barbers": barbers,
             "background_image": "",
             "booksy_global_url": BOOKSY_GLOBAL_URL,
+            "booksy_widget_script_url": BOOKSY_WIDGET_SCRIPT_URL,
+            "google_booking_url": GOOGLE_BOOKING_URL,
+            "account_portal_url": "/account/",
             "booking_defaults_json": json.dumps(
                 {
                     "default_barber_id": default_barber.id if default_barber else None,
                     "default_service_id": default_service.id if default_service else None,
                 }
             ),
+        },
+    )
+
+
+def account_portal(request: HttpRequest) -> HttpResponse:
+    staff_next_url = _safe_next_path(request.GET.get("next"), "/ops/")
+    return render(
+        request,
+        "account.html",
+        {
+            "home_url": "/",
+            "dashboard_url": "/account/dashboard/",
+            "staff_dashboard_url": "/ops/",
+            "staff_next_url": staff_next_url,
+            "initial_mode": "staff" if request.GET.get("mode") == "staff" else "customer",
+        },
+    )
+
+
+def account_dashboard(request: HttpRequest) -> HttpResponse:
+    bootstrap_reference_data()
+    barbers = list(
+        Barber.objects.filter(is_active=True)
+        .order_by("name")
+        .values("id", "name", "slug", "title")
+    )
+    return render(
+        request,
+        "account_dashboard.html",
+        {
+            "home_url": "/",
+            "booksy_global_url": BOOKSY_GLOBAL_URL,
+            "barbers_json": json.dumps(barbers),
         },
     )
 
@@ -474,6 +663,52 @@ def api_auth_verify_otp(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"ok": True, "account": _serialize_account(account)})
 
 
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_staff_login(request: HttpRequest) -> JsonResponse:
+    body = _parse_json_body(request)
+    username = str(body.get("username", "")).strip()
+    password = str(body.get("password", ""))
+    next_url = _safe_next_path(body.get("next"), "/ops/")
+
+    if not username or not password:
+        return _json_error("Username and password are required.")
+
+    user = authenticate(request, username=username, password=password)
+    if user is None:
+        return _json_error("Invalid staff credentials.", status=401)
+    if not user.is_staff:
+        return _json_error("This account does not have staff access.", status=403)
+
+    request.session.pop(SESSION_ACCOUNT_KEY, None)
+    auth_login(request, user)
+
+    full_name = " ".join(part for part in [user.first_name, user.last_name] if part).strip() or user.username
+    return JsonResponse(
+        {
+            "ok": True,
+            "redirect_url": next_url,
+            "user": {
+                "username": user.username,
+                "full_name": full_name,
+                "is_staff": user.is_staff,
+                "is_superuser": user.is_superuser,
+            },
+        }
+    )
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_auth_logout(request: HttpRequest) -> JsonResponse:
+    request.session.pop(SESSION_ACCOUNT_KEY, None)
+    if request.user.is_authenticated:
+        auth_logout(request)
+    else:
+        request.session.modified = True
+    return JsonResponse({"ok": True})
+
+
 @require_GET
 def api_account_me(request: HttpRequest) -> JsonResponse:
     account = _require_account(request)
@@ -492,10 +727,30 @@ def api_account_update(request: HttpRequest) -> JsonResponse:
     body = _parse_json_body(request)
     full_name = str(body.get("full_name", account.full_name)).strip()
     email = str(body.get("email", account.email)).strip()
+    preferred_style = str(body.get("preferred_style", account.preferred_style)).strip()
+    profile_notes = str(body.get("profile_notes", account.profile_notes)).strip()
+    preferred_barber = account.preferred_barber
+    preferred_barber_id = body.get("preferred_barber_id", account.preferred_barber_id)
+    if preferred_barber_id in {"", None}:
+        preferred_barber = None
+    elif preferred_barber_id:
+        preferred_barber = get_object_or_404(Barber, id=preferred_barber_id, is_active=True)
 
     account.full_name = full_name
     account.email = email
-    account.save(update_fields=["full_name", "email", "updated_at"])
+    account.preferred_style = preferred_style
+    account.profile_notes = profile_notes
+    account.preferred_barber = preferred_barber
+    account.save(
+        update_fields=[
+            "full_name",
+            "email",
+            "preferred_style",
+            "profile_notes",
+            "preferred_barber",
+            "updated_at",
+        ]
+    )
 
     return JsonResponse({"ok": True, "account": _serialize_account(account)})
 
@@ -595,6 +850,7 @@ def api_availability(request: HttpRequest) -> JsonResponse:
         {
             "week_start": week_start.isoformat(),
             "timezone": timezone.get_current_timezone_name(),
+            "generated_at": timezone.now().isoformat(),
             "selected_barber_id": barber.id,
             "selected_service_id": service.id,
             "barbers": barbers,
@@ -610,6 +866,11 @@ def api_create_booking(request: HttpRequest) -> JsonResponse:
     account = _require_account(request)
     if isinstance(account, JsonResponse):
         return account
+    if account.is_inhouse_blocked:
+        note = account.booking_policy_note or "Please contact the shop before making another in-house booking."
+        return _json_error(note, status=403)
+    if not account.full_name.strip():
+        return _json_error("Complete your profile before booking your in-house appointment.")
 
     body = _parse_json_body(request)
     barber_id = body.get("barber_id")
@@ -657,6 +918,8 @@ def api_create_booking(request: HttpRequest) -> JsonResponse:
                 price_cents=service.price_cents or 0,
                 amount_paid_cents=0,
                 payment_status=Booking.PAYMENT_UNPAID,
+                origin=Booking.ORIGIN_LOCAL,
+                sync_status=Booking.SYNC_LOCAL_ONLY,
                 notes=notes,
             )
             BookingAudit.objects.create(
@@ -680,7 +943,7 @@ def api_list_bookings(request: HttpRequest) -> JsonResponse:
 
     scope = request.GET.get("scope", "upcoming").strip().lower()
     now = timezone.now()
-    queryset = Booking.objects.filter(customer=account).select_related("barber", "service")
+    queryset = Booking.objects.filter(customer=account).select_related("customer", "barber", "service")
 
     if scope == "upcoming":
         queryset = queryset.filter(
@@ -744,7 +1007,7 @@ def api_cancel_booking(request: HttpRequest, booking_id: int) -> JsonResponse:
 @require_GET
 def ops_dashboard(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated or not request.user.is_staff:
-        return redirect(f"/admin/login/?next={request.path}")
+        return redirect(f"/account/?{urlencode({'next': request.path, 'mode': 'staff'})}")
 
     bootstrap_reference_data()
     barbers = list(Barber.objects.filter(is_active=True).order_by("name").values("id", "name", "slug"))
@@ -753,6 +1016,7 @@ def ops_dashboard(request: HttpRequest) -> HttpResponse:
         "ops.html",
         {
             "barbers_json": json.dumps(barbers),
+            "booksy_global_url": BOOKSY_GLOBAL_URL,
         },
     )
 
@@ -805,11 +1069,67 @@ def api_admin_overview(request: HttpRequest) -> JsonResponse:
                 "missed_this_month": missed_this_month.count(),
                 "repeat_clients": repeat_clients,
                 "customers_total": CustomerAccount.objects.count(),
+                "flagged_customers": CustomerAccount.objects.filter(is_inhouse_blocked=True).count(),
             },
             "barber_stats": barber_stats,
             "recent_bookings": [_serialize_booking(booking) for booking in recent_bookings],
         }
     )
+
+
+@require_GET
+def api_admin_reports(request: HttpRequest) -> JsonResponse:
+    staff_error = _require_staff(request)
+    if staff_error:
+        return staff_error
+    return JsonResponse(_build_reports_payload())
+
+
+@require_GET
+def api_admin_bookings_feed(request: HttpRequest) -> JsonResponse:
+    staff_error = _require_staff(request)
+    if staff_error:
+        return staff_error
+
+    query = request.GET.get("search", "").strip()
+    status = request.GET.get("status", "").strip().lower()
+    origin = request.GET.get("origin", "").strip().lower()
+    start = request.GET.get("start", "").strip()
+    end = request.GET.get("end", "").strip()
+    queryset = Booking.objects.select_related("customer", "barber", "service").order_by("-start_time")
+
+    if query:
+        queryset = queryset.filter(
+            Q(customer__full_name__icontains=query)
+            | Q(customer__phone_e164__icontains=query)
+            | Q(barber__name__icontains=query)
+            | Q(service__name__icontains=query)
+            | Q(external_booking_id__icontains=query)
+        )
+    if status in {
+        Booking.STATUS_CONFIRMED,
+        Booking.STATUS_COMPLETED,
+        Booking.STATUS_MISSED,
+        Booking.STATUS_CANCELLED,
+        Booking.STATUS_RESCHEDULED,
+    }:
+        queryset = queryset.filter(status=status)
+    if origin in {Booking.ORIGIN_LOCAL, Booking.ORIGIN_BOOKSY, Booking.ORIGIN_SYNCED}:
+        queryset = queryset.filter(origin=origin)
+    if start:
+        try:
+            queryset = queryset.filter(start_time__gte=_parse_iso_date_boundary(start))
+        except ValueError:
+            return _json_error("Invalid start date.")
+    if end:
+        try:
+            queryset = queryset.filter(start_time__lt=_parse_iso_date_boundary(end, end_of_day=True))
+        except ValueError:
+            return _json_error("Invalid end date.")
+
+    limit = 200 if start or end else 80
+    bookings = queryset[:limit]
+    return JsonResponse({"bookings": [_serialize_booking(booking) for booking in bookings]})
 
 
 @require_GET
@@ -854,14 +1174,26 @@ def api_admin_customer_detail(request: HttpRequest, customer_id: int) -> JsonRes
         customer.email = str(body.get("email", customer.email)).strip()
         customer.preferred_style = str(body.get("preferred_style", customer.preferred_style)).strip()
         customer.profile_notes = str(body.get("profile_notes", customer.profile_notes)).strip()
+        customer.booking_policy_note = str(
+            body.get("booking_policy_note", customer.booking_policy_note)
+        ).strip()
         customer.preferred_barber = preferred_barber
+        next_blocked = _coerce_bool(body.get("is_inhouse_blocked"), customer.is_inhouse_blocked)
+        customer.is_inhouse_blocked = next_blocked
+        if next_blocked and customer.blocked_at is None:
+            customer.blocked_at = timezone.now()
+        if not next_blocked:
+            customer.blocked_at = None
         customer.save(
             update_fields=[
                 "full_name",
                 "email",
                 "preferred_style",
                 "profile_notes",
+                "booking_policy_note",
                 "preferred_barber",
+                "is_inhouse_blocked",
+                "blocked_at",
                 "updated_at",
             ]
         )
@@ -873,6 +1205,101 @@ def api_admin_customer_detail(request: HttpRequest, customer_id: int) -> JsonRes
             "bookings": [_serialize_booking(booking) for booking in recent_bookings],
         }
     )
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PATCH"])
+def api_admin_staff_profile(request: HttpRequest) -> JsonResponse:
+    staff_error = _require_staff(request)
+    if staff_error:
+        return staff_error
+
+    profile, _ = StaffProfile.objects.get_or_create(user=request.user)
+    if request.method == "PATCH":
+        body = _parse_json_body(request)
+        linked_barber_id = body.get("linked_barber_id")
+        linked_barber = None
+        if linked_barber_id:
+            linked_barber = get_object_or_404(Barber, id=linked_barber_id, is_active=True)
+        request.user.first_name = str(body.get("first_name", request.user.first_name)).strip()
+        request.user.last_name = str(body.get("last_name", request.user.last_name)).strip()
+        request.user.email = str(body.get("email", request.user.email)).strip()
+        request.user.save(update_fields=["first_name", "last_name", "email"])
+
+        profile.phone = str(body.get("phone", profile.phone)).strip()
+        profile.title = str(body.get("title", profile.title)).strip()
+        profile.bio = str(body.get("bio", profile.bio)).strip()
+        profile.linked_barber = linked_barber
+        profile.save(update_fields=["phone", "title", "bio", "linked_barber", "updated_at"])
+
+    return JsonResponse({"profile": _serialize_staff_profile(profile)})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_admin_create_booking(request: HttpRequest) -> JsonResponse:
+    staff_error = _require_staff(request)
+    if staff_error:
+        return staff_error
+
+    body = _parse_json_body(request)
+    customer_id = body.get("customer_id")
+    barber_id = body.get("barber_id")
+    service_id = body.get("service_id")
+    start_time_raw = body.get("start_time")
+    notes = str(body.get("notes", "")).strip()
+
+    if not customer_id or not barber_id or not service_id or not start_time_raw:
+        return _json_error("customer_id, barber_id, service_id, and start_time are required.")
+
+    customer = get_object_or_404(CustomerAccount, id=customer_id)
+    barber = get_object_or_404(Barber, id=barber_id, is_active=True)
+    service = get_object_or_404(Service, id=service_id, is_active=True)
+    try:
+        start_time = _parse_iso_datetime(str(start_time_raw))
+    except ValueError:
+        return _json_error("Invalid start_time format. Use ISO-8601.")
+
+    end_time = start_time + timedelta(minutes=service.duration_minutes)
+    day = timezone.localtime(start_time).date()
+    windows = _build_rule_windows(barber, day - timedelta(days=day.weekday())).get(day.isoformat(), [])
+    if not _slot_fits_any_window(start_time, end_time, windows):
+        return _json_error("Selected slot is outside business availability.")
+
+    try:
+        with transaction.atomic():
+            conflict_exists = Booking.objects.select_for_update().filter(
+                barber=barber,
+                start_time=start_time,
+                status__in=[Booking.STATUS_CONFIRMED, Booking.STATUS_RESCHEDULED],
+            ).exists()
+            if conflict_exists:
+                return _json_error("That slot is no longer available.", status=409)
+            booking = Booking.objects.create(
+                customer=customer,
+                barber=barber,
+                service=service,
+                start_time=start_time,
+                end_time=end_time,
+                status=Booking.STATUS_CONFIRMED,
+                price_cents=service.price_cents or 0,
+                amount_paid_cents=0,
+                payment_status=Booking.PAYMENT_UNPAID,
+                origin=Booking.ORIGIN_LOCAL,
+                sync_status=Booking.SYNC_LOCAL_ONLY,
+                notes=notes,
+            )
+            BookingAudit.objects.create(
+                booking=booking,
+                actor_type="staff",
+                actor_identifier=request.user.username,
+                event="booking_created_by_staff",
+                details={"notes": notes},
+            )
+    except IntegrityError:
+        return _json_error("That slot is no longer available.", status=409)
+
+    return JsonResponse({"ok": True, "booking": _serialize_booking(booking)}, status=201)
 
 
 @csrf_exempt
@@ -924,12 +1351,15 @@ def api_admin_mark_missed(request: HttpRequest, booking_id: int) -> JsonResponse
     booking.payment_status = Booking.PAYMENT_UNPAID
     booking.checked_out_at = None
     booking.save(update_fields=["status", "amount_paid_cents", "payment_status", "checked_out_at", "updated_at"])
+    customer = booking.customer
+    customer.missed_appointments_count += 1
+    customer.save(update_fields=["missed_appointments_count", "updated_at"])
     BookingAudit.objects.create(
         booking=booking,
         actor_type="staff",
         actor_identifier=request.user.username,
         event="booking_marked_missed",
-        details={},
+        details={"missed_appointments_count": customer.missed_appointments_count},
     )
     return JsonResponse({"ok": True, "booking": _serialize_booking(booking)})
 
@@ -947,6 +1377,9 @@ def api_admin_export_bookings_csv(request: HttpRequest) -> HttpResponse:
         [
             "booking_id",
             "status",
+            "origin",
+            "sync_status",
+            "external_booking_id",
             "payment_status",
             "price_cents",
             "amount_paid_cents",
@@ -956,6 +1389,7 @@ def api_admin_export_bookings_csv(request: HttpRequest) -> HttpResponse:
             "service",
             "start_time",
             "end_time",
+            "last_synced_at",
             "cancellation_reason",
             "created_at",
         ]
@@ -965,6 +1399,9 @@ def api_admin_export_bookings_csv(request: HttpRequest) -> HttpResponse:
             [
                 booking.id,
                 booking.status,
+                booking.origin,
+                booking.sync_status,
+                booking.external_booking_id,
                 booking.payment_status,
                 booking.price_cents,
                 booking.amount_paid_cents,
@@ -974,6 +1411,7 @@ def api_admin_export_bookings_csv(request: HttpRequest) -> HttpResponse:
                 booking.service.name,
                 booking.start_time.isoformat(),
                 booking.end_time.isoformat(),
+                booking.last_synced_at.isoformat() if booking.last_synced_at else "",
                 booking.cancellation_reason,
                 booking.created_at.isoformat(),
             ]
@@ -981,71 +1419,4 @@ def api_admin_export_bookings_csv(request: HttpRequest) -> HttpResponse:
 
     response = HttpResponse(output.getvalue(), content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="bookings_export.csv"'
-    return response
-
-
-@require_GET
-def api_admin_export_bookings_ics(request: HttpRequest) -> HttpResponse:
-    staff_error = _require_staff(request)
-    if staff_error:
-        return staff_error
-
-    local_now = timezone.localtime(timezone.now())
-    month_start = local_now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    window_end = month_start + timedelta(days=730)
-    # Booksy import supports history up to ~6 months back.
-    window_start = max(month_start, local_now - timedelta(days=180))
-
-    export_statuses = [
-        Booking.STATUS_CONFIRMED,
-        Booking.STATUS_RESCHEDULED,
-        Booking.STATUS_COMPLETED,
-        Booking.STATUS_MISSED,
-    ]
-    bookings = (
-        Booking.objects.filter(
-            status__in=export_statuses,
-            start_time__gte=window_start,
-            start_time__lte=window_end,
-        )
-        .select_related("barber", "service", "customer")
-        .order_by("start_time")
-    )
-
-    lines = [
-        "BEGIN:VCALENDAR",
-        "VERSION:2.0",
-        "PRODID:-//JP Studio//Booksy Calendar Export//EN",
-        "CALSCALE:GREGORIAN",
-        "METHOD:PUBLISH",
-    ]
-
-    generated_stamp = timezone.now().astimezone(dt_timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    for booking in bookings:
-        start_utc = booking.start_time.astimezone(dt_timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        end_utc = booking.end_time.astimezone(dt_timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        summary = _escape_ics_text(f"JP Studio - {booking.service.name} ({booking.barber.name})")
-        description = _escape_ics_text(
-            f"Status: {booking.status}. Customer: {booking.customer.full_name or booking.customer.phone_e164}."
-        )
-        uid = f"jp-booking-{booking.id}@jpstudio.local"
-        lines.extend(
-            [
-                "BEGIN:VEVENT",
-                f"UID:{uid}",
-                f"DTSTAMP:{generated_stamp}",
-                f"DTSTART:{start_utc}",
-                f"DTEND:{end_utc}",
-                f"SUMMARY:{summary}",
-                f"DESCRIPTION:{description}",
-                "STATUS:CONFIRMED",
-                "TRANSP:OPAQUE",
-                "END:VEVENT",
-            ]
-        )
-
-    lines.append("END:VCALENDAR")
-    payload = "\r\n".join(lines) + "\r\n"
-    response = HttpResponse(payload, content_type="text/calendar; charset=utf-8")
-    response["Content-Disposition"] = 'attachment; filename="jp-bookings-booksy-import.ics"'
     return response

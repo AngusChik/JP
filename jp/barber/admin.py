@@ -11,6 +11,7 @@ from .models import (
     BookingAudit,
     CustomerAccount,
     OTPChallenge,
+    StaffProfile,
     Service,
 )
 
@@ -42,6 +43,13 @@ class CustomerAccountAdmin(admin.ModelAdmin):
     search_fields = ("full_name", "phone_e164", "email", "preferred_style", "profile_notes")
 
 
+@admin.register(StaffProfile)
+class StaffProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "title", "phone", "linked_barber", "updated_at")
+    list_select_related = ("user", "linked_barber")
+    search_fields = ("user__username", "user__first_name", "user__last_name", "title", "phone")
+
+
 @admin.register(OTPChallenge)
 class OTPChallengeAdmin(admin.ModelAdmin):
     list_display = ("phone_e164", "purpose", "attempts", "expires_at", "consumed_at", "created_at")
@@ -58,12 +66,20 @@ class BookingAdmin(admin.ModelAdmin):
         "service",
         "start_time",
         "status",
+        "origin",
+        "sync_status",
         "payment_status",
         "amount_paid_cents",
         "created_at",
     )
-    list_filter = ("status", "barber", "service")
-    search_fields = ("customer__phone_e164", "customer__full_name", "barber__name", "service__name")
+    list_filter = ("status", "origin", "sync_status", "barber", "service")
+    search_fields = (
+        "customer__phone_e164",
+        "customer__full_name",
+        "barber__name",
+        "service__name",
+        "external_booking_id",
+    )
     actions = ("mark_completed", "mark_missed", "export_csv")
 
     @admin.action(description="Mark selected bookings as completed")
@@ -98,12 +114,17 @@ class BookingAdmin(admin.ModelAdmin):
             booking.payment_status = Booking.PAYMENT_UNPAID
             booking.checked_out_at = None
             booking.save(update_fields=["status", "amount_paid_cents", "payment_status", "checked_out_at", "updated_at"])
+            booking.customer.missed_appointments_count += 1
+            booking.customer.save(update_fields=["missed_appointments_count", "updated_at"])
             BookingAudit.objects.create(
                 booking=booking,
                 actor_type="staff",
                 actor_identifier=request.user.username,
                 event="booking_marked_missed",
-                details={"source": "django_admin"},
+                details={
+                    "source": "django_admin",
+                    "missed_appointments_count": booking.customer.missed_appointments_count,
+                },
             )
             count += 1
         self.message_user(request, f"Marked {count} booking(s) as missed.")
@@ -118,12 +139,16 @@ class BookingAdmin(admin.ModelAdmin):
             [
                 "booking_id",
                 "status",
+                "origin",
+                "sync_status",
+                "external_booking_id",
                 "customer_name",
                 "customer_phone",
                 "barber",
                 "service",
                 "start_time",
                 "end_time",
+                "last_synced_at",
                 "created_at",
             ]
         )
@@ -132,12 +157,16 @@ class BookingAdmin(admin.ModelAdmin):
                 [
                     booking.id,
                     booking.status,
+                    booking.origin,
+                    booking.sync_status,
+                    booking.external_booking_id,
                     booking.customer.full_name,
                     booking.customer.phone_e164,
                     booking.barber.name,
                     booking.service.name,
                     booking.start_time.isoformat(),
                     booking.end_time.isoformat(),
+                    booking.last_synced_at.isoformat() if booking.last_synced_at else "",
                     booking.created_at.isoformat(),
                 ]
             )

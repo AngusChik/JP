@@ -1,14 +1,20 @@
 import json
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .booking import bootstrap_reference_data
-from .models import Barber, Booking, CustomerAccount, Service
+from .models import Barber, Booking, CustomerAccount, Service, StaffProfile
 
-
+@override_settings(
+    STORAGES={
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+)
 class BookingSystemTests(TestCase):
     def setUp(self):
         bootstrap_reference_data()
@@ -56,7 +62,23 @@ class BookingSystemTests(TestCase):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Choose Your Booking Path")
-        self.assertContains(response, "Continue In-House Booking")
+        self.assertContains(response, "Open My Account")
+        self.assertContains(response, "Log In")
+        self.assertContains(response, "21963_jp-barber-studio")
+        self.assertContains(response, "26938_milo-cuts")
+
+    def test_account_portal_renders(self):
+        response = self.client.get("/account/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Choose your entrance")
+        self.assertContains(response, "Staff / Admin")
+        self.assertContains(response, "Create My Account")
+
+    def test_account_dashboard_renders(self):
+        response = self.client.get("/account/dashboard/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Customer Dashboard")
+        self.assertContains(response, "Profile Details")
 
     @override_settings(DEBUG=True)
     def test_send_and_verify_otp_creates_account(self):
@@ -91,7 +113,9 @@ class BookingSystemTests(TestCase):
 
     def test_booking_creation_sets_price_snapshot(self):
         slot_start = self._next_available_slot()
-        self._authenticate_client(self.client)
+        account = self._authenticate_client(self.client)
+        account.full_name = "Jordan Prince"
+        account.save(update_fields=["full_name"])
         response = self._json_post(
             "/api/bookings",
             {
@@ -109,8 +133,12 @@ class BookingSystemTests(TestCase):
 
         first_client = self.client
         second_client = self.client_class()
-        self._authenticate_client(first_client, phone="+14165550123")
-        self._authenticate_client(second_client, phone="+14165550124")
+        first_account = self._authenticate_client(first_client, phone="+14165550123")
+        second_account = self._authenticate_client(second_client, phone="+14165550124")
+        first_account.full_name = "First Client"
+        first_account.save(update_fields=["full_name"])
+        second_account.full_name = "Second Client"
+        second_account.save(update_fields=["full_name"])
 
         first_response = self._json_post(
             "/api/bookings",
@@ -136,6 +164,8 @@ class BookingSystemTests(TestCase):
 
     def test_booking_scopes_include_history_and_cancelled(self):
         account = self._authenticate_client(self.client)
+        account.full_name = "Jordan Prince"
+        account.save(update_fields=["full_name"])
         now = timezone.now()
         upcoming = Booking.objects.create(
             customer=account,
@@ -217,11 +247,28 @@ class BookingSystemTests(TestCase):
         self.assertEqual(missed_response.status_code, 200)
         booking.refresh_from_db()
         self.assertEqual(booking.status, Booking.STATUS_MISSED)
+        account.refresh_from_db()
+        self.assertEqual(account.missed_appointments_count, 1)
 
-        ics_response = self.client.get("/api/admin/bookings/export.ics")
-        self.assertEqual(ics_response.status_code, 200)
-        self.assertIn("text/calendar", ics_response["Content-Type"])
-        self.assertIn("BEGIN:VCALENDAR", ics_response.content.decode("utf-8"))
+    def test_staff_can_sign_in_from_account_page(self):
+        User = get_user_model()
+        staff_user = User.objects.create_user(username="frontdesk", password="secret123", is_staff=True)
+
+        login_response = self._json_post(
+            "/api/staff/login",
+            {"username": "frontdesk", "password": "secret123", "next": "/ops/"},
+        )
+        self.assertEqual(login_response.status_code, 200)
+        self.assertEqual(login_response.json()["redirect_url"], "/ops/")
+        self.assertEqual(login_response.json()["user"]["username"], staff_user.username)
+
+        ops_response = self.client.get("/ops/")
+        self.assertEqual(ops_response.status_code, 200)
+
+    def test_ops_redirects_to_staff_mode_on_account_page(self):
+        response = self.client.get("/ops/")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/account/?next=%2Fops%2F&mode=staff", response["Location"])
 
     def test_staff_customer_record_and_overview_endpoints(self):
         account = CustomerAccount.objects.create(
@@ -246,6 +293,10 @@ class BookingSystemTests(TestCase):
         staff_user = User.objects.create_user(username="ops", password="secret123", is_staff=True)
         self.client.force_login(staff_user)
 
+        ops_response = self.client.get("/ops/")
+        self.assertEqual(ops_response.status_code, 200)
+        self.assertContains(ops_response, "Calendar")
+
         overview_response = self.client.get("/api/admin/overview")
         self.assertEqual(overview_response.status_code, 200)
         self.assertIn("summary", overview_response.json())
@@ -262,9 +313,139 @@ class BookingSystemTests(TestCase):
                 "preferred_barber_id": self.barber.id,
                 "preferred_style": "Low taper fade",
                 "profile_notes": "Likes a sharp line-up and low chatter.",
+                "booking_policy_note": "Two missed appointments. Call before booking again.",
+                "is_inhouse_blocked": True,
             },
         )
         self.assertEqual(update_response.status_code, 200)
         account.refresh_from_db()
         self.assertEqual(account.preferred_style, "Low taper fade")
         self.assertEqual(account.preferred_barber, self.barber)
+        self.assertTrue(account.is_inhouse_blocked)
+        self.assertEqual(account.booking_policy_note, "Two missed appointments. Call before booking again.")
+
+        reports_response = self.client.get("/api/admin/reports")
+        self.assertEqual(reports_response.status_code, 200)
+        self.assertIn("cards", reports_response.json())
+
+        bookings_feed_response = self.client.get("/api/admin/bookings-feed", {"origin": "local"})
+        self.assertEqual(bookings_feed_response.status_code, 200)
+        self.assertIn("bookings", bookings_feed_response.json())
+
+    def test_staff_bookings_feed_exposes_origin_and_sync_fields(self):
+        account = CustomerAccount.objects.create(
+            phone_e164="+14165550221",
+            full_name="Feed Client",
+        )
+        User = get_user_model()
+        staff_user = User.objects.create_user(username="scheduler", password="secret123", is_staff=True)
+        self.client.force_login(staff_user)
+        Booking.objects.create(
+            customer=account,
+            barber=self.barber,
+            service=self.service,
+            start_time=timezone.now() + timedelta(days=2),
+            end_time=timezone.now() + timedelta(days=2, minutes=self.service.duration_minutes),
+            status=Booking.STATUS_CONFIRMED,
+            origin=Booking.ORIGIN_BOOKSY,
+            sync_status=Booking.SYNC_SYNCED,
+            external_booking_id="bk_123",
+        )
+        response = self.client.get("/api/admin/bookings-feed", {"search": "bk_123"})
+        self.assertEqual(response.status_code, 200)
+        booking = response.json()["bookings"][0]
+        self.assertEqual(booking["origin"], Booking.ORIGIN_BOOKSY)
+        self.assertEqual(booking["sync_status"], Booking.SYNC_SYNCED)
+        self.assertEqual(booking["external_booking_id"], "bk_123")
+
+    def test_staff_bookings_feed_supports_calendar_date_range(self):
+        account = CustomerAccount.objects.create(
+            phone_e164="+14165550231",
+            full_name="Calendar Client",
+        )
+        User = get_user_model()
+        staff_user = User.objects.create_user(username="calendarops", password="secret123", is_staff=True)
+        self.client.force_login(staff_user)
+        start_of_week = timezone.localdate() - timedelta(days=timezone.localdate().weekday())
+        in_range_start = timezone.make_aware(datetime.combine(start_of_week + timedelta(days=1), time.min)) + timedelta(hours=10)
+        out_of_range_start = in_range_start + timedelta(days=10)
+        Booking.objects.create(
+            customer=account,
+            barber=self.barber,
+            service=self.service,
+            start_time=in_range_start,
+            end_time=in_range_start + timedelta(minutes=self.service.duration_minutes),
+            status=Booking.STATUS_CONFIRMED,
+            origin=Booking.ORIGIN_BOOKSY,
+            sync_status=Booking.SYNC_SYNCED,
+            external_booking_id="range_in",
+        )
+        Booking.objects.create(
+            customer=account,
+            barber=self.barber,
+            service=self.service,
+            start_time=out_of_range_start,
+            end_time=out_of_range_start + timedelta(minutes=self.service.duration_minutes),
+            status=Booking.STATUS_CONFIRMED,
+            origin=Booking.ORIGIN_LOCAL,
+            sync_status=Booking.SYNC_LOCAL_ONLY,
+            external_booking_id="range_out",
+        )
+        response = self.client.get(
+            "/api/admin/bookings-feed",
+            {
+                "start": start_of_week.isoformat(),
+                "end": (start_of_week + timedelta(days=6)).isoformat(),
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        ids = {booking["external_booking_id"] for booking in response.json()["bookings"]}
+        self.assertIn("range_in", ids)
+        self.assertNotIn("range_out", ids)
+
+    def test_staff_profile_endpoint_updates_profile(self):
+        User = get_user_model()
+        staff_user = User.objects.create_user(username="profileops", password="secret123", is_staff=True)
+        self.client.force_login(staff_user)
+
+        get_response = self.client.get("/api/admin/staff/profile")
+        self.assertEqual(get_response.status_code, 200)
+        self.assertIn("profile", get_response.json())
+
+        update_response = self._json_patch(
+            "/api/admin/staff/profile",
+            {
+                "first_name": "Jordan",
+                "last_name": "Prince",
+                "email": "ops@example.com",
+                "phone": "+14165550000",
+                "title": "Ops Lead",
+                "linked_barber_id": self.barber.id,
+                "bio": "Handles internal workflows.",
+            },
+        )
+        self.assertEqual(update_response.status_code, 200)
+        staff_user.refresh_from_db()
+        profile = StaffProfile.objects.get(user=staff_user)
+        self.assertEqual(staff_user.first_name, "Jordan")
+        self.assertEqual(profile.title, "Ops Lead")
+        self.assertEqual(profile.linked_barber, self.barber)
+
+    def test_flagged_customer_cannot_create_inhouse_booking(self):
+        slot_start = self._next_available_slot()
+        account = self._authenticate_client(self.client)
+        account.full_name = "Blocked Client"
+        account.is_inhouse_blocked = True
+        account.booking_policy_note = "Please call the shop before booking again."
+        account.save(update_fields=["full_name", "is_inhouse_blocked", "booking_policy_note"])
+
+        response = self._json_post(
+            "/api/bookings",
+            {
+                "barber_id": self.barber.id,
+                "service_id": self.service.id,
+                "start_time": slot_start,
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["error"], "Please call the shop before booking again.")

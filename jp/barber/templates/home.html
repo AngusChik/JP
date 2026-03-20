@@ -134,6 +134,13 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 .nav-links a.is-active::after{width:16px;left:calc(50% - 8px)}
 .nav-links a:hover,.nav-links a.is-active{color:var(--text)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.nav-login{
+  padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.12);color:var(--text);
+  font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;
+  transition:transform .2s ease,border-color .2s ease,background .2s ease;
+}
+.nav-login:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.04)}
 .nav-cta{
   padding:8px 18px;border-radius:8px;background:var(--accent);color:var(--bg);
   font-weight:600;font-size:13px;
@@ -176,7 +183,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .mobile-menu.is-open a:nth-child(4){transition-delay:.14s}
 .mobile-menu.is-open a:nth-child(5){transition-delay:.18s}
 .mobile-menu a:hover{color:var(--text)}
-.mobile-menu .nav-cta{margin-top:16px;display:inline-flex;align-items:center;justify-content:center}
+.mobile-menu .nav-login,.mobile-menu .nav-cta{margin-top:16px;display:inline-flex;align-items:center;justify-content:center}
 
 /* ── SCROLL ROOT ── */
 .scroll-root{
@@ -926,7 +933,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .hero{min-height:calc(100vh - var(--nav-h))}
   .nav-links{display:none}
   .hamburger{display:flex}
-  .nav-cta{display:none}
+  .nav-actions{display:none}
   .photo-row{gap:10px}
   .barber-card{border-radius:12px;aspect-ratio:3/4}
   .section-title{font-size:22px}
@@ -1161,7 +1168,10 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
         <a href="#cuts" data-section="cuts">Services</a>
         <a href="#contact" data-section="contact">Contact</a>
       </div>
-      <a class="nav-cta" href="https://booksy.com/your-link" target="_blank" rel="noopener">Book Now</a>
+      <div class="nav-actions">
+        <a class="nav-login" href="{{ account_portal_url }}?intent=register">Log In</a>
+        <a class="nav-cta" href="{{ booksy_global_url }}" target="_blank" rel="noopener">Book Now</a>
+      </div>
       <button class="hamburger" id="hamburger" type="button" aria-label="Menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -1173,7 +1183,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     <a href="#about" data-section="about">About</a>
     <a href="#cuts" data-section="cuts">Services</a>
     <a href="#contact" data-section="contact">Contact</a>
-    <a class="nav-cta" href="https://booksy.com/your-link" target="_blank" rel="noopener">Book Now</a>
+    <a class="nav-login" href="{{ account_portal_url }}?intent=register">Log In</a>
+    <a class="nav-cta" href="{{ booksy_global_url }}" target="_blank" rel="noopener">Book Now</a>
   </div>
 
   <div class="scroll-root" id="scrollRoot">
@@ -1492,7 +1503,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
           <a href="#about">About</a>
           <a href="#cuts">Services</a>
           <a href="#contact">Contact</a>
-          <a href="https://booksy.com/your-link" target="_blank" rel="noopener">Book Now</a>
+          <a href="{{ booksy_global_url }}" target="_blank" rel="noopener">Book Now</a>
         </div>
         <div class="footer-social">
           <a href="https://instagram.com/jpstudio" target="_blank" rel="noopener" aria-label="Instagram">
@@ -1517,7 +1528,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   </button>
 
   <!-- FLOATING BOOK (mobile) -->
-  <a class="float-book" id="floatBook" href="https://booksy.com/your-link" target="_blank" rel="noopener">
+  <a class="float-book" id="floatBook" href="{{ booksy_global_url }}" target="_blank" rel="noopener">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     Book Now
   </a>
@@ -1582,19 +1593,25 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     <div class="booking-choice-panel">
       <button type="button" class="booking-close" data-booking-close aria-label="Close">&times;</button>
       <div class="booking-choice-title serif">Choose Your Booking Path</div>
-      <p class="booking-choice-sub">Book instantly in-house with your phone number, or jump directly to Booksy.</p>
+      <p class="booking-choice-sub">Booksy is the live booking backend. Use your in-house account page to review profile details and booking history before continuing.</p>
       <div class="booking-choice-actions">
         <button type="button" class="book-path inhouse" id="continueInhouseBooking">
-          <span>Continue In-House Booking</span>
-          <span class="book-note">Weekly calendar + account</span>
+          <span>Open My Account</span>
+          <span class="book-note">Profile + booking history</span>
         </button>
         <a class="book-path booksy booking-direct-link" id="continueBooksyBooking" href="{{ booksy_global_url }}" target="_blank" rel="noopener">
-          <span>Go To Booksy</span>
-          <span class="book-note">External booking</span>
+          <span>Book With Booksy</span>
+          <span class="book-note">Live booking backend</span>
         </a>
+        {% if google_booking_url %}
+        <a class="book-path booking-direct-link" href="{{ google_booking_url }}" target="_blank" rel="noopener">
+          <span>Book With Google</span>
+          <span class="book-note">Reserve with Google</span>
+        </a>
+        {% endif %}
       </div>
-      <div class="booking-meta">Your in-house profile stores upcoming appointments and previous visits, including completed, cancelled, and missed sessions.</div>
-      <button type="button" class="book-account-link" id="openInhouseAccount">Open My In-House Account</button>
+      <div class="booking-meta">Booksy remains the source of truth for appointments. The in-house page handles sign-in, profile notes, and booking history before sending customers to Booksy or Google to finish the booking.</div>
+      <button type="button" class="book-account-link" id="openInhouseAccount">Open My In-House Login</button>
     </div>
   </div>
 
@@ -1605,7 +1622,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       <div class="inhouse-head">
         <div>
           <div class="inhouse-title serif">In-House Booking</div>
-          <div class="inhouse-sub">Phone OTP sign-in, weekly spreadsheet calendar, and booking history</div>
+          <div class="inhouse-sub">Phone OTP sign-in, profile details, and booking history</div>
         </div>
       </div>
 
@@ -1632,7 +1649,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       <div id="inhouseAppStep" style="display:none">
         <div class="inhouse-grid">
           <section class="card">
-            <h4>Weekly Booking Calendar</h4>
+            <h4>Booking Snapshot</h4>
             <div class="form-row">
               <div class="field">
                 <label for="inhouseBarberSelect">Barber</label>
@@ -1932,6 +1949,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 <script>
 (() => {
   const BOOKSY_GLOBAL_URL = "{{ booksy_global_url|escapejs }}";
+  const ACCOUNT_PORTAL_URL = "{{ account_portal_url|escapejs }}";
   const BOOKING_DEFAULTS = {{ booking_defaults_json|safe }};
 
   const bookingChoiceModal = document.getElementById("bookingChoiceModal");
@@ -2038,6 +2056,11 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   function closeChoiceModal() {
     bookingChoiceModal.classList.remove("is-open");
     bookingChoiceModal.setAttribute("aria-hidden", "true");
+  }
+
+  function goToAccountPortal(intent) {
+    const nextUrl = `${ACCOUNT_PORTAL_URL}?intent=${encodeURIComponent(intent || "booking")}`;
+    window.location.href = nextUrl;
   }
 
   function openInhouseModal() {
@@ -2313,11 +2336,11 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
   continueInhouseBooking.addEventListener("click", () => {
     closeChoiceModal();
-    openInhouseModal();
+    goToAccountPortal("booking");
   });
   openInhouseAccount.addEventListener("click", () => {
     closeChoiceModal();
-    openInhouseModal();
+    goToAccountPortal("register");
   });
 
   sendOtpBtn.addEventListener("click", sendOtp);
@@ -2361,6 +2384,10 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   });
 })();
 </script>
+
+{% if booksy_widget_script_url %}
+<script src="{{ booksy_widget_script_url }}"></script>
+{% endif %}
 
 </body>
 </html>

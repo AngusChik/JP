@@ -13,13 +13,13 @@ DEFAULT_BARBERS = [
         "slug": "jp",
         "name": "JP",
         "title": "Owner / Lead Barber",
-        "booksy_url": "https://booksy.com/your-link/jp",
+        "booksy_url": "https://booksy.com/en-ca/21963_jp-barber-studio_barbershop_870806_mississauga#ba_s=sh_1",
     },
     {
         "slug": "mike",
-        "name": "Mike",
-        "title": "Senior Barber",
-        "booksy_url": "https://booksy.com/your-link/mike",
+        "name": "Milo",
+        "title": "Barber",
+        "booksy_url": "https://booksy.com/en-ca/26938_milo-cuts_barbershop_870806_mississauga#ba_s=seo",
     },
 ]
 
@@ -43,13 +43,13 @@ def bootstrap_reference_data() -> None:
             },
         )
         changed = False
-        if not barber.name:
+        if barber.name != barber_data["name"]:
             barber.name = barber_data["name"]
             changed = True
-        if not barber.title:
+        if barber.title != barber_data["title"]:
             barber.title = barber_data["title"]
             changed = True
-        if not barber.booksy_url:
+        if barber.booksy_url != barber_data["booksy_url"]:
             barber.booksy_url = barber_data["booksy_url"]
             changed = True
         if changed:

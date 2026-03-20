@@ -1,0 +1,394 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Manage your JP Studio profile and upcoming appointments." />
+  <title>JP Studio | My Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#090909;--panel:rgba(17,17,17,.88);--panel-soft:rgba(255,255,255,.03);--line:rgba(255,255,255,.08);--text:#ede9e0;--muted:#9b9286;--accent:#c9a96e;--accent-soft:rgba(201,169,110,.14);--ok:#95d1ab;--warn:#efc987;--bad:#f1a5a5;--blue:#99c5ff;--shadow:0 24px 60px rgba(0,0,0,.32)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:"Inter",system-ui,sans-serif;background:linear-gradient(180deg,rgba(6,6,6,.6),rgba(6,6,6,.92)),radial-gradient(circle at top left,rgba(201,169,110,.18),transparent 30%),url("{% static 'Cuts/BG1.jpg' %}") center/cover fixed no-repeat}
+    a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button{cursor:pointer}
+    .page{max-width:1280px;margin:0 auto;padding:24px}.hero,.panel{border:1px solid var(--line);border-radius:28px;background:linear-gradient(180deg,rgba(18,18,18,.88),rgba(10,10,10,.96));box-shadow:var(--shadow)}
+    .hero{position:relative;overflow:hidden;padding:28px}.hero:after{content:"";position:absolute;inset:16px;border:1px solid rgba(255,255,255,.04);border-radius:22px;pointer-events:none}
+    .topbar,.hero-main,.hero-actions,.facts,.layout,.stack,.profile-meta,.progress,.status-grid,.tabs,.booking-list,.booking-grid,.field-grid,.field,.booking-card,.booking-head,.booking-foot{display:grid;gap:12px}
+    .topbar{position:relative;z-index:1;grid-template-columns:1fr auto;align-items:start}.brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.04em}.brand-mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--accent);color:#15120c}
+    .hero-main{position:relative;z-index:1;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:20px;margin-top:24px}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+    h1{margin:10px 0 0;font-family:"Playfair Display",Georgia,serif;font-size:clamp(38px,5.5vw,66px);line-height:.97;letter-spacing:-.04em}.hero-copy p,.panel-head p,.profile-meta p,.status-card p,.booking-copy p,.booking-notes,.hint,.booking-foot small{margin:0;color:#d6d0c7;line-height:1.7;font-size:14px}
+    .hero-card,.fact,.status-card,.booking-card,.booking-cell,.profile-meta{padding:18px;border-radius:22px;border:1px solid var(--line);background:var(--panel-soft)}
+    .hero-card{align-self:stretch}.card-label,label,.fact span,.booking-cell span{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.hero-card strong{display:block;margin-top:10px;font-size:20px;line-height:1.3}
+    .hero-actions{grid-auto-flow:column;grid-auto-columns:max-content;align-items:center}.button,a.button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text);transition:transform .2s ease,background .2s ease,border-color .2s ease,opacity .2s ease}
+    .button:hover:not(:disabled),a.button:hover{transform:translateY(-1px);background:rgba(255,255,255,.06)}.button:disabled{opacity:.65;cursor:progress}.button.primary,a.button.primary{background:var(--accent);border-color:transparent;color:#17130d;font-weight:800}.pill,.badge{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+    .pill{background:var(--accent-soft);color:var(--accent)}.facts{position:relative;z-index:1;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px}.fact strong{display:block;margin-top:12px;font-size:26px;letter-spacing:-.04em}.fact small{display:block;margin-top:6px;color:#cfc7bb;line-height:1.5;font-size:12px}
+    .layout{grid-template-columns:minmax(320px,390px) minmax(0,1fr);align-items:start;margin-top:18px}.stack{align-items:start}.panel{padding:22px}.panel-head{grid-template-columns:1fr auto;align-items:start;margin-bottom:16px}.panel-head h2{margin:0;font-size:18px}
+    .profile-meta strong{font-size:18px;line-height:1.3}.progress-bar{width:100%;height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.06)}.progress-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#e6c48a);width:0}
+    .field-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.field input,.field select,.field textarea{width:100%;min-height:52px;padding:0 15px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text);outline:none}.field textarea{min-height:140px;padding:14px 15px;resize:vertical}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(201,169,110,.45);box-shadow:0 0 0 4px rgba(201,169,110,.1);background:rgba(255,255,255,.05)}.state{min-height:20px;margin-top:12px;font-size:13px;line-height:1.5}.state.ok{color:var(--ok)}.state.error{color:var(--bad)}
+    .tabs{grid-auto-flow:column;grid-auto-columns:max-content;align-items:center}.tab.is-active{background:var(--accent-soft);color:var(--accent);border-color:rgba(201,169,110,.3)}.booking-list{margin-top:8px}
+    .booking-card{gap:14px}.booking-head{grid-template-columns:1fr auto;align-items:start}.booking-copy strong,.booking-cell strong{font-size:16px;line-height:1.4}.booking-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .badge.confirmed,.badge.rescheduled,.badge.paid{background:rgba(149,209,171,.12);color:var(--ok)}.badge.completed{background:rgba(153,197,255,.12);color:var(--blue)}.badge.cancelled{background:rgba(241,165,165,.12);color:var(--bad)}.badge.missed,.badge.partial{background:rgba(239,201,135,.12);color:var(--warn)}.badge.unpaid{background:rgba(255,255,255,.06);color:#d8d0c2}
+    .booking-empty{padding:22px;border-radius:22px;border:1px dashed rgba(255,255,255,.12);color:var(--muted);line-height:1.7;font-size:14px;background:rgba(255,255,255,.015)}
+    @media (max-width:1120px){.hero-main,.layout{grid-template-columns:1fr}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:760px){.page{padding:14px}.hero,.panel{padding:20px;border-radius:24px}.hero:after{inset:12px;border-radius:18px}.topbar,.panel-head,.booking-head,.booking-foot{grid-template-columns:1fr}.hero-actions,.tabs,.field-grid.two,.booking-grid,.facts{grid-auto-flow:row;grid-template-columns:1fr}.button,a.button{width:100%}h1{font-size:clamp(34px,11vw,48px)}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="topbar">
+        <div class="brand"><div class="brand-mark">JP</div><span>JP Studio</span></div>
+        <div class="hero-actions">
+          <a class="button" href="{{ home_url }}">Back to Site</a>
+          <a class="button primary" href="{{ booksy_global_url }}" target="_blank" rel="noopener">Book with Booksy</a>
+          <button type="button" class="button" id="logoutBtn">Log Out</button>
+        </div>
+      </div>
+      <div class="hero-main">
+        <div class="hero-copy">
+          <div class="eyebrow">Customer Dashboard</div>
+          <h1 id="heroTitle">Your account, your next appointment, handled.</h1>
+          <p id="heroSubtitle">We are loading your profile, booking history, and saved preferences now.</p>
+        </div>
+        <aside class="hero-card">
+          <div class="card-label">Next Up</div>
+          <strong id="nextBookingTitle">Checking your schedule</strong>
+          <p id="nextBookingBody">Pulling your account data now.</p>
+          <div class="hint" id="policyNote">We will show account notes, booking standing, and any policy flags here.</div>
+          <span class="pill" id="accountStandingPill">Loading</span>
+        </aside>
+      </div>
+      <div class="facts" id="summaryFacts">
+        <div class="fact"><span>Profile</span><strong>Loading</strong><small>We are calculating how complete your account is.</small></div>
+        <div class="fact"><span>Upcoming</span><strong>0</strong><small>Checking your future appointments.</small></div>
+        <div class="fact"><span>Completed</span><strong>0</strong><small>Looking through your visit history.</small></div>
+        <div class="fact"><span>Saved Spend</span><strong>$0.00</strong><small>Total from completed appointments.</small></div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="stack">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Profile Details</h2>
+              <p>Keep your account ready for faster booking, easier follow-ups, and better haircut notes the next time you are in.</p>
+            </div>
+          </div>
+          <div class="profile-meta">
+            <strong id="profileIdentity">Loading your account</strong>
+            <p id="profileSummary">We are pulling your saved customer details now.</p>
+            <div class="progress">
+              <div class="hint" id="profileProgressLabel">Profile completeness</div>
+              <div class="progress-bar"><span id="profileProgressBar"></span></div>
+            </div>
+          </div>
+          <div class="field-grid two">
+            <div class="field"><label for="profileName">Full Name</label><input id="profileName" type="text" autocomplete="name" /></div>
+            <div class="field"><label for="profilePhone">Phone</label><input id="profilePhone" type="text" readonly /></div>
+            <div class="field"><label for="profileEmail">Email</label><input id="profileEmail" type="email" autocomplete="email" /></div>
+            <div class="field"><label for="profileBarber">Preferred Barber</label><select id="profileBarber"></select></div>
+            <div class="field" style="grid-column:1 / -1;"><label for="profileStyle">Preferred Cut / Style</label><input id="profileStyle" type="text" placeholder="Low taper, beard line-up, textured crop..." /></div>
+          </div>
+          <div class="field" style="margin-top:14px;"><label for="profileNotes">Hair Notes</label><textarea id="profileNotes" placeholder="Anything you want remembered for future appointments."></textarea></div>
+          <div class="hero-actions" style="margin-top:16px;"><button type="button" class="button primary" id="saveProfileBtn">Save My Details</button></div>
+          <div class="state" id="profileMsg"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Account Standing</h2>
+              <p>Your profile status, saved notes, and booking behaviour all roll up here for a quick read.</p>
+            </div>
+          </div>
+          <div class="status-grid" id="statusGrid">
+            <div class="status-card"><strong>Loading account status</strong><p>We are checking your saved profile, missed visits, and notes now.</p></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Appointments</h2>
+            <p>Switch between upcoming visits and your booking history. Upcoming appointments can be cancelled directly from here.</p>
+          </div>
+          <div class="tabs">
+            <button type="button" class="button tab is-active" data-scope="upcoming">Upcoming</button>
+            <button type="button" class="button tab" data-scope="history">History</button>
+          </div>
+        </div>
+        <div class="booking-list" id="bookingList"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const BARBERS = JSON.parse("{{ barbers_json|escapejs }}");
+      const state = { account: null, scope: "upcoming", bookings: { upcoming: [], history: [] } };
+      const bookingList = document.getElementById("bookingList");
+      const profileMsg = document.getElementById("profileMsg");
+      const saveProfileBtn = document.getElementById("saveProfileBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      function show(message, tone) {
+        profileMsg.textContent = message || "";
+        profileMsg.className = `state ${tone || ""}`.trim();
+      }
+
+      async function api(url, options = {}) {
+        const config = {
+          credentials: "same-origin",
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        };
+        if (!config.body) delete config.headers["Content-Type"];
+        const response = await fetch(url, config);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || `Request failed (${response.status})`);
+        return payload;
+      }
+
+      function money(cents) {
+        return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format((cents || 0) / 100);
+      }
+
+      function formatDateTime(value) {
+        return new Intl.DateTimeFormat("en-CA", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        }).format(new Date(value));
+      }
+
+      function formatDate(value) {
+        return new Intl.DateTimeFormat("en-CA", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }).format(new Date(value));
+      }
+
+      function renderBarberOptions(selectedId) {
+        const select = document.getElementById("profileBarber");
+        const options = [`<option value="">No preference yet</option>`];
+        BARBERS.forEach((barber) => {
+          const selected = String(selectedId || "") === String(barber.id) ? " selected" : "";
+          const title = barber.title ? ` - ${barber.title}` : "";
+          options.push(`<option value="${barber.id}"${selected}>${barber.name}${title}</option>`);
+        });
+        select.innerHTML = options.join("");
+      }
+
+      function renderProfile(account) {
+        const completenessFields = [account.full_name, account.email, account.preferred_barber_id, account.preferred_style];
+        const completeness = Math.round((completenessFields.filter(Boolean).length / completenessFields.length) * 100);
+        document.getElementById("profileName").value = account.full_name || "";
+        document.getElementById("profilePhone").value = account.phone || "";
+        document.getElementById("profileEmail").value = account.email || "";
+        document.getElementById("profileStyle").value = account.preferred_style || "";
+        document.getElementById("profileNotes").value = account.profile_notes || "";
+        renderBarberOptions(account.preferred_barber_id);
+        document.getElementById("profileIdentity").textContent = account.full_name || "Finish setting up your JP Studio account";
+        document.getElementById("profileSummary").textContent = account.email
+          ? `Signed in with ${account.phone} and reachable at ${account.email}.`
+          : `Signed in with ${account.phone}. Add your email so follow-ups are easier to manage.`;
+        document.getElementById("profileProgressLabel").textContent = `Profile completeness: ${completeness}%`;
+        document.getElementById("profileProgressBar").style.width = `${completeness}%`;
+      }
+
+      function renderHero(account, upcomingBookings, historyBookings) {
+        const nextBooking = upcomingBookings[0] || null;
+        const completedBookings = historyBookings.filter((booking) => booking.status === "completed");
+        const spend = completedBookings.reduce((sum, booking) => sum + (booking.amount_paid_cents || 0), 0);
+        const completenessFields = [account.full_name, account.email, account.preferred_barber_id, account.preferred_style];
+        const completeness = Math.round((completenessFields.filter(Boolean).length / completenessFields.length) * 100);
+        const standing = account.is_inhouse_blocked ? "Review Required" : (account.missed_appointments_count || 0) > 0 ? "Watchlist" : "Good Standing";
+
+        document.getElementById("heroTitle").textContent = account.full_name ? `${account.full_name}, your account is ready.` : "Your JP Studio account is live.";
+        document.getElementById("heroSubtitle").textContent = nextBooking
+          ? `Your next appointment is ${formatDateTime(nextBooking.start_time)} with ${nextBooking.barber.name}. Keep your notes and preferences up to date before you come in.`
+          : "No upcoming appointments right now. Keep your profile polished so booking the next one is fast.";
+        document.getElementById("accountStandingPill").textContent = standing;
+        document.getElementById("nextBookingTitle").textContent = nextBooking ? `${nextBooking.service.name} with ${nextBooking.barber.name}` : "Nothing booked yet";
+        document.getElementById("nextBookingBody").textContent = nextBooking
+          ? `${formatDateTime(nextBooking.start_time)}. ${nextBooking.notes || "No notes saved for this appointment yet."}`
+          : "Use Booksy to lock in your next appointment, then come back here to review the details.";
+        document.getElementById("policyNote").textContent = account.booking_policy_note
+          ? account.booking_policy_note
+          : account.is_inhouse_blocked
+            ? "Your account needs staff review before new in-house bookings can be approved."
+            : "Account looks clear. We will surface any booking policy notes here if they are added later.";
+
+        document.getElementById("summaryFacts").innerHTML = [
+          { label: "Profile", value: `${completeness}%`, detail: completeness >= 100 ? "Everything important is filled in." : "Complete the rest for faster rebooking." },
+          { label: "Upcoming", value: String(upcomingBookings.length), detail: nextBooking ? `Next: ${formatDate(nextBooking.start_time)}` : "No future visits booked yet." },
+          { label: "Completed", value: String(completedBookings.length), detail: completedBookings.length ? `${completedBookings.length} finished appointments on record.` : "Your completed visits will appear here." },
+          { label: "Saved Spend", value: money(spend), detail: spend ? "Total from completed appointments." : "Spend totals update after completed visits." },
+        ].map((item) => `<div class="fact"><span>${item.label}</span><strong>${item.value}</strong><small>${item.detail}</small></div>`).join("");
+      }
+
+      function renderStatusGrid(account, upcomingBookings, historyBookings) {
+        const completed = historyBookings.filter((booking) => booking.status === "completed");
+        const spend = completed.reduce((sum, booking) => sum + (booking.amount_paid_cents || 0), 0);
+        const cards = [
+          {
+            title: account.is_inhouse_blocked ? "Account requires review" : "Account standing is clear",
+            body: account.is_inhouse_blocked ? "There is an in-house block on this account. Reach out to the shop before booking in person." : "No active staff blocks are showing on your account right now.",
+          },
+          {
+            title: `Missed appointments: ${account.missed_appointments_count || 0}`,
+            body: (account.missed_appointments_count || 0) > 0 ? "Please keep cancellations up to date so missed visits do not keep stacking." : "Great track record so far. Keep using this page to stay on top of upcoming visits.",
+          },
+          {
+            title: `Member since ${formatDate(account.created_at)}`,
+            body: spend ? `Completed visits total ${money(spend)} so far.` : "Spend totals will grow here after your completed appointments are checked out.",
+          },
+          {
+            title: upcomingBookings.length ? "Upcoming appointments on deck" : "Ready for the next booking",
+            body: upcomingBookings.length ? `You have ${upcomingBookings.length} future appointment${upcomingBookings.length === 1 ? "" : "s"} scheduled.` : "Nothing upcoming yet. Use the booking button above whenever you are ready.",
+          },
+        ];
+        if (account.booking_policy_note) {
+          cards.unshift({ title: "Booking policy note", body: account.booking_policy_note });
+        }
+        document.getElementById("statusGrid").innerHTML = cards.map((item) => `<article class="status-card"><strong>${item.title}</strong><p>${item.body}</p></article>`).join("");
+      }
+
+      function bookingCard(booking) {
+        const cancelAction = booking.can_cancel ? `<button type="button" class="button" data-cancel-id="${booking.id}">Cancel Appointment</button>` : "";
+        const amountText = booking.amount_paid_cents ? money(booking.amount_paid_cents) : money(booking.price_cents);
+        return `
+          <article class="booking-card">
+            <div class="booking-head">
+              <div class="booking-copy">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <span class="badge ${booking.status}">${booking.status}</span>
+                  <span class="badge ${booking.payment_status}">${booking.payment_status}</span>
+                </div>
+                <strong>${booking.service.name}</strong>
+                <p>${formatDateTime(booking.start_time)} with ${booking.barber.name}</p>
+              </div>
+              ${cancelAction}
+            </div>
+            <div class="booking-grid">
+              <div class="booking-cell"><span>Service</span><strong>${booking.service.duration_minutes} minutes</strong></div>
+              <div class="booking-cell"><span>Price</span><strong>${money(booking.price_cents)}</strong></div>
+              <div class="booking-cell"><span>Recorded Payment</span><strong>${amountText}</strong></div>
+            </div>
+            <p class="booking-notes">${booking.notes || "No additional notes saved for this appointment."}</p>
+            <div class="booking-foot">
+              <small>Booked on ${formatDate(booking.created_at)}</small>
+              ${booking.cancellation_reason ? `<small>Cancellation reason: ${booking.cancellation_reason}</small>` : ""}
+            </div>
+          </article>
+        `;
+      }
+
+      function renderBookings() {
+        const bookings = state.bookings[state.scope] || [];
+        bookingList.innerHTML = bookings.length
+          ? bookings.map((booking) => bookingCard(booking)).join("")
+          : `<div class="booking-empty">${state.scope === "upcoming" ? "No upcoming appointments yet. Use the Booksy button above when you are ready for your next visit." : "No booking history yet. Completed, cancelled, and missed visits will appear here over time."}</div>`;
+        document.querySelectorAll("[data-cancel-id]").forEach((button) => {
+          button.addEventListener("click", () => cancelBooking(button.dataset.cancelId));
+        });
+      }
+
+      async function refreshBookings() {
+        const [upcomingPayload, historyPayload] = await Promise.all([
+          api("/api/bookings?scope=upcoming"),
+          api("/api/bookings?scope=history"),
+        ]);
+        state.bookings.upcoming = upcomingPayload.bookings || [];
+        state.bookings.history = historyPayload.bookings || [];
+      }
+
+      async function refreshData() {
+        const accountPayload = await api("/api/account/me");
+        state.account = accountPayload.account;
+        await refreshBookings();
+        renderProfile(state.account);
+        renderHero(state.account, state.bookings.upcoming, state.bookings.history);
+        renderStatusGrid(state.account, state.bookings.upcoming, state.bookings.history);
+        renderBookings();
+      }
+
+      async function saveProfile() {
+        saveProfileBtn.disabled = true;
+        show("");
+        try {
+          const payload = await api("/api/account/me", {
+            method: "PATCH",
+            body: JSON.stringify({
+              full_name: document.getElementById("profileName").value,
+              email: document.getElementById("profileEmail").value,
+              preferred_barber_id: document.getElementById("profileBarber").value || "",
+              preferred_style: document.getElementById("profileStyle").value,
+              profile_notes: document.getElementById("profileNotes").value,
+            }),
+          });
+          state.account = payload.account;
+          renderProfile(state.account);
+          renderHero(state.account, state.bookings.upcoming, state.bookings.history);
+          renderStatusGrid(state.account, state.bookings.upcoming, state.bookings.history);
+          show("Your profile details were saved.", "ok");
+        } catch (error) {
+          show(error.message, "error");
+        } finally {
+          saveProfileBtn.disabled = false;
+        }
+      }
+
+      async function cancelBooking(bookingId) {
+        const confirmed = window.confirm("Cancel this appointment?");
+        if (!confirmed) return;
+        const reason = window.prompt("Optional: add a short cancellation note.", "") || "";
+        try {
+          await api(`/api/bookings/${bookingId}/cancel`, {
+            method: "POST",
+            body: JSON.stringify({ reason }),
+          });
+          await refreshData();
+          show("Appointment cancelled.", "ok");
+        } catch (error) {
+          show(error.message, "error");
+        }
+      }
+
+      document.querySelectorAll("[data-scope]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.scope = button.dataset.scope;
+          document.querySelectorAll("[data-scope]").forEach((item) => item.classList.toggle("is-active", item.dataset.scope === state.scope));
+          renderBookings();
+        });
+      });
+
+      saveProfileBtn.addEventListener("click", saveProfile);
+      logoutBtn.addEventListener("click", async () => {
+        logoutBtn.disabled = true;
+        try {
+          await api("/api/auth/logout", { method: "POST", body: "{}" });
+        } catch (_error) {
+          // Redirect even if the logout request fails so the user is not stranded here.
+        }
+        window.location.href = "/account/";
+      });
+
+      refreshData().catch(() => {
+        window.location.href = "/account/";
+      });
+    })();
+  </script>
+</body>
+</html>

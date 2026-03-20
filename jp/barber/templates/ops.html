@@ -4,236 +4,529 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>JP Studio Ops</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --bg:#0b1013;
-      --panel:#12191f;
-      --panel-soft:#182129;
-      --muted:#8fa0ae;
-      --text:#edf3f7;
-      --accent:#e0a449;
-      --accent-soft:rgba(224,164,73,.16);
-      --line:rgba(255,255,255,.08);
-      --ok:#9dd8ae;
-      --warn:#f4c485;
-      --bad:#f3a0a0;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;background:
-        radial-gradient(circle at top left, rgba(224,164,73,.12), transparent 30%),
-        linear-gradient(180deg,#0a0f12,#0b1013 30%,#10161b 100%);
-      color:var(--text);font-family:"Inter",system-ui,sans-serif;
-    }
-    .wrap{max-width:1320px;margin:0 auto;padding:28px 22px 48px}
-    .topbar{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:24px}
-    .eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
-    h1{margin:8px 0 0;font-family:"Fraunces",serif;font-size:clamp(32px,5vw,54px);line-height:1}
-    .sub{color:var(--muted);max-width:68ch;font-size:14px;line-height:1.6}
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-    .btn,.link-btn,button{
-      border:1px solid var(--line);background:var(--panel-soft);color:var(--text);border-radius:12px;
-      padding:10px 14px;font:600 13px "Inter",system-ui,sans-serif;cursor:pointer;text-decoration:none;
-    }
-    .btn.primary{background:var(--accent);color:#17130d;border-color:transparent}
-    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
-    .metric{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
-    .metric small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
-    .metric strong{display:block;margin-top:8px;font-size:28px}
-    .layout{display:grid;grid-template-columns:1.1fr 1.4fr 1.1fr;gap:16px;align-items:start}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px}
-    .card h2{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-    .search{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#0d1317;color:var(--text)}
-    .list{display:grid;gap:10px;max-height:700px;overflow:auto;padding-right:4px}
-    .person{
-      width:100%;text-align:left;padding:13px;border-radius:14px;border:1px solid var(--line);
-      background:linear-gradient(180deg,#131a20,#10161b);
-    }
-    .person.is-active{border-color:rgba(224,164,73,.45);box-shadow:0 0 0 1px rgba(224,164,73,.18) inset}
-    .person strong{display:block;font-size:14px}
-    .person span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
-    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
-    input,select,textarea{
-      width:100%;padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:#0d1317;color:var(--text)
-    }
-    textarea{min-height:112px;resize:vertical}
-    .note{margin-top:10px;color:var(--muted);font-size:12px}
-    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
-    .stat{padding:12px;border-radius:14px;background:var(--panel-soft);border:1px solid var(--line)}
-    .stat small{display:block;color:var(--muted);font-size:11px}
-    .stat strong{display:block;margin-top:6px;font-size:20px}
-    .history,.recent{display:grid;gap:10px}
-    .item{padding:12px;border-radius:14px;background:var(--panel-soft);border:1px solid var(--line)}
-    .item strong{display:block}
-    .item p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
-    .badge{display:inline-block;margin-right:6px;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase}
-    .badge.confirmed,.badge.rescheduled{background:rgba(157,216,174,.12);color:var(--ok)}
-    .badge.completed{background:rgba(111,199,255,.12);color:#9bd7ff}
-    .badge.cancelled{background:rgba(243,160,160,.12);color:var(--bad)}
-    .badge.missed{background:rgba(244,196,133,.12);color:var(--warn)}
-    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .msg{min-height:18px;margin-top:10px;font-size:12px}
-    .msg.ok{color:var(--ok)}
-    .msg.error{color:var(--bad)}
-    @media (max-width: 1120px){
-      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .layout{grid-template-columns:1fr}
-    }
-    @media (max-width: 640px){
-      .grid{grid-template-columns:1fr}
-      .detail-grid,.stats{grid-template-columns:1fr}
-      .topbar{align-items:start;flex-direction:column}
-    }
+    :root{--bg:#0a0e12;--panel:#12181d;--panel-soft:#182027;--line:rgba(255,255,255,.08);--text:#eef3f7;--muted:#8ea0ad;--accent:#d7a45b;--accent-soft:rgba(215,164,91,.14);--ok:#98d4aa;--warn:#efcb8a;--bad:#eea5a5;--blue:#8db8ff}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#090d11,#10161b);color:var(--text);font-family:Inter,system-ui,sans-serif}
+    button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}
+    .app{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100vh}.sidebar{padding:24px 18px;border-right:1px solid var(--line);background:#0c1115;display:grid;align-content:start;gap:18px;position:sticky;top:0;height:100vh}
+    .brand{display:grid;gap:8px}.eyebrow{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:.16em;font-weight:800}.brand h1{margin:0;font-size:30px;font-family:Georgia,serif}.brand p,.sub,.item p,.person span,.policy p,.booking-card p,.booking-card small,.pairs .l{color:var(--muted);line-height:1.6}
+    .nav{display:grid;gap:8px}.nav button{width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:transparent;color:var(--text);transition:background .2s ease,border-color .2s ease}.nav button.active{background:var(--accent-soft);border-color:rgba(215,164,91,.35);color:var(--accent)}
+    .side-actions{display:grid;gap:10px}.btn,a.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel-soft);color:var(--text)}.btn.primary{background:var(--accent);border-color:transparent;color:#17120d;font-weight:700}
+    .main{padding:24px 22px 40px}.top{display:flex;justify-content:space-between;gap:16px;align-items:end;flex-wrap:wrap}.top h2{margin:6px 0 0;font-size:clamp(28px,4vw,46px);font-family:Georgia,serif}.top p{margin:0;color:var(--muted);max-width:72ch;line-height:1.6}
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0 18px}.metric,.card{background:var(--panel);border:1px solid var(--line);border-radius:18px}.metric{padding:16px}.metric small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.metric strong{display:block;margin-top:8px;font-size:26px}
+    .page{display:none}.page.active{display:block}.layout,.split,.report-grid,.cards,.pairs,.stats,.filters,.form-grid,.calendar-shell,.calendar-grid,.calendar-summary{display:grid;gap:16px}.layout{grid-template-columns:1.2fr .8fr}.split{grid-template-columns:1fr 1.3fr}.report-grid{grid-template-columns:1.25fr .85fr}.cards,.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .card{padding:18px}.card h3{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.list{display:grid;gap:10px;max-height:760px;overflow:auto}.item,.person,.stat,.policy,.booking-card,.box{padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--panel-soft)}
+    .person{text-align:left;width:100%}.person.on{border-color:rgba(215,164,91,.35);box-shadow:0 0 0 1px rgba(215,164,91,.14) inset}.person strong,.item strong,.booking-card strong{display:block}.search,input,select,textarea{width:100%;padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:#0e1418;color:var(--text)}textarea{min-height:110px;resize:vertical}label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+    .msg{min-height:18px;margin-top:10px;font-size:12px}.ok{color:var(--ok)}.warn{color:var(--warn)}.error{color:var(--bad)}.badge{display:inline-flex;align-items:center;margin-right:6px;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase}
+    .confirmed,.rescheduled{background:rgba(152,212,170,.12);color:var(--ok)}.completed{background:rgba(141,184,255,.14);color:var(--blue)}.cancelled{background:rgba(238,165,165,.12);color:var(--bad)}.missed,.flagged,.partial,.pending{background:rgba(239,203,138,.12);color:var(--warn)}.unpaid,.local_only{background:rgba(255,255,255,.06);color:#d3dbe1}.paid,.synced,.booksy{background:rgba(152,212,170,.12);color:var(--ok)}.local{background:rgba(141,184,255,.14);color:var(--blue)}.failed{background:rgba(238,165,165,.12);color:var(--bad)}
+    .booking-card .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.booking-card .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.filters{grid-template-columns:2fr 1fr 1fr}.pairs{grid-template-columns:1fr 1fr;gap:10px}.pairs .v{font-size:16px;font-weight:700;color:var(--text)}.svg{width:100%;height:190px;display:block}
+    .form-grid{grid-template-columns:1fr 1fr}.box h4{margin:0 0 10px}.calendar-shell{grid-template-columns:1.35fr .85fr}.calendar-frame,.calendar-day,.calendar-summary .box{background:var(--panel);border:1px solid var(--line);border-radius:18px}.calendar-frame{padding:18px}.calendar-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}.calendar-head h3{margin:0;font-size:22px;font-family:Georgia,serif}.calendar-controls{display:flex;gap:8px;flex-wrap:wrap}.calendar-controls .btn{min-width:108px}
+    .calendar-grid{display:block;overflow:auto;padding-bottom:4px}.schedule-board{min-width:1120px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,#141c24,#101820);overflow:hidden}.schedule-head{display:grid;grid-template-columns:88px repeat(7,minmax(0,1fr));border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}.schedule-corner{border-right:1px solid var(--line);background:rgba(255,255,255,.015)}.schedule-day-head{padding:16px 14px;border-right:1px solid var(--line);display:grid;gap:4px}.schedule-day-head:last-child{border-right:none}.schedule-day-head small{color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.schedule-day-head strong{font-size:17px}
+    .schedule-body{display:grid;grid-template-columns:88px repeat(7,minmax(0,1fr))}.schedule-time-col{background:rgba(255,255,255,.015);border-right:1px solid var(--line)}.schedule-time,.schedule-slot{min-height:86px}.schedule-time{padding:10px 10px 0 0;border-bottom:1px dashed rgba(255,255,255,.06);display:flex;justify-content:flex-end;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.schedule-col{border-right:1px solid var(--line)}.schedule-col:last-child{border-right:none}.schedule-slot{padding:8px;border-bottom:1px dashed rgba(255,255,255,.06);display:grid;align-content:start;gap:8px}.schedule-card{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--panel-soft);box-shadow:0 10px 24px rgba(0,0,0,.08);text-align:left;color:var(--text)}.schedule-card.booksy-linked{border-color:rgba(152,212,170,.28);box-shadow:0 0 0 1px rgba(152,212,170,.08) inset}.schedule-card strong{display:block;margin:6px 0 4px;font-size:15px;line-height:1.25}.schedule-card p,.schedule-empty-note{margin:0;color:var(--muted);line-height:1.5;font-size:13px}.schedule-empty-note{padding:18px}
+    .calendar-summary{grid-template-columns:1fr}.calendar-summary .box{padding:18px}.calendar-summary .pairs{grid-template-columns:1fr 1fr}.calendar-legend{display:flex;flex-wrap:wrap;gap:8px}.calendar-link{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-weight:700}.detail-list{display:grid;gap:10px}.detail-item{padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--panel-soft)}.detail-item p,.detail-item small{margin:0;color:var(--muted);line-height:1.55}
+    .schedule-card{cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.schedule-card:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.16)}
+    .calendar-hint{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.6}
+    .customer-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(4,8,12,.66);backdrop-filter:blur(10px);z-index:40}
+    .customer-modal.open{display:flex}
+    .customer-dialog{width:min(560px,100%);border-radius:24px;border:1px solid var(--line);background:linear-gradient(180deg,#121a22,#0f151c);box-shadow:0 28px 60px rgba(0,0,0,.35);overflow:hidden}
+    .customer-dialog-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:20px 22px 14px;border-bottom:1px solid var(--line)}
+    .customer-dialog-head h4{margin:6px 0 0;font-size:28px;font-family:Georgia,serif}
+    .customer-dialog-close{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--panel-soft);color:var(--text);display:grid;place-items:center}
+    .customer-dialog-body{padding:20px 22px 22px;display:grid;gap:16px}
+    .customer-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .customer-stat{padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--panel-soft)}
+    .customer-stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+    .customer-stat strong,.customer-stat span{display:block;margin-top:6px}
+    .customer-note{padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--panel-soft)}
+    .customer-note strong{display:block;margin-bottom:6px}
+    .customer-note p{margin:0;color:var(--muted);line-height:1.6}
+    .customer-modal-msg{min-height:18px;font-size:12px}
+    @media (max-width:1180px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--line)}.layout,.split,.report-grid,.metrics,.calendar-shell{grid-template-columns:1fr 1fr}.cards,.stats,.pairs,.filters,.form-grid,.calendar-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:760px){.main{padding:18px 14px 32px}.top,.metrics,.layout,.split,.report-grid,.cards,.stats,.pairs,.filters,.form-grid,.calendar-shell,.calendar-grid{grid-template-columns:1fr}.sidebar{padding:18px 14px}.btn,a.btn{width:100%}}
+    .icon{width:18px;height:18px;display:block;flex:0 0 18px}
+    .app{transition:grid-template-columns .22s ease}
+    body.sidebar-collapsed .app{grid-template-columns:88px minmax(0,1fr)}
+    .sidebar{transition:padding .22s ease}
+    .sidebar-toggle{width:42px;height:42px;border-radius:13px;border:1px solid var(--line);background:var(--panel-soft);color:var(--text);display:grid;place-items:center;justify-self:end}
+    .sidebar-head{display:grid;gap:14px}
+    .brand{grid-template-columns:auto 1fr;align-items:start;gap:12px;padding:0;border:none;border-radius:0;background:transparent}
+    .brand-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--accent);color:#17120d;font-weight:800;letter-spacing:.06em}
+    .brand-copy{min-width:0}
+    .nav button,.side-actions .btn{display:flex;align-items:center;justify-content:flex-start;gap:10px}
+    .nav-label,.action-label,.brand-copy{transition:opacity .18s ease,max-width .18s ease,transform .18s ease;white-space:nowrap}
+    body.sidebar-collapsed .brand{grid-template-columns:1fr;justify-items:center;padding:0}
+    body.sidebar-collapsed .brand-copy,body.sidebar-collapsed .nav-label,body.sidebar-collapsed .action-label{opacity:0;max-width:0;overflow:hidden;transform:translateX(-8px)}
+    body.sidebar-collapsed .nav button,body.sidebar-collapsed .side-actions .btn{justify-content:center;padding-left:0;padding-right:0}
+    .calendar-shell{grid-template-columns:minmax(0,1fr) 320px;align-items:start}
+    .calendar-frame{padding:20px;box-shadow:0 18px 48px rgba(0,0,0,.18)}
+    .calendar-grid{gap:12px}
+    .calendar-day{min-height:360px}
+    .calendar-summary-wrap{position:relative}
+    .summary-toggle{width:100%;justify-content:space-between}
+    .summary-toggle-copy{display:flex;align-items:center;gap:10px}
+    body.rail-collapsed .calendar-shell{grid-template-columns:minmax(0,1fr) 74px}
+    body.rail-collapsed #calendarSummaryPanel{display:none}
+    body.rail-collapsed .summary-toggle{position:sticky;top:24px;height:200px;padding:12px 8px;writing-mode:vertical-rl;text-orientation:mixed}
+    body.rail-collapsed .summary-toggle-copy{flex-direction:row-reverse}
+    @media (min-width:1181px){body.sidebar-collapsed .sidebar-toggle{display:none}body.sidebar-collapsed .app:has(.sidebar:hover){grid-template-columns:280px minmax(0,1fr)}body.sidebar-collapsed .sidebar:hover .brand{grid-template-columns:auto 1fr;justify-items:start;padding:0}body.sidebar-collapsed .sidebar:hover .brand-copy,body.sidebar-collapsed .sidebar:hover .nav-label,body.sidebar-collapsed .sidebar:hover .action-label{opacity:1;max-width:none;overflow:visible;transform:none}body.sidebar-collapsed .sidebar:hover .nav button,body.sidebar-collapsed .sidebar:hover .side-actions .btn{justify-content:flex-start;padding-left:14px;padding-right:14px}}
+    @media (max-width:1400px){.schedule-board{min-width:1040px}}
+    @media (max-width:1180px){body.sidebar-collapsed .app{grid-template-columns:1fr}body.sidebar-collapsed .brand-copy,body.sidebar-collapsed .nav-label,body.sidebar-collapsed .action-label{opacity:1;max-width:none;overflow:visible;transform:none}body.sidebar-collapsed .nav button,body.sidebar-collapsed .side-actions .btn{justify-content:flex-start;padding-left:14px;padding-right:14px}.calendar-shell,body.rail-collapsed .calendar-shell{grid-template-columns:1fr 1fr}body.rail-collapsed #calendarSummaryPanel{display:grid}body.rail-collapsed .summary-toggle{position:static;writing-mode:horizontal-tb;height:auto;padding:11px 14px}}
+    @media (max-width:760px){.calendar-shell,body.rail-collapsed .calendar-shell{grid-template-columns:1fr}.schedule-board{min-width:920px}.schedule-time,.schedule-slot{min-height:78px}.customer-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div>
-        <div class="eyebrow">Staff Operations</div>
-        <h1>Client Records and Shop Pulse</h1>
-        <p class="sub">Run the shop from Python: search clients, store barber notes, review visit history, complete checkouts, and track no-shows and revenue without leaving the site.</p>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 7h16M4 12h16M4 17h10"></path>
+          </svg>
+        </button>
+        <div class="brand">
+          <div class="brand-mark">JP</div>
+          <div class="brand-copy">
+            <div class="eyebrow">Staff Operations</div>
+            <h1>JP Studio</h1>
+          </div>
+        </div>
       </div>
-      <div class="actions">
-        <a class="link-btn" href="/api/admin/bookings/export.csv">Export CSV</a>
-        <a class="link-btn" href="/api/admin/bookings/export.ics">Export ICS</a>
-        <a class="link-btn" href="/">View Site</a>
+      <nav class="nav">
+        <button type="button" class="active" data-page="dashboard"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 13h8V3H3zM13 21h8v-6h-8zM13 11h8V3h-8zM3 21h8v-6H3z"></path></svg><span class="nav-label">Dashboard</span></button>
+        <button type="button" data-page="calendar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg><span class="nav-label">Calendar</span></button>
+        <button type="button" data-page="bookings"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4z"></path><path d="M8 9h8M8 13h8M8 17h5"></path></svg><span class="nav-label">Bookings</span></button>
+        <button type="button" data-page="clients"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path><circle cx="9.5" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg><span class="nav-label">Clients</span></button>
+        <button type="button" data-page="reports"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16"></path><path d="M7 16V9M12 16V5M17 16v-3"></path></svg><span class="nav-label">Reports</span></button>
+        <button type="button" data-page="settings"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8.92 4.6H9A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.36.57.56 1.23.6 1.91H20a2 2 0 1 1 0 4h-.09c-.04.68-.24 1.34-.6 1.09z"></path></svg><span class="nav-label">Settings</span></button>
+      </nav>
+      <div class="side-actions">
+        <a class="btn" href="/api/admin/bookings/export.csv"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg><span class="action-label">Export CSV</span></a>
+        <a class="btn" href="/"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v10h14V10"></path></svg><span class="action-label">View Site</span></a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="top">
+        <div>
+          <div class="eyebrow">Admin Workspace</div>
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSub">Review shop activity, recent bookings, and performance trends across local and Booksy-connected appointments.</p>
+        </div>
+      </div>
+
+      <section class="metrics" id="metricGrid"></section>
+
+      <section class="page active" data-panel="dashboard">
+        <div class="layout">
+          <div class="card"><h3>Recent Activity</h3><div class="list" id="recentList"></div></div>
+          <div class="card"><h3>Barber Performance</h3><div class="list" id="barberStatsList"></div></div>
+        </div>
+      </section>
+
+      <section class="page" data-panel="calendar">
+        <div class="calendar-shell">
+          <div class="calendar-frame">
+            <div class="calendar-head">
+              <div>
+                <div class="eyebrow">Staff Calendar</div>
+                <h3 id="calendarRangeLabel">This week</h3>
+              </div>
+              <div class="calendar-controls">
+                <button class="btn" type="button" id="calendarPrevBtn">Previous Week</button>
+                <button class="btn" type="button" id="calendarTodayBtn">This Week</button>
+                <button class="btn primary" type="button" id="calendarNextBtn">Next Week</button>
+              </div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <div class="calendar-hint">Click any booked session to view the customer's basic details.</div>
+          </div>
+          <aside class="calendar-summary-wrap">
+            <button type="button" class="btn summary-toggle" id="calendarSummaryToggle">
+              <span class="summary-toggle-copy">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 6h16M4 12h12M4 18h8"></path>
+                </svg>
+                <span id="calendarSummaryToggleLabel">Collapse Sync Panel</span>
+              </span>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </button>
+            <div class="calendar-summary" id="calendarSummaryPanel">
+              <div class="box">
+                <h4>Sync Status</h4>
+                <div class="pairs" id="calendarStatusPairs"></div>
+              </div>
+              <div class="box">
+                <h4>Legend</h4>
+                <div class="calendar-legend">
+                  <span class="badge booksy">booksy</span>
+                  <span class="badge synced">synced</span>
+                  <span class="badge local">local</span>
+                  <span class="badge pending">pending</span>
+                  <span class="badge failed">failed</span>
+                </div>
+                <p class="sub" style="margin-top:12px">Booksy-linked appointments appear here when they already exist in the local synced booking table. This gives staff one operations calendar without pretending there is a direct live Booksy embed.</p>
+              </div>
+              <div class="box">
+                <h4>Booksy</h4>
+                <p class="sub">Use Booksy for a quick external cross-check whenever needed.</p>
+                <a class="calendar-link" href="{{ booksy_global_url }}" target="_blank" rel="noreferrer">Open Booksy booking page</a>
+              </div>
+              <div class="box">
+                <h4>Details</h4>
+                <div class="detail-list" id="calendarDetailsList"></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="page" data-panel="bookings">
+        <div class="card">
+          <h3>Bookings</h3>
+          <div class="filters">
+            <div><label for="bookingSearch">Search</label><input id="bookingSearch" class="search" type="search" placeholder="Client, phone, service, external id" /></div>
+            <div><label for="bookingStatus">Status</label><select id="bookingStatus"><option value="">All statuses</option><option value="confirmed">Confirmed</option><option value="rescheduled">Rescheduled</option><option value="completed">Completed</option><option value="missed">Missed</option><option value="cancelled">Cancelled</option></select></div>
+            <div><label for="bookingOrigin">Origin</label><select id="bookingOrigin"><option value="">All origins</option><option value="local">Local</option><option value="booksy">Booksy</option><option value="synced">Synced</option></select></div>
+          </div>
+          <div class="list" id="bookingFeed" style="margin-top:16px"></div>
+        </div>
+      </section>
+
+      <section class="page" data-panel="clients">
+        <div class="split">
+          <div class="card">
+            <h3>Clients</h3>
+            <input id="customerSearch" class="search" type="search" placeholder="Search name, phone, email, or style" />
+            <div class="list" id="customerList" style="margin-top:12px"></div>
+          </div>
+          <div class="card">
+            <h3>Client Record</h3>
+            <div class="form-grid">
+              <div><label for="recordName">Full Name</label><input id="recordName" type="text" /></div>
+              <div><label for="recordPhone">Phone</label><input id="recordPhone" type="text" readonly /></div>
+              <div><label for="recordEmail">Email</label><input id="recordEmail" type="email" /></div>
+              <div><label for="recordBarber">Preferred Barber</label><select id="recordBarber"></select></div>
+            </div>
+            <div style="margin-top:10px"><label for="recordStyle">Preferred Cut / Style</label><input id="recordStyle" type="text" /></div>
+            <div style="margin-top:10px"><label for="recordNotes">Internal Barber Notes</label><textarea id="recordNotes"></textarea></div>
+            <div class="policy"><strong id="policyLabel">In-house booking is open.</strong><p id="policySummary">Flag a client if they should contact the shop before another in-house booking is approved.</p></div>
+            <div style="margin-top:10px"><label for="policyNote">Policy Note</label><textarea id="policyNote"></textarea></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+              <button class="btn primary" id="saveRecordBtn" type="button">Save Client Record</button>
+              <button class="btn" id="flagCustomerBtn" type="button">Flag Client</button>
+              <button class="btn" id="clearFlagBtn" type="button">Clear Flag</button>
+            </div>
+            <div class="msg" id="recordMsg"></div>
+            <div class="stats" id="recordStats"></div>
+            <h3 style="margin-top:18px">Visit History</h3>
+            <div class="list" id="historyList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" data-panel="reports">
+        <div class="report-grid">
+          <div class="cards">
+            <div class="card"><h3>Appointments & Occupancy</h3><svg class="svg" id="appointmentsChart" viewBox="0 0 680 210" preserveAspectRatio="none"></svg></div>
+            <div class="card"><h3>Revenue</h3><svg class="svg" id="revenueChart" viewBox="0 0 680 210" preserveAspectRatio="none"></svg></div>
+          </div>
+          <div class="cards">
+            <div class="box"><h4>Appointments</h4><div class="pairs" id="reportAppointments"></div></div>
+            <div class="box"><h4>Revenue</h4><div class="pairs" id="reportRevenue"></div></div>
+            <div class="box"><h4>Clients</h4><div class="pairs" id="reportClients"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" data-panel="settings">
+        <div class="card">
+          <h3>Staff Profile</h3>
+          <div class="form-grid">
+            <div><label for="staffFirstName">First Name</label><input id="staffFirstName" type="text" /></div>
+            <div><label for="staffLastName">Last Name</label><input id="staffLastName" type="text" /></div>
+            <div><label for="staffEmail">Email</label><input id="staffEmail" type="email" /></div>
+            <div><label for="staffPhone">Phone</label><input id="staffPhone" type="text" /></div>
+            <div><label for="staffTitle">Title</label><input id="staffTitle" type="text" placeholder="Owner, Barber, Ops Lead..." /></div>
+            <div><label for="staffLinkedBarber">Linked Barber Profile</label><select id="staffLinkedBarber"></select></div>
+          </div>
+          <div style="margin-top:10px"><label for="staffBio">Internal Bio / Notes</label><textarea id="staffBio"></textarea></div>
+          <div class="policy" style="margin-top:12px"><strong id="staffIdentity">Loading profile...</strong><p id="staffMeta">We are pulling your staff profile and permissions now.</p></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <button class="btn primary" id="saveStaffProfileBtn" type="button">Save Staff Profile</button>
+          </div>
+          <div class="msg" id="staffMsg"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="customer-modal" id="customerModal" aria-hidden="true">
+    <div class="customer-dialog" role="dialog" aria-modal="true" aria-labelledby="customerModalTitle">
+      <div class="customer-dialog-head">
+        <div>
+          <div class="eyebrow">Customer Details</div>
+          <h4 id="customerModalTitle">Loading...</h4>
+        </div>
+        <button type="button" class="customer-dialog-close" id="customerModalClose" aria-label="Close customer details">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="customer-dialog-body">
+        <div class="customer-grid">
+          <div class="customer-stat"><small>Phone</small><span id="customerModalPhone">-</span></div>
+          <div class="customer-stat"><small>Email</small><span id="customerModalEmail">-</span></div>
+          <div class="customer-stat"><small>Preferred Barber</small><span id="customerModalBarber">-</span></div>
+          <div class="customer-stat"><small>Preferred Style</small><span id="customerModalStyle">-</span></div>
+        </div>
+        <div class="customer-note">
+          <strong>Profile Notes</strong>
+          <p id="customerModalNotes">No notes saved.</p>
+        </div>
+        <div class="customer-note">
+          <strong>Booking Status</strong>
+          <p id="customerModalPolicy">Customer booking access is active.</p>
+        </div>
+        <div class="customer-modal-msg" id="customerModalMsg"></div>
       </div>
     </div>
-
-    <section class="grid" id="metricGrid"></section>
-
-    <section class="layout">
-      <div class="card">
-        <h2>Clients</h2>
-        <input id="customerSearch" class="search" type="search" placeholder="Search name, phone, email, or style" />
-        <div class="list" id="customerList"></div>
-      </div>
-
-      <div class="card">
-        <h2>Client Record</h2>
-        <div class="detail-grid">
-          <div>
-            <label for="recordName">Full Name</label>
-            <input id="recordName" type="text" />
-          </div>
-          <div>
-            <label for="recordPhone">Phone</label>
-            <input id="recordPhone" type="text" readonly />
-          </div>
-          <div>
-            <label for="recordEmail">Email</label>
-            <input id="recordEmail" type="email" />
-          </div>
-          <div>
-            <label for="recordBarber">Preferred Barber</label>
-            <select id="recordBarber"></select>
-          </div>
-        </div>
-        <div style="margin-top:10px">
-          <label for="recordStyle">Preferred Cut / Style</label>
-          <input id="recordStyle" type="text" placeholder="Low taper, line-up, beard cleanup..." />
-        </div>
-        <div style="margin-top:10px">
-          <label for="recordNotes">Internal Barber Notes</label>
-          <textarea id="recordNotes" placeholder="Clipper guard, hair texture, conversation preferences, no-show context..."></textarea>
-        </div>
-        <div class="row" style="margin-top:12px">
-          <button class="btn primary" id="saveRecordBtn" type="button">Save Client Record</button>
-        </div>
-        <div class="msg" id="recordMsg"></div>
-
-        <div class="stats" id="recordStats"></div>
-
-        <h2 style="margin-top:18px">Visit History</h2>
-        <div class="history" id="historyList"></div>
-      </div>
-
-      <div class="card">
-        <h2>Recent Activity</h2>
-        <div class="recent" id="recentList"></div>
-      </div>
-    </section>
   </div>
 
   <script>
     (() => {
       const barbers = {{ barbers_json|safe }};
-      const state = {
-        customers: [],
-        selectedCustomerId: null,
-      };
+      const state = { customers: [], selectedCustomerId: null, bookings: [], calendarBookings: [], calendarDate: new Date(), currentPage: "dashboard" };
+      const $ = (id) => document.getElementById(id);
+      const metricGrid = $("metricGrid");
+      const recentList = $("recentList");
+      const barberStatsList = $("barberStatsList");
+      const bookingFeed = $("bookingFeed");
+      const calendarGrid = $("calendarGrid");
+      const calendarRangeLabel = $("calendarRangeLabel");
+      const calendarDetailsList = $("calendarDetailsList");
+      const customerModal = $("customerModal");
+      const customerModalClose = $("customerModalClose");
+      const sidebarToggle = $("sidebarToggle");
+      const calendarSummaryToggle = $("calendarSummaryToggle");
+      const calendarSummaryToggleLabel = $("calendarSummaryToggleLabel");
+      const customerList = $("customerList");
+      const recordName = $("recordName");
+      const recordPhone = $("recordPhone");
+      const recordEmail = $("recordEmail");
+      const recordBarber = $("recordBarber");
+      const recordStyle = $("recordStyle");
+      const recordNotes = $("recordNotes");
+      const policyNote = $("policyNote");
+      const policyLabel = $("policyLabel");
+      const policySummary = $("policySummary");
+      const recordMsg = $("recordMsg");
+      const recordStats = $("recordStats");
+      const historyList = $("historyList");
+      const staffMsg = $("staffMsg");
+      const customerModalTitle = $("customerModalTitle");
+      const customerModalPhone = $("customerModalPhone");
+      const customerModalEmail = $("customerModalEmail");
+      const customerModalBarber = $("customerModalBarber");
+      const customerModalStyle = $("customerModalStyle");
+      const customerModalNotes = $("customerModalNotes");
+      const customerModalPolicy = $("customerModalPolicy");
+      const customerModalMsg = $("customerModalMsg");
 
-      const metricGrid = document.getElementById("metricGrid");
-      const customerSearch = document.getElementById("customerSearch");
-      const customerList = document.getElementById("customerList");
-      const recentList = document.getElementById("recentList");
-      const recordName = document.getElementById("recordName");
-      const recordPhone = document.getElementById("recordPhone");
-      const recordEmail = document.getElementById("recordEmail");
-      const recordBarber = document.getElementById("recordBarber");
-      const recordStyle = document.getElementById("recordStyle");
-      const recordNotes = document.getElementById("recordNotes");
-      const saveRecordBtn = document.getElementById("saveRecordBtn");
-      const recordMsg = document.getElementById("recordMsg");
-      const recordStats = document.getElementById("recordStats");
-      const historyList = document.getElementById("historyList");
+      const titles = {
+        dashboard: ["Dashboard", "Review shop activity, recent bookings, and performance trends across local and Booksy-connected appointments."],
+        calendar: ["Calendar", "View the weekly schedule with Booksy-linked and local bookings together in one staff calendar."],
+        bookings: ["Bookings", "Filter booking records by status and origin, then manage completion and no-show status from one feed."],
+        clients: ["Clients", "Update customer details, preferences, notes, and booking policy flags."],
+        reports: ["Reports", "Track appointment volume, occupancy, revenue, and client retention."],
+        settings: ["Settings", "Update your staff profile and link your admin account to a barber profile."],
+      };
 
       function money(cents) {
         return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format((cents || 0) / 100);
       }
 
-      async function api(url, options = {}) {
-        const config = {
+      function setMsg(node, msg, tone) {
+        node.textContent = msg || "";
+        node.className = `msg ${tone || ""}`.trim();
+      }
+
+      function badge(value) {
+        if (!value) return "";
+        return `<span class="badge ${value}">${String(value).replace(/_/g, " ")}</span>`;
+      }
+
+      function closeCustomerModal() {
+        customerModal.classList.remove("open");
+        customerModal.setAttribute("aria-hidden", "true");
+      }
+
+      function populateCustomerModal(customer) {
+        customerModalTitle.textContent = customer.full_name || "Unnamed client";
+        customerModalPhone.textContent = customer.phone || "No phone saved";
+        customerModalEmail.textContent = customer.email || "No email saved";
+        customerModalBarber.textContent = customer.preferred_barber ? customer.preferred_barber.name : "No preference";
+        customerModalStyle.textContent = customer.preferred_style || "No style saved";
+        customerModalNotes.textContent = customer.profile_notes || "No notes saved.";
+        customerModalPolicy.textContent = customer.is_inhouse_blocked
+          ? (customer.booking_policy_note || "This customer must contact the shop before booking again.")
+          : "Customer booking access is active.";
+      }
+
+      async function openCustomerModal(customerId) {
+        customerModal.classList.add("open");
+        customerModal.setAttribute("aria-hidden", "false");
+        customerModalTitle.textContent = "Loading...";
+        customerModalPhone.textContent = "-";
+        customerModalEmail.textContent = "-";
+        customerModalBarber.textContent = "-";
+        customerModalStyle.textContent = "-";
+        customerModalNotes.textContent = "Loading customer notes...";
+        customerModalPolicy.textContent = "Loading booking status...";
+        customerModalMsg.className = "customer-modal-msg";
+        customerModalMsg.textContent = "";
+        try {
+          const payload = await api(`/api/admin/customers/${customerId}`);
+          populateCustomerModal(payload.customer);
+        } catch (error) {
+          customerModalMsg.className = "customer-modal-msg error";
+          customerModalMsg.textContent = error.message;
+        }
+      }
+
+      async function api(url, opt = {}) {
+        const cfg = {
           credentials: "same-origin",
-          ...options,
+          ...opt,
           headers: {
             "Content-Type": "application/json",
-            ...(options.headers || {}),
+            ...(opt.headers || {}),
           },
         };
-        if (!config.body) delete config.headers["Content-Type"];
-        const response = await fetch(url, config);
+        if (!cfg.body) delete cfg.headers["Content-Type"];
+        const response = await fetch(url, cfg);
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(payload.error || "Request failed");
         return payload;
       }
 
-      function setMsg(message, tone) {
-        recordMsg.textContent = message || "";
-        recordMsg.className = `msg ${tone || ""}`.trim();
+      function statPairs(node, rows) {
+        node.innerHTML = rows.map(([label, value]) => `<div><span class="l">${label}</span><span class="v">${value}</span></div>`).join("");
       }
 
-      function renderMetricGrid(summary) {
-        const cards = [
-          ["Upcoming", summary.upcoming_bookings],
-          ["Revenue This Month", money(summary.monthly_revenue_cents)],
-          ["Missed This Month", summary.missed_this_month],
-          ["Repeat Clients", summary.repeat_clients],
-        ];
-        metricGrid.innerHTML = cards.map(([label, value]) => `
-          <div class="metric">
-            <small>${label}</small>
-            <strong>${value}</strong>
-          </div>
-        `).join("");
+      function chart(node, labels, values, color) {
+        const width = 680, height = 210, padding = 28;
+        const max = Math.max(...values, 1);
+        const stepX = labels.length > 1 ? (width - padding * 2) / (labels.length - 1) : 1;
+        const points = values.map((value, index) => ({ x: padding + index * stepX, y: height - padding - ((value / max) * (height - padding * 2)), label: labels[index] }));
+        const path = points.map((point, index) => `${index ? "L" : "M"}${point.x},${point.y}`).join(" ");
+        const fill = `${path} L ${points[points.length - 1].x},${height - padding} L ${points[0].x},${height - padding} Z`;
+        node.innerHTML = `<path d="${fill}" fill="${color}" opacity=".12"></path><path d="${path}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round"></path>${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="5" fill="#0b1013" stroke="${color}" stroke-width="4"></circle>`).join("")}${points.map((point) => `<text x="${point.x}" y="${height - 6}" text-anchor="middle" fill="#8fa0ae" font-size="11">${point.label}</text>`).join("")}`;
+      }
+
+      function renderMetrics(summary) {
+        metricGrid.innerHTML = [["Upcoming", summary.upcoming_bookings], ["Revenue This Month", money(summary.monthly_revenue_cents)], ["Missed This Month", summary.missed_this_month], ["Flagged Clients", summary.flagged_customers]].map(([label, value]) => `<div class="metric"><small>${label}</small><strong>${value}</strong></div>`).join("");
+      }
+
+      function renderOverview(payload) {
+        renderMetrics(payload.summary);
+        recentList.innerHTML = (payload.recent_bookings || []).length ? payload.recent_bookings.map((booking) => `<div class="item" data-booking-id="${booking.id}"><strong>${badge(booking.status)}${badge(booking.origin)}${badge(booking.sync_status)}${booking.service.name}</strong><p>${booking.customer.full_name || booking.customer.phone} with ${booking.barber.name}</p><p>${new Date(booking.start_time).toLocaleString()}</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">${(booking.status === "confirmed" || booking.status === "rescheduled") ? '<button class="btn complete">Complete</button><button class="btn missed">Mark Missed</button>' : ""}</div></div>`).join("") : `<div class="item"><p>No recent activity yet.</p></div>`;
+        barberStatsList.innerHTML = (payload.barber_stats || []).length ? payload.barber_stats.map((item) => `<div class="item"><strong>${item.barber_name}</strong><p>${item.completed_visits} completed visits this month</p><p>${money(item.revenue_cents)} collected</p></div>`).join("") : `<div class="item"><p>No barber data yet.</p></div>`;
+      }
+
+      function renderBookings() {
+        bookingFeed.innerHTML = state.bookings.length ? state.bookings.map((booking) => `<div class="booking-card" data-booking-id="${booking.id}"><div class="meta">${badge(booking.status)}${badge(booking.origin)}${badge(booking.sync_status)}${badge(booking.payment_status)}</div><strong>${booking.service.name}</strong><p>${booking.customer.full_name || booking.customer.phone} with ${booking.barber.name}</p><p>${new Date(booking.start_time).toLocaleString()}</p><p>${booking.external_booking_id ? `External id: ${booking.external_booking_id}` : "No external id linked."}</p><small>${booking.last_synced_at ? `Last synced ${new Date(booking.last_synced_at).toLocaleString()}` : "No sync timestamp yet."}</small><div class="actions">${(booking.status === "confirmed" || booking.status === "rescheduled") ? '<button class="btn complete">Complete</button><button class="btn missed">Mark Missed</button>' : ""}</div></div>`).join("") : `<div class="item"><p>No bookings matched the current filters.</p></div>`;
+      }
+
+      function startOfWeek(date) {
+        const base = new Date(date);
+        const day = (base.getDay() + 6) % 7;
+        base.setHours(0, 0, 0, 0);
+        base.setDate(base.getDate() - day);
+        return base;
+      }
+
+      function addDays(date, days) {
+        const copy = new Date(date);
+        copy.setDate(copy.getDate() + days);
+        return copy;
+      }
+
+      function isoDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function timeLabel(value) {
+        return new Date(value).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      }
+
+      function hourSlots() {
+        return ["9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM", "7 PM"];
+      }
+
+      function slotLabelForBooking(booking) {
+        const hour = new Date(booking.start_time).getHours();
+        if (hour === 0) return "12 AM";
+        if (hour < 12) return `${hour} AM`;
+        if (hour === 12) return "12 PM";
+        return `${hour - 12} PM`;
+      }
+
+      function isCalendarVisibleStatus(status) {
+        return status === "confirmed" || status === "rescheduled";
+      }
+
+      function renderCalendar() {
+        const weekStart = startOfWeek(state.calendarDate);
+        const weekEnd = addDays(weekStart, 6);
+        calendarRangeLabel.textContent = `${weekStart.toLocaleDateString([], { month: "short", day: "numeric" })} - ${weekEnd.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}`;
+
+        const totals = {
+          total: state.calendarBookings.filter((booking) => isCalendarVisibleStatus(booking.status)).length,
+          booksyLinked: state.calendarBookings.filter((booking) => isCalendarVisibleStatus(booking.status) && (booking.origin === "booksy" || booking.origin === "synced" || booking.sync_status === "synced")).length,
+          localOnly: state.calendarBookings.filter((booking) => isCalendarVisibleStatus(booking.status) && (booking.sync_status === "local_only" || booking.origin === "local")).length,
+          attention: state.calendarBookings.filter((booking) => isCalendarVisibleStatus(booking.status) && (booking.sync_status === "pending" || booking.sync_status === "failed")).length,
+        };
+        statPairs($("calendarStatusPairs"), [["Week bookings", totals.total], ["Booksy linked", totals.booksyLinked], ["Local only", totals.localOnly], ["Needs attention", totals.attention]]);
+
+        const cancelledBookings = state.calendarBookings
+          .filter((booking) => booking.status === "cancelled")
+          .sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+        calendarDetailsList.innerHTML = cancelledBookings.length
+          ? cancelledBookings.map((booking) => `<div class="detail-item"><strong>${badge(booking.status)}${badge(booking.origin)}${booking.service.name}</strong><p>${new Date(booking.start_time).toLocaleString()} with ${booking.barber.name}</p><p>${booking.customer.full_name || booking.customer.phone}</p><small>${booking.cancellation_reason || "No cancellation reason provided."}</small></div>`).join("")
+          : `<div class="detail-item"><p>No cancellations this week.</p></div>`;
+
+        const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+        const visibleBookings = state.calendarBookings.filter((booking) => isCalendarVisibleStatus(booking.status));
+        const scheduleHeads = days.map((day) => `<div class="schedule-day-head"><small>${day.toLocaleDateString([], { weekday: "short" })}</small><strong>${day.toLocaleDateString([], { month: "short", day: "numeric" })}</strong></div>`).join("");
+        const timeColumn = hourSlots().map((slotLabel) => `<div class="schedule-time">${slotLabel}</div>`).join("");
+        const dayColumns = days.map((day) => {
+          const dayKey = isoDate(day);
+          const dayBookings = visibleBookings
+            .filter((booking) => isoDate(new Date(booking.start_time)) === dayKey)
+            .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+          return `<div class="schedule-col">${hourSlots().map((slotLabel) => {
+            const slotBookings = dayBookings.filter((booking) => slotLabelForBooking(booking) === slotLabel);
+            const slotCards = slotBookings.map((booking) => `<button type="button" class="schedule-card ${(booking.origin === "booksy" || booking.origin === "synced" || booking.sync_status === "synced") ? "booksy-linked" : ""}" data-booking-id="${booking.id}" data-customer-id="${booking.customer.id}"><div class="meta">${badge(booking.origin)}${badge(booking.sync_status)}</div><strong>${timeLabel(booking.start_time)} - ${timeLabel(booking.end_time)}</strong><p>${booking.customer.full_name || booking.customer.phone}</p><p>${booking.service.name} with ${booking.barber.name}</p></button>`).join("");
+            return `<div class="schedule-slot">${slotCards}</div>`;
+          }).join("")}</div>`;
+        }).join("");
+
+        calendarGrid.innerHTML = `<div class="schedule-board"><div class="schedule-head"><div class="schedule-corner"></div>${scheduleHeads}</div><div class="schedule-body"><div class="schedule-time-col">${timeColumn}</div>${dayColumns}</div></div>`;
+        if (!visibleBookings.length) {
+          calendarGrid.innerHTML += `<div class="schedule-empty-note">No confirmed or rescheduled appointments are booked for this week yet.</div>`;
+        }
+        calendarGrid.querySelectorAll("[data-customer-id]").forEach((button) => button.addEventListener("click", () => openCustomerModal(button.dataset.customerId)));
       }
 
       function renderCustomers() {
-        customerList.innerHTML = state.customers.map((customer) => `
-          <button type="button" class="person ${state.selectedCustomerId === customer.id ? "is-active" : ""}" data-customer-id="${customer.id}">
-            <strong>${customer.full_name || "Unnamed client"}</strong>
-            <span>${customer.phone}</span>
-            <span>${customer.preferred_style || "No preferred style saved yet"}</span>
-          </button>
-        `).join("");
-        customerList.querySelectorAll("[data-customer-id]").forEach((button) => {
-          button.addEventListener("click", () => loadCustomer(Number(button.dataset.customerId)));
-        });
+        customerList.innerHTML = state.customers.map((customer) => `<button type="button" class="person ${state.selectedCustomerId === customer.id ? "on" : ""}" data-id="${customer.id}"><strong>${customer.is_inhouse_blocked ? '<span class="badge flagged">flagged</span>' : ""}${customer.full_name || "Unnamed client"}</strong><span>${customer.phone}</span><span>${customer.preferred_style || "No preferred style saved yet"}</span></button>`).join("");
+        customerList.querySelectorAll("[data-id]").forEach((button) => button.addEventListener("click", () => loadCustomer(Number(button.dataset.id))));
       }
 
       function renderCustomerDetail(payload) {
@@ -245,75 +538,83 @@
         recordEmail.value = customer.email || "";
         recordStyle.value = customer.preferred_style || "";
         recordNotes.value = customer.profile_notes || "";
-
-        recordBarber.innerHTML = [`<option value="">No preference</option>`]
-          .concat(barbers.map((barber) => {
-            const selected = customer.preferred_barber && customer.preferred_barber.id === barber.id ? "selected" : "";
-            return `<option value="${barber.id}" ${selected}>${barber.name}</option>`;
-          }))
-          .join("");
-
-        const stats = customer.stats;
-        recordStats.innerHTML = [
-          ["Completed visits", stats.completed_visits],
-          ["Cancelled", stats.cancelled_visits],
-          ["Missed", stats.missed_visits],
-          ["Lifetime spend", money(stats.total_spend_cents)],
-        ].map(([label, value]) => `
-          <div class="stat"><small>${label}</small><strong>${value}</strong></div>
-        `).join("");
-
-        historyList.innerHTML = payload.bookings.length ? payload.bookings.map((booking) => `
-          <div class="item">
-            <strong><span class="badge ${booking.status}">${booking.status}</span>${booking.service.name}</strong>
-            <p>${new Date(booking.start_time).toLocaleString()} with ${booking.barber.name}</p>
-            <p>${money(booking.amount_paid_cents)} collected${booking.notes ? ` | ${booking.notes}` : ""}</p>
-          </div>
-        `).join("") : `<div class="item"><p>No visits yet for this client.</p></div>`;
+        policyNote.value = customer.booking_policy_note || "";
+        policyLabel.textContent = customer.is_inhouse_blocked ? "In-house booking is flagged." : "In-house booking is open.";
+        policySummary.textContent = customer.is_inhouse_blocked ? (customer.booking_policy_note || "Client must contact the shop before booking in-house again.") : "If a client misses appointments, staff can flag them here so they must contact the shop before booking in-house again.";
+        recordBarber.innerHTML = [`<option value="">No preference</option>`].concat(barbers.map((barber) => `<option value="${barber.id}" ${(customer.preferred_barber && customer.preferred_barber.id === barber.id) ? "selected" : ""}>${barber.name}</option>`)).join("");
+        recordStats.innerHTML = [["Completed visits", customer.stats.completed_visits], ["Cancelled", customer.stats.cancelled_visits], ["Missed", customer.stats.missed_visits], ["Missed total", customer.stats.missed_appointments_count]].map(([label, value]) => `<div class="stat"><small>${label}</small><strong>${value}</strong></div>`).join("");
+        historyList.innerHTML = payload.bookings.length ? payload.bookings.map((booking) => `<div class="item"><strong>${badge(booking.status)}${badge(booking.origin)}${booking.service.name}</strong><p>${new Date(booking.start_time).toLocaleString()} with ${booking.barber.name}</p><p>${money(booking.amount_paid_cents)} collected${booking.notes ? ` | ${booking.notes}` : ""}</p></div>`).join("") : `<div class="item"><p>No visits yet for this client.</p></div>`;
       }
 
-      function renderRecent(bookings) {
-        recentList.innerHTML = bookings.map((booking) => `
-          <div class="item" data-booking-id="${booking.id}">
-            <strong><span class="badge ${booking.status}">${booking.status}</span>${booking.service.name}</strong>
-            <p>${booking.barber.name} | ${new Date(booking.start_time).toLocaleString()}</p>
-            <p>${money(booking.amount_paid_cents)} collected</p>
-            <div class="row" style="margin-top:8px">
-              ${booking.status === "confirmed" || booking.status === "rescheduled" ? `<button type="button" class="btn complete-btn">Complete / Checkout</button><button type="button" class="btn miss-btn">Mark Missed</button>` : ""}
-            </div>
-          </div>
-        `).join("");
-
-        recentList.querySelectorAll(".complete-btn").forEach((button) => {
-          button.addEventListener("click", async (event) => {
-            const container = event.target.closest("[data-booking-id]");
-            const bookingId = container.dataset.bookingId;
-            const amount = window.prompt("Amount collected in cents", "4000");
-            if (amount === null) return;
-            await api(`/api/admin/bookings/${bookingId}/complete`, {
-              method: "POST",
-              body: JSON.stringify({ amount_paid_cents: Number(amount) || 0 }),
-            });
-            await loadOverview();
-            if (state.selectedCustomerId) await loadCustomer(state.selectedCustomerId);
-          });
-        });
-
-        recentList.querySelectorAll(".miss-btn").forEach((button) => {
-          button.addEventListener("click", async (event) => {
-            const container = event.target.closest("[data-booking-id]");
-            const bookingId = container.dataset.bookingId;
-            await api(`/api/admin/bookings/${bookingId}/mark-missed`, { method: "POST", body: "{}" });
-            await loadOverview();
-            if (state.selectedCustomerId) await loadCustomer(state.selectedCustomerId);
-          });
-        });
+      function renderStaffProfile(profile) {
+        $("staffFirstName").value = profile.first_name || "";
+        $("staffLastName").value = profile.last_name || "";
+        $("staffEmail").value = profile.email || "";
+        $("staffPhone").value = profile.phone || "";
+        $("staffTitle").value = profile.title || "";
+        $("staffBio").value = profile.bio || "";
+        $("staffLinkedBarber").innerHTML = [`<option value="">No linked barber</option>`].concat(barbers.map((barber) => `<option value="${barber.id}" ${(profile.linked_barber && profile.linked_barber.id === barber.id) ? "selected" : ""}>${barber.name}</option>`)).join("");
+        $("staffIdentity").textContent = `${profile.full_name || profile.username}${profile.title ? `, ${profile.title}` : ""}`;
+        $("staffMeta").textContent = `${profile.is_superuser ? "Superuser" : "Staff account"}${profile.last_login ? ` | Last login ${new Date(profile.last_login).toLocaleString()}` : ""}`;
       }
 
       async function loadOverview() {
-        const payload = await api("/api/admin/overview");
-        renderMetricGrid(payload.summary);
-        renderRecent(payload.recent_bookings || []);
+        renderOverview(await api("/api/admin/overview"));
+        recentList.querySelectorAll(".complete").forEach((button) => button.addEventListener("click", async (event) => {
+          const id = event.target.closest("[data-booking-id]").dataset.bookingId;
+          const amount = window.prompt("Amount collected in cents", "4000");
+          if (amount === null) return;
+          await api(`/api/admin/bookings/${id}/complete`, { method: "POST", body: JSON.stringify({ amount_paid_cents: Number(amount) || 0 }) });
+          await refreshOverviewAndBookings();
+        }));
+        recentList.querySelectorAll(".missed").forEach((button) => button.addEventListener("click", async (event) => {
+          const id = event.target.closest("[data-booking-id]").dataset.bookingId;
+          await api(`/api/admin/bookings/${id}/mark-missed`, { method: "POST", body: "{}" });
+          await refreshOverviewAndBookings();
+        }));
+      }
+
+      async function loadReports() {
+        const payload = await api("/api/admin/reports");
+        chart($("appointmentsChart"), payload.labels, payload.occupancy, "#7ce3b0");
+        chart($("revenueChart"), payload.labels, payload.revenue, "#82b4ff");
+        statPairs($("reportAppointments"), [["Appointments", payload.cards.appointments], ["Time Booked", `${payload.cards.time_booked_hours} hrs`], ["Confirmed", payload.cards.confirmed], ["Finished", payload.cards.finished], ["No-Shows", payload.cards.no_shows], ["Cancelled", payload.cards.cancelled]]);
+        statPairs($("reportRevenue"), [["Services", money(payload.cards.services_revenue)], ["Products", "$0.00"], ["Tips", "$0.00"], ["Gift Cards", "$0.00"], ["Memberships", "$0.00"], ["Packages", "$0.00"]]);
+        statPairs($("reportClients"), [["Clients", payload.cards.clients_total], ["New", payload.cards.new_clients], ["Returning", payload.cards.returning_clients]]);
+      }
+
+      async function loadBookings() {
+        const params = new URLSearchParams();
+        if ($("bookingSearch").value.trim()) params.set("search", $("bookingSearch").value.trim());
+        if ($("bookingStatus").value) params.set("status", $("bookingStatus").value);
+        if ($("bookingOrigin").value) params.set("origin", $("bookingOrigin").value);
+        const payload = await api(`/api/admin/bookings-feed${params.toString() ? `?${params.toString()}` : ""}`);
+        state.bookings = payload.bookings || [];
+        renderBookings();
+        bookingFeed.querySelectorAll(".complete").forEach((button) => button.addEventListener("click", async (event) => {
+          const id = event.target.closest("[data-booking-id]").dataset.bookingId;
+          const amount = window.prompt("Amount collected in cents", "4000");
+          if (amount === null) return;
+          await api(`/api/admin/bookings/${id}/complete`, { method: "POST", body: JSON.stringify({ amount_paid_cents: Number(amount) || 0 }) });
+          await refreshAll();
+        }));
+        bookingFeed.querySelectorAll(".missed").forEach((button) => button.addEventListener("click", async (event) => {
+          const id = event.target.closest("[data-booking-id]").dataset.bookingId;
+          await api(`/api/admin/bookings/${id}/mark-missed`, { method: "POST", body: "{}" });
+          await refreshAll();
+        }));
+      }
+
+      async function loadCalendar() {
+        const weekStart = startOfWeek(state.calendarDate);
+        const weekEnd = addDays(weekStart, 6);
+        const params = new URLSearchParams({
+          start: isoDate(weekStart),
+          end: isoDate(weekEnd),
+        });
+        const payload = await api(`/api/admin/bookings-feed?${params.toString()}`);
+        state.calendarBookings = payload.bookings || [];
+        renderCalendar();
       }
 
       async function loadCustomers(query = "") {
@@ -321,42 +622,125 @@
         const payload = await api(`/api/admin/customers${suffix}`);
         state.customers = payload.customers || [];
         renderCustomers();
-        if (!state.selectedCustomerId && state.customers[0]) {
-          await loadCustomer(state.customers[0].id);
+        if (!state.selectedCustomerId && state.customers[0]) await loadCustomer(state.customers[0].id);
+      }
+
+      async function loadCustomer(id) {
+        renderCustomerDetail(await api(`/api/admin/customers/${id}`));
+      }
+
+      async function loadStaffProfile() {
+        renderStaffProfile((await api("/api/admin/staff/profile")).profile);
+      }
+
+      async function refreshOverviewAndBookings() {
+        await Promise.all([loadOverview(), loadBookings(), loadReports(), loadCalendar()]);
+        if (state.selectedCustomerId) await loadCustomer(state.selectedCustomerId);
+      }
+
+      async function refreshAll() {
+        await Promise.all([loadOverview(), loadReports(), loadBookings(), loadCalendar()]);
+        await Promise.all([loadCustomers($("customerSearch").value), loadStaffProfile()]);
+      }
+
+      function applySidebarState(collapsed) {
+        document.body.classList.toggle("sidebar-collapsed", collapsed);
+        window.localStorage.setItem("jp_staff_sidebar_collapsed", collapsed ? "1" : "0");
+      }
+
+      function applyRailState(collapsed) {
+        document.body.classList.toggle("rail-collapsed", collapsed);
+        calendarSummaryToggleLabel.textContent = collapsed ? "Open Sync Panel" : "Collapse Sync Panel";
+        window.localStorage.setItem("jp_staff_calendar_rail_collapsed", collapsed ? "1" : "0");
+      }
+
+      function setActivePage(page) {
+        state.currentPage = page;
+        document.querySelectorAll("[data-page]").forEach((item) => item.classList.toggle("active", item.dataset.page === page));
+        document.querySelectorAll("[data-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === page));
+        $("pageTitle").textContent = titles[page][0];
+        $("pageSub").textContent = titles[page][1];
+      }
+
+      document.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => setActivePage(button.dataset.page)));
+
+      $("bookingSearch").addEventListener("input", loadBookings);
+      $("bookingStatus").addEventListener("change", loadBookings);
+      $("bookingOrigin").addEventListener("change", loadBookings);
+      $("customerSearch").addEventListener("input", () => loadCustomers($("customerSearch").value));
+      $("calendarPrevBtn").addEventListener("click", () => {
+        state.calendarDate = addDays(startOfWeek(state.calendarDate), -7);
+        loadCalendar().catch((error) => setMsg(staffMsg, error.message, "error"));
+      });
+      $("calendarTodayBtn").addEventListener("click", () => {
+        state.calendarDate = new Date();
+        loadCalendar().catch((error) => setMsg(staffMsg, error.message, "error"));
+      });
+      $("calendarNextBtn").addEventListener("click", () => {
+        state.calendarDate = addDays(startOfWeek(state.calendarDate), 7);
+        loadCalendar().catch((error) => setMsg(staffMsg, error.message, "error"));
+      });
+      sidebarToggle.addEventListener("click", () => applySidebarState(!document.body.classList.contains("sidebar-collapsed")));
+      calendarSummaryToggle.addEventListener("click", () => applyRailState(!document.body.classList.contains("rail-collapsed")));
+      customerModalClose.addEventListener("click", closeCustomerModal);
+      customerModal.addEventListener("click", (event) => {
+        if (event.target === customerModal) closeCustomerModal();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && customerModal.classList.contains("open")) {
+          closeCustomerModal();
         }
-      }
-
-      async function loadCustomer(customerId) {
-        const payload = await api(`/api/admin/customers/${customerId}`);
-        renderCustomerDetail(payload);
-      }
-
-      customerSearch.addEventListener("input", async () => {
-        await loadCustomers(customerSearch.value);
       });
 
-      saveRecordBtn.addEventListener("click", async () => {
+      $("saveRecordBtn").addEventListener("click", async () => {
         if (!state.selectedCustomerId) return;
         try {
-          const payload = await api(`/api/admin/customers/${state.selectedCustomerId}`, {
-            method: "PATCH",
-            body: JSON.stringify({
-              full_name: recordName.value,
-              email: recordEmail.value,
-              preferred_barber_id: recordBarber.value || null,
-              preferred_style: recordStyle.value,
-              profile_notes: recordNotes.value,
-            }),
-          });
-          renderCustomerDetail(payload);
-          setMsg("Client record saved.", "ok");
+          renderCustomerDetail(await api(`/api/admin/customers/${state.selectedCustomerId}`, { method: "PATCH", body: JSON.stringify({ full_name: recordName.value, email: recordEmail.value, preferred_barber_id: recordBarber.value || null, preferred_style: recordStyle.value, profile_notes: recordNotes.value, booking_policy_note: policyNote.value }) }));
+          setMsg(recordMsg, "Client record saved.", "ok");
+          await Promise.all([loadCustomers($("customerSearch").value), loadOverview()]);
         } catch (error) {
-          setMsg(error.message, "error");
+          setMsg(recordMsg, error.message, "error");
         }
       });
 
-      Promise.all([loadOverview(), loadCustomers()]).catch((error) => {
-        setMsg(error.message, "error");
+      $("flagCustomerBtn").addEventListener("click", async () => {
+        if (!state.selectedCustomerId) return;
+        try {
+          renderCustomerDetail(await api(`/api/admin/customers/${state.selectedCustomerId}`, { method: "PATCH", body: JSON.stringify({ full_name: recordName.value, email: recordEmail.value, preferred_barber_id: recordBarber.value || null, preferred_style: recordStyle.value, profile_notes: recordNotes.value, booking_policy_note: policyNote.value, is_inhouse_blocked: true }) }));
+          setMsg(recordMsg, "Client flagged for in-house booking review.", "ok");
+          await Promise.all([loadCustomers($("customerSearch").value), loadOverview()]);
+        } catch (error) {
+          setMsg(recordMsg, error.message, "error");
+        }
+      });
+
+      $("clearFlagBtn").addEventListener("click", async () => {
+        if (!state.selectedCustomerId) return;
+        try {
+          renderCustomerDetail(await api(`/api/admin/customers/${state.selectedCustomerId}`, { method: "PATCH", body: JSON.stringify({ full_name: recordName.value, email: recordEmail.value, preferred_barber_id: recordBarber.value || null, preferred_style: recordStyle.value, profile_notes: recordNotes.value, booking_policy_note: policyNote.value, is_inhouse_blocked: false }) }));
+          setMsg(recordMsg, "Client flag cleared.", "ok");
+          await Promise.all([loadCustomers($("customerSearch").value), loadOverview()]);
+        } catch (error) {
+          setMsg(recordMsg, error.message, "error");
+        }
+      });
+
+      $("saveStaffProfileBtn").addEventListener("click", async () => {
+        try {
+          renderStaffProfile((await api("/api/admin/staff/profile", { method: "PATCH", body: JSON.stringify({ first_name: $("staffFirstName").value, last_name: $("staffLastName").value, email: $("staffEmail").value, phone: $("staffPhone").value, title: $("staffTitle").value, bio: $("staffBio").value, linked_barber_id: $("staffLinkedBarber").value || null }) })).profile);
+          setMsg(staffMsg, "Staff profile saved.", "ok");
+        } catch (error) {
+          setMsg(staffMsg, error.message, "error");
+        }
+      });
+
+      applySidebarState(window.innerWidth > 1180);
+      applyRailState(window.localStorage.getItem("jp_staff_calendar_rail_collapsed") === "1");
+      setActivePage(state.currentPage);
+
+      Promise.all([loadOverview(), loadReports(), loadBookings(), loadCalendar(), loadCustomers(), loadStaffProfile()]).catch((error) => {
+        setMsg(recordMsg, error.message, "error");
+        setMsg(staffMsg, error.message, "error");
       });
     })();
   </script>

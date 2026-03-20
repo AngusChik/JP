@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -78,6 +79,10 @@ class CustomerAccount(models.Model):
     )
     preferred_style = models.CharField(max_length=120, blank=True)
     profile_notes = models.TextField(blank=True)
+    is_inhouse_blocked = models.BooleanField(default=False)
+    booking_policy_note = models.CharField(max_length=240, blank=True)
+    blocked_at = models.DateTimeField(null=True, blank=True)
+    missed_appointments_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -86,6 +91,32 @@ class CustomerAccount(models.Model):
 
     def __str__(self) -> str:
         return self.full_name or self.phone_e164
+
+
+class StaffProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="staff_profile",
+    )
+    phone = models.CharField(max_length=20, blank=True)
+    title = models.CharField(max_length=120, blank=True)
+    bio = models.TextField(blank=True)
+    linked_barber = models.ForeignKey(
+        Barber,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="staff_profiles",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["user__username"]
+
+    def __str__(self) -> str:
+        return self.title or self.user.get_username()
 
 
 class OTPChallenge(models.Model):
@@ -127,6 +158,13 @@ class Booking(models.Model):
     PAYMENT_UNPAID = "unpaid"
     PAYMENT_PARTIAL = "partial"
     PAYMENT_PAID = "paid"
+    ORIGIN_LOCAL = "local"
+    ORIGIN_BOOKSY = "booksy"
+    ORIGIN_SYNCED = "synced"
+    SYNC_LOCAL_ONLY = "local_only"
+    SYNC_PENDING = "pending"
+    SYNC_SYNCED = "synced"
+    SYNC_FAILED = "failed"
 
     STATUS_CHOICES = [
         (STATUS_CONFIRMED, "Confirmed"),
@@ -139,6 +177,17 @@ class Booking(models.Model):
         (PAYMENT_UNPAID, "Unpaid"),
         (PAYMENT_PARTIAL, "Partial"),
         (PAYMENT_PAID, "Paid"),
+    ]
+    ORIGIN_CHOICES = [
+        (ORIGIN_LOCAL, "Local"),
+        (ORIGIN_BOOKSY, "Booksy"),
+        (ORIGIN_SYNCED, "Synced"),
+    ]
+    SYNC_STATUS_CHOICES = [
+        (SYNC_LOCAL_ONLY, "Local Only"),
+        (SYNC_PENDING, "Pending"),
+        (SYNC_SYNCED, "Synced"),
+        (SYNC_FAILED, "Failed"),
     ]
 
     customer = models.ForeignKey(
@@ -157,6 +206,14 @@ class Booking(models.Model):
         max_length=20,
         choices=PAYMENT_STATUS_CHOICES,
         default=PAYMENT_UNPAID,
+    )
+    origin = models.CharField(max_length=20, choices=ORIGIN_CHOICES, default=ORIGIN_LOCAL)
+    external_booking_id = models.CharField(max_length=120, blank=True, db_index=True)
+    last_synced_at = models.DateTimeField(null=True, blank=True)
+    sync_status = models.CharField(
+        max_length=20,
+        choices=SYNC_STATUS_CHOICES,
+        default=SYNC_LOCAL_ONLY,
     )
     notes = models.TextField(blank=True)
     cancellation_reason = models.CharField(max_length=240, blank=True)
