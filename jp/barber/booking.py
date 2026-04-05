@@ -15,12 +15,6 @@ DEFAULT_BARBERS = [
         "title": "Owner / Lead Barber",
         "booksy_url": "https://booksy.com/en-ca/21963_jp-barber-studio_barbershop_870806_mississauga#ba_s=sh_1",
     },
-    {
-        "slug": "mike",
-        "name": "Milo",
-        "title": "Barber",
-        "booksy_url": "https://booksy.com/en-ca/26938_milo-cuts_barbershop_870806_mississauga#ba_s=seo",
-    },
 ]
 
 DEFAULT_SERVICES = [

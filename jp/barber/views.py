@@ -11,6 +11,7 @@ from urllib.request import Request, urlopen
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.hashers import check_password, make_password
+from django.core.cache import cache
 from django.db import IntegrityError, transaction
 from django.db.utils import OperationalError, ProgrammingError
 from django.db.models import Count, Q, Sum
@@ -18,7 +19,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 
 from .booking import bootstrap_reference_data, generate_week_slots, normalize_phone, parse_week_start
@@ -37,10 +38,18 @@ from .models import (
 BOOKSY_GLOBAL_URL = getattr(settings, "BOOKSY_GLOBAL_URL", "https://booksy.com/your-link")
 BOOKSY_WIDGET_SCRIPT_URL = getattr(settings, "BOOKSY_WIDGET_SCRIPT_URL", "")
 GOOGLE_BOOKING_URL = getattr(settings, "GOOGLE_BOOKING_URL", "")
-MILO_BOOKSY_URL = "https://booksy.com/en-ca/26938_milo-cuts_barbershop_870806_mississauga#ba_s=seo"
+PUBLIC_BARBER_SLUG = "jp"
 SESSION_ACCOUNT_KEY = "customer_account_id"
 OTP_PURPOSE_LOGIN = "login"
 OTP_TTL_MINUTES = 10
+OTP_SEND_LIMIT = 5
+OTP_SEND_WINDOW_SECONDS = 15 * 60
+STAFF_LOGIN_LIMIT = 10
+STAFF_LOGIN_WINDOW_SECONDS = 15 * 60
+
+
+def _public_barbers_queryset():
+    return Barber.objects.filter(is_active=True, slug=PUBLIC_BARBER_SLUG)
 
 
 def _json_error(message: str, status: int = 400) -> JsonResponse:
@@ -61,6 +70,24 @@ def _safe_next_path(value: str | None, default: str) -> str:
     if candidate.startswith("/") and not candidate.startswith("//"):
         return candidate
     return default
+
+
+def _client_ip(request: HttpRequest) -> str:
+    forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR", "unknown")
+
+
+def _rate_limit_exceeded(key: str, limit: int, window_seconds: int) -> bool:
+    if cache.add(key, 1, timeout=window_seconds):
+        return False
+    try:
+        count = cache.incr(key)
+    except ValueError:
+        cache.set(key, 1, timeout=window_seconds)
+        return False
+    return count > limit
 
 
 def _serialize_account(account: CustomerAccount) -> dict:
@@ -393,43 +420,30 @@ def _build_reports_payload() -> dict:
 def _build_home_data() -> tuple[list[dict], list[dict]]:
     cuts = [
         {
-            "name": "Skin Fade",
+            "name": "Beard Outline",
             "time": "30-40 min",
             "price": "$40",
             "desc": "Clean fade from skin up with a sharp, blended finish. Our most popular cut.",
             "category": "Fade",
-            "image_url": static("Cuts/fade1.webp"),
+            "image_url": static("Cuts/FD.JPG"),
             "gallery": "|".join(
                 [
-                    static("Cuts/fade1.webp"),
-                    static("Cuts/fade2.webp"),
+                    static("Cuts/FD.JPG"),
                 ]
             ),
         },
         {
-            "name": "Buzz Cut",
+            "name": "Precision Cut",
             "time": "15-25 min",
             "price": "$25",
             "desc": "Simple, sharp, and low-maintenance. Even length all around with a crisp lineup.",
             "category": "Classic",
-            "image_url": static("Cuts/buzz1.webp"),
+            "image_url": static("Cuts/HC.JPG"),
             "gallery": "|".join(
                 [
-                    static("Cuts/buzz1.webp"),
-                ]
-            ),
-        },
-        {
-            "name": "Classic Taper",
-            "time": "30-40 min",
-            "price": "$35",
-            "desc": "Timeless taper with a clean neckline. Works with any hair type and length.",
-            "category": "Taper",
-            "image_url": static("Cuts/fade2.webp"),
-            "gallery": "|".join(
-                [
-                    static("Cuts/fade2.webp"),
-                    static("Cuts/fade1.webp"),
+                    static("Cuts/HC.JPG"),
+                    static("Cuts/FD.JPG"),
+
                 ]
             ),
         },
@@ -439,12 +453,13 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "price": "$55",
             "desc": "Full fade with detailed beard shaping, lineup, and hot towel finish.",
             "category": "Combo",
-            "image_url": static("Cuts/fade3.jpg"),
+            "image_url": static("Cuts/HC+B3.JPG"),
             "gallery": "|".join(
                 [
-                    static("Cuts/fade3.jpg"),
-                    static("Cuts/fade1.webp"),
-                    static("Cuts/fade2.webp"),
+                    static("Cuts/HC+B3.JPG"),
+                    static("Cuts/HC+B4.JPG"),
+                    static("Cuts/HC+B5.JPG"),
+                    static("Cuts/HC+B6.JPG"),
                 ]
             ),
         },
@@ -460,7 +475,7 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "bio": "Started cutting hair at 16 out of my parents' basement. "
             "Fifteen years later, I'm still obsessed with getting every "
             "fade, lineup, and taper right. I built this shop to be the "
-            "kind of place I always wanted to walk into - no ego, no rush, "
+            "kind of place I always wanted to walk into \u2014 no ego, no rush, "
             "just sharp work and good conversation.",
             "reviews": [
                 {
@@ -477,30 +492,11 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
                 },
             ],
         },
-        {
-            "id": "mike",
-            "name": "Milo",
-            "title": "Barber",
-            "photo_url": "https://picsum.photos/800/1100?random=31",
-            "booksy_url": MILO_BOOKSY_URL,
-            "bio": "Milo focuses on clean blends, crisp outlines, and sharp everyday cuts "
-            "that stay easy to manage between visits. His chair is about consistent work, "
-            "good energy, and making sure you leave looking polished without overcomplicating it.",
-            "reviews": [
-                {
-                    "author": "James W.",
-                    "text": "Milo dialed in exactly the look I wanted and made the whole appointment feel easy.",
-                },
-                {
-                    "author": "Chris P.",
-                    "text": "Super consistent. Clean fade, good conversation, and no wasted time.",
-                },
-            ],
-        },
     ]
     return cuts, barbers
 
 
+@ensure_csrf_cookie
 def home(request: HttpRequest) -> HttpResponse:
     cuts, barbers = _build_home_data()
 
@@ -509,8 +505,8 @@ def home(request: HttpRequest) -> HttpResponse:
     default_service = None
     try:
         bootstrap_reference_data()
-        model_barbers = {barber.slug: barber for barber in Barber.objects.filter(is_active=True)}
-        default_barber = Barber.objects.filter(is_active=True).order_by("name").first()
+        model_barbers = {barber.slug: barber for barber in _public_barbers_queryset()}
+        default_barber = _public_barbers_queryset().order_by("name").first()
         default_service = Service.objects.filter(is_active=True).order_by("duration_minutes", "name").first()
     except (OperationalError, ProgrammingError):
         # Supports static build mode where migrations may not have run.
@@ -553,6 +549,7 @@ def home(request: HttpRequest) -> HttpResponse:
     )
 
 
+@ensure_csrf_cookie
 def account_portal(request: HttpRequest) -> HttpResponse:
     staff_next_url = _safe_next_path(request.GET.get("next"), "/ops/")
     return render(
@@ -568,10 +565,11 @@ def account_portal(request: HttpRequest) -> HttpResponse:
     )
 
 
+@ensure_csrf_cookie
 def account_dashboard(request: HttpRequest) -> HttpResponse:
     bootstrap_reference_data()
     barbers = list(
-        Barber.objects.filter(is_active=True)
+        _public_barbers_queryset()
         .order_by("name")
         .values("id", "name", "slug", "title")
     )
@@ -586,7 +584,6 @@ def account_dashboard(request: HttpRequest) -> HttpResponse:
     )
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_auth_send_otp(request: HttpRequest) -> JsonResponse:
     body = _parse_json_body(request)
@@ -594,6 +591,12 @@ def api_auth_send_otp(request: HttpRequest) -> JsonResponse:
         phone_e164 = normalize_phone(body.get("phone", ""))
     except ValueError as exc:
         return _json_error(str(exc))
+
+    ip_address = _client_ip(request)
+    if _rate_limit_exceeded(f"otp-send:ip:{ip_address}", OTP_SEND_LIMIT, OTP_SEND_WINDOW_SECONDS):
+        return _json_error("Too many verification attempts. Please wait a few minutes.", status=429)
+    if _rate_limit_exceeded(f"otp-send:phone:{phone_e164}", OTP_SEND_LIMIT, OTP_SEND_WINDOW_SECONDS):
+        return _json_error("Too many verification attempts. Please wait a few minutes.", status=429)
 
     OTPChallenge.objects.filter(
         phone_e164=phone_e164,
@@ -621,7 +624,6 @@ def api_auth_send_otp(request: HttpRequest) -> JsonResponse:
     return JsonResponse(response_data, status=201)
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_auth_verify_otp(request: HttpRequest) -> JsonResponse:
     body = _parse_json_body(request)
@@ -657,22 +659,32 @@ def api_auth_verify_otp(request: HttpRequest) -> JsonResponse:
 
     challenge.mark_consumed()
     account, _ = CustomerAccount.objects.get_or_create(phone_e164=phone_e164)
+    if request.user.is_authenticated:
+        auth_logout(request)
+    request.session.cycle_key()
     request.session[SESSION_ACCOUNT_KEY] = account.id
     request.session.modified = True
 
     return JsonResponse({"ok": True, "account": _serialize_account(account)})
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_staff_login(request: HttpRequest) -> JsonResponse:
     body = _parse_json_body(request)
     username = str(body.get("username", "")).strip()
     password = str(body.get("password", ""))
     next_url = _safe_next_path(body.get("next"), "/ops/")
+    ip_address = _client_ip(request)
 
     if not username or not password:
         return _json_error("Username and password are required.")
+
+    ip_key = f"staff-login:ip:{ip_address}"
+    user_key = f"staff-login:user:{username.lower()}"
+    if _rate_limit_exceeded(ip_key, STAFF_LOGIN_LIMIT, STAFF_LOGIN_WINDOW_SECONDS):
+        return _json_error("Too many login attempts. Please wait a few minutes.", status=429)
+    if _rate_limit_exceeded(user_key, STAFF_LOGIN_LIMIT, STAFF_LOGIN_WINDOW_SECONDS):
+        return _json_error("Too many login attempts. Please wait a few minutes.", status=429)
 
     user = authenticate(request, username=username, password=password)
     if user is None:
@@ -680,6 +692,8 @@ def api_staff_login(request: HttpRequest) -> JsonResponse:
     if not user.is_staff:
         return _json_error("This account does not have staff access.", status=403)
 
+    cache.delete(ip_key)
+    cache.delete(user_key)
     request.session.pop(SESSION_ACCOUNT_KEY, None)
     auth_login(request, user)
 
@@ -698,7 +712,6 @@ def api_staff_login(request: HttpRequest) -> JsonResponse:
     )
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_auth_logout(request: HttpRequest) -> JsonResponse:
     request.session.pop(SESSION_ACCOUNT_KEY, None)
@@ -717,7 +730,6 @@ def api_account_me(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"account": _serialize_account(account)})
 
 
-@csrf_exempt
 @require_http_methods(["PATCH"])
 def api_account_update(request: HttpRequest) -> JsonResponse:
     account = _require_account(request)
@@ -755,7 +767,6 @@ def api_account_update(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"ok": True, "account": _serialize_account(account)})
 
 
-@csrf_exempt
 @require_http_methods(["GET", "PATCH"])
 def api_account_me_endpoint(request: HttpRequest) -> JsonResponse:
     if request.method == "GET":
@@ -769,11 +780,11 @@ def api_availability(request: HttpRequest) -> JsonResponse:
 
     barber_raw = request.GET.get("barber_id")
     if barber_raw and barber_raw.isdigit():
-        barber = Barber.objects.filter(id=int(barber_raw), is_active=True).first()
+        barber = _public_barbers_queryset().filter(id=int(barber_raw)).first()
     elif barber_raw:
-        barber = Barber.objects.filter(slug=barber_raw, is_active=True).first()
+        barber = _public_barbers_queryset().filter(slug=barber_raw).first()
     else:
-        barber = Barber.objects.filter(is_active=True).order_by("name").first()
+        barber = _public_barbers_queryset().order_by("name").first()
 
     if barber is None:
         return _json_error("No active barbers available.", status=404)
@@ -834,7 +845,7 @@ def api_availability(request: HttpRequest) -> JsonResponse:
 
     barbers = [
         {"id": b.id, "slug": b.slug, "name": b.name, "title": b.title, "booksy_url": b.booksy_url}
-        for b in Barber.objects.filter(is_active=True).order_by("name")
+        for b in _public_barbers_queryset().order_by("name")
     ]
     services = [
         {
@@ -859,8 +870,6 @@ def api_availability(request: HttpRequest) -> JsonResponse:
         }
     )
 
-
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_create_booking(request: HttpRequest) -> JsonResponse:
     account = _require_account(request)
@@ -967,7 +976,6 @@ def api_list_bookings(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"bookings": [_serialize_booking(booking) for booking in queryset]})
 
 
-@csrf_exempt
 @require_http_methods(["GET", "POST"])
 def api_bookings(request: HttpRequest) -> JsonResponse:
     if request.method == "GET":
@@ -975,7 +983,6 @@ def api_bookings(request: HttpRequest) -> JsonResponse:
     return api_create_booking(request)
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_cancel_booking(request: HttpRequest, booking_id: int) -> JsonResponse:
     account = _require_account(request)
@@ -1004,6 +1011,7 @@ def api_cancel_booking(request: HttpRequest, booking_id: int) -> JsonResponse:
     return JsonResponse({"ok": True, "booking": _serialize_booking(booking)})
 
 
+@ensure_csrf_cookie
 @require_GET
 def ops_dashboard(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated or not request.user.is_staff:
@@ -1152,7 +1160,6 @@ def api_admin_customers(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"customers": payload})
 
 
-@csrf_exempt
 @require_http_methods(["GET", "PATCH"])
 def api_admin_customer_detail(request: HttpRequest, customer_id: int) -> JsonResponse:
     staff_error = _require_staff(request)
@@ -1207,7 +1214,6 @@ def api_admin_customer_detail(request: HttpRequest, customer_id: int) -> JsonRes
     )
 
 
-@csrf_exempt
 @require_http_methods(["GET", "PATCH"])
 def api_admin_staff_profile(request: HttpRequest) -> JsonResponse:
     staff_error = _require_staff(request)
@@ -1235,7 +1241,6 @@ def api_admin_staff_profile(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"profile": _serialize_staff_profile(profile)})
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_admin_create_booking(request: HttpRequest) -> JsonResponse:
     staff_error = _require_staff(request)
@@ -1302,7 +1307,6 @@ def api_admin_create_booking(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"ok": True, "booking": _serialize_booking(booking)}, status=201)
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_admin_mark_completed(request: HttpRequest, booking_id: int) -> JsonResponse:
     staff_error = _require_staff(request)
@@ -1335,7 +1339,6 @@ def api_admin_mark_completed(request: HttpRequest, booking_id: int) -> JsonRespo
     return JsonResponse({"ok": True, "booking": _serialize_booking(booking)})
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_admin_mark_missed(request: HttpRequest, booking_id: int) -> JsonResponse:
     staff_error = _require_staff(request)

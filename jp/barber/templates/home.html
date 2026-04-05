@@ -4,16 +4,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="JP Studio — Sharp cuts, clean fades, and precise beard work in Toronto. Walk-ins welcome." />
+<meta name="description" content="JP Barber Studio — Sharp cuts, clean fades, and precise beard work in Mississauga. Book appointments online." />
   <title>JP Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet" />
-  <link rel="preload" as="image" href="{% static 'Cuts/fade1.webp' %}" />
-  <link rel="preload" as="image" href="{% static 'Cuts/fade2.webp' %}" />
-  <link rel="preload" as="image" href="{% static 'Cuts/fade3.jpg' %}" />
-  <link rel="preload" as="image" href="{% static 'Cuts/buzz1.webp' %}" />
+  <link rel="preload" as="image" href="{% static 'Cuts/FD.JPG' %}" />
+  <link rel="preload" as="image" href="{% static 'Cuts/HC.JPG' %}" />
+  <link rel="preload" as="image" href="{% static 'Cuts/HC2.JPG' %}" />
+  <link rel="preload" as="image" href="{% static 'Cuts/HC+B3.JPG' %}" />
 
   <style>
 :root{
@@ -58,31 +58,31 @@ a{color:inherit;text-decoration:none}
   will-change:opacity;
   background-position:center;
   background-repeat:no-repeat;
-  background-size:cover;
+  background-size:100% auto;
 }
 .bg-home{
   background:
-    radial-gradient(60% 70% at 50% 15%, rgba(201,169,110,.14), transparent 65%),
-    linear-gradient(160deg, rgba(8,8,8,.72) 0%, rgba(12,10,10,.82) 55%, rgba(8,8,8,.88) 100%),
-    url("{% static 'Cuts/BG1.jpg' %}");
+    linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 40%, rgba(0,0,0,.55) 100%),
+    url("{% static 'bg/BG10.JPG' %}");
+  background-position:center 62%;
+  background-size:cover;
 }
 .bg-about{
   background:
-    radial-gradient(70% 70% at 20% 30%, rgba(201,169,110,.1), transparent 60%),
-    linear-gradient(160deg, rgba(10,9,8,.72) 0%, rgba(15,12,10,.82) 52%, rgba(8,8,8,.9) 100%),
-    url("{% static 'Cuts/BG2.jpg' %}");
+    linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 40%, rgba(0,0,0,.55) 100%),
+    url("{% static 'bg/BG2.JPG' %}");
 }
 .bg-cuts{
   background:
-    radial-gradient(80% 80% at 80% 20%, rgba(201,169,110,.1), transparent 60%),
-    linear-gradient(155deg, rgba(8,8,9,.72) 0%, rgba(10,12,14,.82) 48%, rgba(6,7,8,.9) 100%),
-    url("{% static 'Cuts/BG3.jpg' %}");
+    linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 40%, rgba(0,0,0,.55) 100%),
+    url("{% static 'bg/BG3.JPG' %}");
 }
 .bg-contact{
   background:
-    radial-gradient(75% 75% at 50% 90%, rgba(201,169,110,.14), transparent 65%),
-    linear-gradient(145deg, rgba(7,7,7,.74) 0%, rgba(11,10,9,.84) 50%, rgba(7,7,7,.9) 100%),
-    url("{% static 'Cuts/BG1.jpg' %}");
+    linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 40%, rgba(0,0,0,.55) 100%),
+    url("{% static 'bg/BG4.JPG' %}");
+  background-position:center center;
+  background-size:cover;
 }
 body[data-active-section="home"] .bg-home,
 body[data-active-section="about"] .bg-about,
@@ -141,6 +141,21 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   transition:transform .2s ease,border-color .2s ease,background .2s ease;
 }
 .nav-login:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.04)}
+.is-disabled,
+.is-disabled:hover{
+  transform:none !important;
+  box-shadow:none !important;
+  cursor:not-allowed !important;
+  pointer-events:none;
+  opacity:.42;
+}
+.nav-login.is-disabled,
+.book-path.is-disabled,
+.book-account-link.is-disabled{
+  border-color:rgba(255,255,255,.08) !important;
+  background:rgba(255,255,255,.03) !important;
+  color:rgba(237,233,224,.58) !important;
+}
 .nav-cta{
   padding:8px 18px;border-radius:8px;background:var(--accent);color:var(--bg);
   font-weight:600;font-size:13px;
@@ -249,7 +264,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   font-size:clamp(36px,5.5vw,64px);font-weight:600;line-height:1.08;letter-spacing:-.5px;margin-bottom:18px;
 }
 .hero-inner h1 em{font-style:italic;color:var(--accent)}
-.hero-sub{color:var(--muted);font-size:16px;line-height:1.65;max-width:44ch;margin-bottom:32px}
+.hero-sub{color:var(--text);font-size:16px;line-height:1.65;max-width:44ch;margin-bottom:32px}
 .hero-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .btn-primary{
   padding:12px 28px;border-radius:8px;background:var(--accent);color:var(--bg);
@@ -278,7 +293,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .photo-row{
   width:min(900px,100%);margin:0 auto;
   display:grid;gap:clamp(12px,2vw,24px);
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),420px));
+  justify-content:center;
 }
 
 .barber-card{
@@ -549,10 +565,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   display:flex;align-items:stretch;
   gap:var(--loop-gap);width:max-content;
   will-change:transform;
-  animation:reviewLoop var(--loop-speed) linear infinite;
+  transform:translate3d(0,0,0);
 }
 .review-loop--reverse{--loop-speed:52s}
-.review-loop--reverse .review-loop-track{animation-direction:reverse}
 .review-loop-group{
   display:flex;align-items:stretch;gap:var(--loop-gap);
   flex-shrink:0;
@@ -576,10 +591,6 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 .review-name{font-weight:700;color:var(--text)}
 .review-stars{letter-spacing:.8px;color:var(--accent)}
-@keyframes reviewLoop{
-  from{transform:translateX(0)}
-  to{transform:translateX(calc(-50% - (var(--loop-gap) / 2)))}
-}
 
 /* Tablet */
 @media(max-width:1024px){
@@ -653,33 +664,53 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
    CONTACT
    ========================= */
 .contact-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;align-items:stretch}
-.contact-card{border:1px solid var(--border);background:var(--surface);border-radius:16px;overflow:hidden}
+.contact-card{
+  border:0;
+  background:rgba(10,10,10,.12);
+  border-radius:16px;
+  overflow:hidden;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
 .map-card{padding:16px;display:flex;flex-direction:column;gap:12px}
 .map-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.map-title{font-size:14px;font-weight:700}
-.map-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.map-title{font-size:14px;font-weight:700;color:rgba(255,255,255,.96)}
+.map-sub{font-size:12px;color:rgba(255,255,255,.76);margin-top:2px}
 .map-link{
   font-size:12px;font-weight:600;color:var(--accent);
-  padding:8px 14px;border-radius:8px;border:1px solid var(--accent-dim);
+  padding:8px 14px;border-radius:8px;border:0;
+  background:rgba(255,255,255,.035);
   transition:background .2s ease;display:inline-flex;align-items:center;gap:5px;flex-shrink:0;
 }
-.map-link:hover{background:var(--accent-dim)}
+.map-link:hover{background:rgba(201,169,110,.16)}
 .map-link svg{width:12px;height:12px}
-.map-frame{border-radius:12px;overflow:hidden;border:1px solid var(--border);aspect-ratio:16/10;background:var(--surface2)}
+.map-frame{border-radius:12px;overflow:hidden;border:0;aspect-ratio:16/10;background:rgba(0,0,0,.28)}
 .map-embed{width:100%;height:100%;border:0;display:block}
 .detail-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.detail-item{padding:10px;border-radius:10px;background:var(--surface2)}
-.detail-item small{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.detail-item b{display:block;font-size:12px;font-weight:600}
-.detail-item span{display:block;font-size:11px;color:var(--muted);margin-top:1px}
-.map-quote{font-size:12px;color:var(--muted);line-height:1.5;font-style:italic;padding:0 2px}
+.detail-item{
+  padding:10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+.detail-item small{display:block;font-size:10px;font-weight:600;color:rgba(255,255,255,.62);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.detail-item b{display:block;font-size:12px;font-weight:700;color:rgba(255,255,255,.97)}
+.detail-item span{display:block;font-size:11px;color:rgba(255,255,255,.72);margin-top:1px}
+.map-quote{font-size:12px;color:rgba(255,255,255,.72);line-height:1.5;font-style:italic;padding:0 2px}
 .map-copy{font-size:11px;color:rgba(255,255,255,.25);margin-top:4px}
 
 .book-card{padding:16px;display:flex;flex-direction:column;gap:12px}
-.book-box{border-radius:12px;padding:16px;background:var(--surface2);border:1px solid var(--border)}
+.book-box{
+  border-radius:12px;padding:16px;
+  background:rgba(255,255,255,.04);
+  border:0;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
 .book-label{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.book-title{font-size:17px;font-weight:700;letter-spacing:-.2px}
-.book-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px}
+.book-title{font-size:17px;font-weight:700;letter-spacing:-.2px;color:rgba(255,255,255,.97)}
+.book-desc{font-size:12px;color:rgba(255,255,255,.76);line-height:1.5;margin-top:6px}
 .book-buttons{display:flex;gap:8px;margin-top:14px}
 .book-btn{flex:1;padding:10px;border-radius:8px;font-weight:600;font-size:12px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .25s var(--ease-out-expo),box-shadow .25s ease,opacity .2s ease}
 .book-btn.fill{background:var(--accent);color:var(--bg)}
@@ -687,130 +718,252 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .book-btn.ghost{border:1px solid rgba(255,255,255,.10);background:transparent;color:var(--text);transition:border-color .2s ease,background .2s ease,transform .25s var(--ease-out-expo)}
 .book-btn.ghost:hover{border-color:rgba(255,255,255,.20);background:rgba(255,255,255,.04);transform:translateY(-2px)}
 .action-list{display:grid;gap:6px}
-.action-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;background:var(--surface2);transition:background .2s ease,transform .25s var(--ease-out-expo),border-color .2s ease;border:1px solid transparent}
-.action-item:hover{background:rgba(255,255,255,.05);transform:translateX(4px);border-color:rgba(201,169,110,.1)}
+.action-item{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;
+  background:rgba(255,255,255,.036);
+  transition:background .2s ease,transform .25s var(--ease-out-expo),border-color .2s ease;
+  border:0;
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+.action-item:hover{background:rgba(255,255,255,.075);transform:translateX(4px)}
 .action-icon{width:32px;height:32px;border-radius:8px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .action-icon svg{width:14px;height:14px;color:var(--accent)}
 .action-text{flex:1;min-width:0}
-.action-text small{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.action-text strong{display:block;font-size:13px;font-weight:600;margin-top:1px}
-.action-badge{font-size:10px;font-weight:600;color:var(--muted);padding:4px 8px;border-radius:5px;background:rgba(255,255,255,.04)}
+.action-text small{display:block;font-size:10px;font-weight:600;color:rgba(255,255,255,.58);text-transform:uppercase;letter-spacing:.5px}
+.action-text strong{display:block;font-size:13px;font-weight:600;margin-top:1px;color:rgba(255,255,255,.94)}
+.action-badge{font-size:10px;font-weight:600;color:rgba(255,255,255,.62);padding:4px 8px;border-radius:5px;background:rgba(255,255,255,.03)}
 
 /* =========================
    GALLERY MODAL
    ========================= */
 .gallery-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:clamp(12px,2vw,24px);pointer-events:none;visibility:hidden}
-.gallery-modal.is-open{pointer-events:auto;visibility:visible}
+.gallery-modal.is-open,
+.gallery-modal.is-closing{pointer-events:auto;visibility:visible}
 .gm-backdrop{
   position:absolute;inset:0;
-  background:radial-gradient(circle at 50% 30%, rgba(24,20,15,.48), rgba(0,0,0,.9) 60%);
-  opacity:0;transition:opacity .3s ease;
+  background:linear-gradient(180deg, rgba(8,8,8,.94), rgba(5,5,5,.98));
+  opacity:0;transition:opacity .35s ease;
+  will-change:opacity;
 }
 .gallery-modal.is-open .gm-backdrop{opacity:1}
 .gm-panel{
-  position:relative;width:min(1320px,100%);height:min(840px,calc(100vh - 36px));
-  border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);
-  background:
-    linear-gradient(170deg,rgba(26,24,22,.98) 0%,rgba(18,18,18,.98) 54%,rgba(15,15,15,.98) 100%);
-  box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.04);
+  position:relative;width:min(1180px,100%);height:min(94vh,calc(100vh - 12px));
+  border-radius:24px;overflow:visible;border:0;
+  background:transparent;
+  box-shadow:none;
   display:grid;grid-template-rows:auto 1fr;
-  transform:translateY(16px) scale(.97);opacity:0;transition:transform .4s var(--ease-out-expo),opacity .3s ease;
+  transform:translateY(20px) scale(.96);opacity:0;
+  transition:transform .45s var(--ease-out-expo),opacity .35s ease;
+  will-change:transform,opacity;
+  contain:layout paint;
+  pointer-events:none;
 }
 .gallery-modal.is-open .gm-panel{transform:translateY(0) scale(1);opacity:1}
 .gm-head{
   display:flex;justify-content:space-between;align-items:center;
-  padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.07);
-  background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.08));
-}
-.gm-titlewrap{display:flex;align-items:baseline;gap:10px;min-width:0}
-.gm-title{
-  font-weight:700;font-size:20px;letter-spacing:-.2px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw;
-}
-.gm-counter{
-  font-size:11px;font-weight:700;color:rgba(255,255,255,.75);
-  padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.04);
-}
-.gm-close{
-  width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
-  background:rgba(0,0,0,.35);color:var(--text);cursor:pointer;font-size:16px;
-  transition:background .18s ease,transform .18s ease,border-color .18s ease;
-}
-.gm-close:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
-.gm-body{display:grid;grid-template-columns:1fr 210px;min-height:0}
-.gm-stage{
-  --gm-stage-pad:18px;
-  --gm-frame-pad:clamp(10px,1.2vw,18px);
-  position:relative;padding:var(--gm-stage-pad);min-height:0;
-  display:flex;align-items:center;justify-content:center;
-}
-.gm-frame{
-  width:100%;height:100%;border-radius:14px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.06), transparent 55%),
-    linear-gradient(180deg,rgba(0,0,0,.56),rgba(0,0,0,.34));
-  border:1px solid rgba(255,255,255,.08);
-  overflow:hidden;display:flex;align-items:center;justify-content:center;
-  padding:var(--gm-frame-pad);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 0 0 1px rgba(0,0,0,.25);
-}
-.gm-image{
-  width:100%;height:100%;max-width:100%;max-height:100%;
-  object-fit:contain;border-radius:10px;background:rgba(0,0,0,.45);transition:opacity .15s ease;
-}
-.gm-image.is-loading{opacity:.3}
-.gm-controls{
-  position:absolute;
-  left:calc(var(--gm-stage-pad) + var(--gm-frame-pad) + 6px);
-  right:calc(var(--gm-stage-pad) + var(--gm-frame-pad) + 6px);
-  top:50%;transform:translateY(-50%);
-  display:flex;align-items:center;justify-content:space-between;
-  z-index:2;
-  pointer-events:none;
-}
-.gm-nav{
-  position:static;width:50px;height:50px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.28);
-  background:rgba(8,8,8,.72);color:rgba(255,255,255,.98);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  cursor:pointer;font-size:22px;font-weight:800;line-height:1;
-  box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.1);
-  transition:background .18s ease,transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+  gap:12px;
+  padding:8px 18px 2px;border-bottom:0;
+  background:transparent;
   pointer-events:auto;
 }
-.gm-nav:hover{
-  background:rgba(201,169,110,.2);
-  border-color:rgba(201,169,110,.55);
-  transform:translateY(-2px);
-  box-shadow:0 14px 30px rgba(0,0,0,.42),0 0 0 1px rgba(201,169,110,.2);
+.gm-titlewrap{
+  display:flex;
+  align-items:center;
+  gap:8px 12px;
+  min-width:0;
+  flex:1 1 auto;
+  flex-wrap:nowrap;
 }
-.gm-nav:active{transform:translateY(0)}
-.gm-nav[disabled]{opacity:.28;cursor:not-allowed;transform:none;box-shadow:none}
+.gm-title{
+  font-family:'Playfair Display',Georgia,serif;
+  flex:0 1 auto;
+  font-weight:600;font-size:clamp(28px,3vw,40px);line-height:1;letter-spacing:-.04em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:none;
+  color:#f6f1e8;
+  text-shadow:0 10px 30px rgba(0,0,0,.28);
+}
+.gm-service-info{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.gm-service-info .gm-price{
+  display:inline;
+  height:auto;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  font-size:15px;font-weight:800;color:#d8af5b;
+  line-height:1;letter-spacing:0;white-space:nowrap;
+  text-align:left;
+  padding:0;border-radius:0;
+  background:none;
+  border:0;
+  box-shadow:none;
+}
+.gm-service-info .gm-time{
+  display:inline;
+  height:auto;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  font-size:12px;font-weight:700;color:rgba(255,255,255,.82);
+  line-height:1;letter-spacing:0;white-space:nowrap;
+  text-align:left;
+  padding:0;border-radius:0;
+  background:none;
+  border:0;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+.gm-counter{
+  display:inline;
+  height:auto;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  font-size:12px;font-weight:800;color:#f1d49a;
+  line-height:1;letter-spacing:0;white-space:nowrap;
+  text-align:left;
+  padding:0 0 0 2px;border-radius:0;border:0;
+  background:none;
+  box-shadow:none;
+}
+.gm-service-info .gm-time::before,
+.gm-counter::before{
+  content:"•";
+  color:rgba(255,255,255,.28);
+  margin-right:10px;
+}
+.gm-close{
+  width:46px;height:46px;border-radius:16px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.055);color:var(--text);cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:all .2s ease;
+}
+.gm-close:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);transform:translateY(-1px) scale(1.04)}
+.gm-body{
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  min-height:0;
+}
+.gm-stage{
+  --gm-stage-pad:8px;
+  --gm-frame-pad:0;
+  position:relative;padding:var(--gm-stage-pad) var(--gm-stage-pad) 0;min-height:0;
+  display:grid;place-items:center;
+}
+.gm-frame{
+  position:relative;
+  width:fit-content;height:fit-content;
+  max-width:100%;max-height:100%;
+  border-radius:24px;
+  background:transparent;
+  border:0;
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  box-shadow:none;
+  pointer-events:auto;
+}
+.gm-image{
+  width:auto;height:auto;
+  max-width:min(100%,calc(100vw - 240px));
+  max-height:calc(100vh - 235px);
+  object-fit:contain;border-radius:0;background:transparent;
+  display:block;
+  transition:opacity .2s ease,transform .3s var(--ease-out-expo);
+}
+.gm-image.is-loading{opacity:.2;transform:scale(.98)}
+.gm-controls{
+  position:absolute;
+  left:14px;
+  right:14px;
+  top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:2;pointer-events:none;
+}
+.gm-nav{
+  position:static;width:44px;height:44px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(0,0,0,.6);color:#fff;
+  cursor:pointer;font-size:20px;font-weight:800;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+  transition:all .2s ease;pointer-events:auto;
+}
+.gm-nav:hover{
+  background:var(--accent);border-color:var(--accent);color:#111;
+  transform:scale(1.1);
+  box-shadow:0 6px 24px rgba(201,169,110,.3);
+}
+.gm-nav:active{transform:scale(.95)}
+.gm-nav[disabled]{opacity:.2;cursor:not-allowed;transform:none;box-shadow:none;background:rgba(0,0,0,.3)}
 .gm-side{
-  border-left:1px solid rgba(255,255,255,.08);
-  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(0,0,0,.14));
-  display:flex;flex-direction:column;
+  display:flex;
+  justify-content:center;
+  padding:32px 20px 12px;
+  background:none;
+  border:0;
+  position:relative;
+  z-index:4;
+  pointer-events:auto;
 }
 .gm-sidehead{
-  padding:12px 12px;display:flex;justify-content:space-between;align-items:center;
-  border-bottom:1px solid rgba(255,255,255,.08);
+  position:absolute;
+  width:1px;height:1px;
+  padding:0;margin:-1px;border:0;
+  overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);
+  white-space:nowrap;
 }
-.gm-sidelabel{font-size:12px;font-weight:700;color:rgba(255,255,255,.9)}
-.gm-sidesub{font-size:11px;font-weight:600;color:rgba(255,255,255,.55)}
-.gm-thumbs{padding:10px;overflow:auto;display:flex;flex-direction:column;gap:8px;min-height:0}
+.gm-sidelabel,.gm-sidesub{display:none}
+.gm-thumbs{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:4px;
+  min-height:0;
+  overflow-x:auto;
+  overflow-y:visible;
+  padding:6px 14px 0;
+  isolation:isolate;
+  position:relative;
+  z-index:4;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.gm-thumbs::-webkit-scrollbar{display:none}
 .gm-thumb{
-  width:100%;height:84px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.1);
-  background:var(--surface2);cursor:pointer;opacity:.72;
-  transition:opacity .15s ease,border-color .15s ease,transform .15s ease,box-shadow .15s ease;
+  --dock-scale:1;
+  --dock-lift:0px;
+  --dock-opacity:.72;
+  --dock-shadow:none;
+  flex:0 0 auto;
+  width:76px;height:50px;
+  border-radius:18px;overflow:hidden;border:0;
+  background:none;cursor:pointer;opacity:var(--dock-opacity);
+  margin:0 -2px;
+  padding:0;
+  position:relative;
+  transform-origin:center bottom;
+  transform:translateY(var(--dock-lift)) scale(var(--dock-scale));
+  box-shadow:var(--dock-shadow);
+  transition:transform .22s var(--ease-out-expo),opacity .18s ease,filter .18s ease,box-shadow .22s ease;
 }
-.gm-thumb:hover{opacity:1;transform:translateY(-1px)}
 .gm-thumb.is-active{
-  border-color:var(--accent);opacity:1;
-  box-shadow:0 0 0 1px rgba(201,169,110,.22),0 8px 18px rgba(0,0,0,.32);
+  --dock-opacity:1;
+  --dock-lift:0px;
+  --dock-scale:1.03;
+  --dock-shadow:0 6px 14px rgba(0,0,0,.2);
+  z-index:1;
 }
-.gm-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gm-thumb img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  border-radius:18px;
+}
+/* portrait / landscape adaptive layout */
+.gm-panel.is-portrait{
+  width:min(980px,100%);height:min(96vh,calc(100vh - 8px));
+}
+.gm-panel.is-portrait .gm-frame{background:transparent}
+.gm-panel.is-portrait .gm-image{object-fit:contain;max-height:calc(100vh - 235px)}
+
+.gm-panel.is-landscape{
+  width:min(1320px,100%);height:min(92vh,calc(100vh - 12px));
+}
+.gm-panel.is-landscape .gm-frame{background:transparent}
+.gm-panel.is-landscape .gm-image{object-fit:contain;max-height:calc(100vh - 235px)}
+
 .modal-open .scroll-root{overflow:hidden}
 
 /* ── RESPONSIVE ── */
@@ -818,7 +971,6 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .info-grid{grid-template-columns:1fr}
   .contact-grid{grid-template-columns:1fr}
   .detail-row{grid-template-columns:1fr}
-  .gm-body{grid-template-columns:1fr 176px}
 }
 @media(max-width:700px){
   .gallery-modal{
@@ -838,36 +990,43 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     position:sticky;
     top:0;
     z-index:3;
-    padding:10px 12px;
+    gap:12px;
+    padding:12px 12px 6px;
     background:linear-gradient(180deg,rgba(12,12,12,.92),rgba(12,12,12,.78));
     backdrop-filter:blur(8px);
     -webkit-backdrop-filter:blur(8px);
   }
+  .gm-titlewrap{gap:8px 10px}
   .gm-title{
-    font-size:15px;
-    max-width:58vw;
+    font-size:24px;
+    line-height:.98;
   }
+  .gm-service-info{display:none}
   .gm-counter{
-    font-size:10px;
-    padding:2px 7px;
+    min-height:28px;
+    font-size:11px;
+    padding:0 9px;
   }
   .gm-close{
     width:40px;
     height:40px;
-    border-radius:12px;
+    border-radius:14px;
   }
-  .gm-body{grid-template-columns:1fr;grid-template-rows:1fr auto}
+  .gm-panel.is-portrait,.gm-panel.is-landscape{width:100%;height:100%}
+  .gm-panel.is-portrait .gm-body,.gm-panel.is-landscape .gm-body,
+  .gm-body{grid-template-rows:minmax(0,1fr) auto}
   .gm-stage{
     --gm-stage-pad:8px;
     --gm-frame-pad:8px;
-    padding:var(--gm-stage-pad);
-    align-items:stretch;
+    padding:var(--gm-stage-pad) var(--gm-stage-pad) 0;
+    place-items:center;
   }
   .gm-frame{
     border-radius:12px;
-    padding:var(--gm-frame-pad);
-    min-height:clamp(240px,56vh,420px);
+    padding:0;
+    max-width:100%;
   }
+  .gm-image{max-width:min(100%,calc(100vw - 36px));max-height:calc(100vh - 250px)}
   .gm-nav{
     width:46px;
     height:46px;
@@ -875,28 +1034,32 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     border-radius:999px;
   }
   .gm-side{
-    border-left:0;
-    border-top:1px solid var(--border);
-    background:linear-gradient(180deg,rgba(7,7,7,.74),rgba(10,10,10,.92));
-  }
-  .gm-sidehead{
-    padding:10px 12px;
+    padding:0 10px calc(10px + env(safe-area-inset-bottom));
   }
   .gm-thumbs{
-    flex-direction:row;
-    gap:10px;
-    overflow-x:auto;
-    padding:10px 12px 12px;
+    gap:0;
+    justify-content:flex-start;
+    padding:10px 6px 0;
     scroll-snap-type:x proximity;
     -webkit-overflow-scrolling:touch;
   }
   .gm-thumb{
     flex:0 0 auto;
-    width:106px;
-    height:70px;
-    border-radius:9px;
+    width:88px;
+    height:58px;
+    border-radius:14px;
+    margin:0;
     scroll-snap-align:start;
   }
+  .gm-thumb img{border-radius:14px}
+  .gm-thumb,
+  .gm-thumb.is-active{
+    --dock-scale:1;
+    --dock-lift:0px;
+    --dock-shadow:none;
+    transform:none;
+  }
+  .gm-thumb.is-active{--dock-opacity:1}
 }
 @media(max-width:900px){
   html,body{overflow-x:hidden;overscroll-behavior-x:none}
@@ -919,17 +1082,14 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   /* Sections flow naturally on mobile — no snap */
   .scroll-root{scroll-snap-type:none}
   .page-section{min-height:auto;padding:40px 0;scroll-snap-align:none}
-  .gm-head{padding:8px 10px}
-  .gm-title{font-size:14px;max-width:54vw}
+  .gm-head{padding:12px 10px 8px}
+  .gm-title{font-size:20px}
   .gm-counter{display:none}
   .gm-close{width:36px;height:36px;border-radius:10px}
-  .gm-controls{
-    left:calc(var(--gm-stage-pad) + var(--gm-frame-pad) + 4px);
-    right:calc(var(--gm-stage-pad) + var(--gm-frame-pad) + 4px);
-  }
+  .gm-controls{left:10px;right:10px}
   .gm-nav{width:42px;height:42px;font-size:20px}
-  .gm-thumbs{padding:8px 10px calc(10px + env(safe-area-inset-bottom))}
-  .gm-thumb{width:92px;height:62px}
+  .gm-thumbs{padding:10px 10px calc(8px + env(safe-area-inset-bottom))}
+  .gm-thumb{width:84px;height:56px;margin:0}
   .hero{min-height:calc(100vh - var(--nav-h))}
   .nav-links{display:none}
   .hamburger{display:flex}
@@ -1048,7 +1208,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .map-link:hover{background:var(--accent-dim);transform:translateY(-1px)}
 
 /* IN-HOUSE BOOKING */
-.booking-choice-modal,.inhouse-modal{position:fixed;inset:0;z-index:220;display:none}
+.booking-choice-modal,.inhouse-modal{position:fixed;inset:0;z-index:10000;display:none}
 .booking-choice-modal.is-open,.inhouse-modal.is-open{display:block}
 .booking-choice-backdrop,.inhouse-backdrop{
   position:absolute;inset:0;background:rgba(5,5,5,.66);backdrop-filter:blur(3px);
@@ -1077,6 +1237,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 .booking-meta{margin-top:12px;font-size:12px;color:var(--muted)}
 .book-account-link{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:13px;margin-top:10px}
+.feature-note{margin-top:8px;font-size:12px;color:var(--muted)}
 .inhouse-panel{padding:18px 18px 14px;max-width:1080px}
 .inhouse-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
 .inhouse-title{font-size:22px;letter-spacing:-.3px}
@@ -1138,6 +1299,42 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .inhouse-grid{grid-template-columns:1fr}
 }
 
+/* ── SHOP GALLERY ── */
+.shop-gallery{padding:60px 0}
+.shop-gallery .section-label{margin-bottom:8px}
+.shop-gallery .section-title{margin-bottom:32px}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+  gap:12px;
+}
+.gallery-grid img{
+  width:100%;
+  height:280px;
+  object-fit:cover;
+  border-radius:10px;
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:transform .3s var(--ease-out-quart), box-shadow .3s ease;
+}
+.gallery-grid img:hover{
+  transform:scale(1.03);
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+}
+/* lightbox */
+.gallery-lightbox{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.85);
+  align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.gallery-lightbox.active{display:flex}
+.gallery-lightbox img{
+  max-width:90vw;max-height:90vh;
+  object-fit:contain;border-radius:8px;
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+}
+
 @media (prefers-reduced-motion: reduce){
   html,.scroll-root{scroll-behavior:auto}
   .bg-layer,.scroll-progress,.fade-in{transition:none}
@@ -1169,7 +1366,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
         <a href="#contact" data-section="contact">Contact</a>
       </div>
       <div class="nav-actions">
-        <a class="nav-login" href="{{ account_portal_url }}?intent=register">Log In</a>
+        <a class="nav-login is-disabled" aria-disabled="true" tabindex="-1" title="Temporarily unavailable">Log In</a>
         <a class="nav-cta" href="{{ booksy_global_url }}" target="_blank" rel="noopener">Book Now</a>
       </div>
       <button class="hamburger" id="hamburger" type="button" aria-label="Menu" aria-expanded="false">
@@ -1183,7 +1380,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     <a href="#about" data-section="about">About</a>
     <a href="#cuts" data-section="cuts">Services</a>
     <a href="#contact" data-section="contact">Contact</a>
-    <a class="nav-login" href="{{ account_portal_url }}?intent=register">Log In</a>
+    <a class="nav-login is-disabled" aria-disabled="true" tabindex="-1" title="Temporarily unavailable">Log In</a>
     <a class="nav-cta" href="{{ booksy_global_url }}" target="_blank" rel="noopener">Book Now</a>
   </div>
 
@@ -1192,7 +1389,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     <!-- HERO -->
     <section id="home" class="page-section hero">
       <div class="wrap hero-inner fade-in">
-        <div class="hero-label">Toronto Barbershop</div>
+            <div class="hero-label">Mississauga Barbershop</div>
         <h1 class="serif">Sharp cuts.<br>Clean <em>fades.</em><br>Zero stress.</h1>
         <p class="hero-sub">Fresh fades, classic styles, and precise beard work. Come in for the cut, leave with the confidence.</p>
         <div class="hero-actions">
@@ -1377,6 +1574,24 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
 
 
+    <!-- SHOP GALLERY -->
+    <section class="shop-gallery page-section">
+      <div class="wrap">
+        <div class="section-label fade-in">The Shop</div>
+        <div class="section-title fade-in">Take a look around.</div>
+        <div class="gallery-grid fade-in">
+          <img src="{% static 'bg/BG7.JPG' %}" alt="JP Studio" loading="lazy" onclick="openLightbox(this.src)" />
+          <img src="{% static 'bg/BG8.JPG' %}" alt="JP Studio" loading="lazy" onclick="openLightbox(this.src)" />
+          <img src="{% static 'bg/BG10.JPG' %}" alt="JP Studio" loading="lazy" onclick="openLightbox(this.src)" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="gallery-lightbox" id="galleryLightbox" onclick="closeLightbox()">
+      <img id="lightboxImg" src="" alt="Gallery preview" />
+    </div>
+
     <!-- CONTACT -->
     <section id="contact" class="page-section">
       <div class="wrap">
@@ -1386,25 +1601,25 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
           <div class="contact-card map-card fade-in">
             <div class="map-header">
               <div>
-                <div class="map-title">JP Studio</div>
-                <div class="map-sub">Come in for the cut &mdash; leave with the confidence.</div>
+                <div class="map-title">JP Barber Studio</div>
+                <div class="map-sub">3095 Argentia Rd, Suite #30, Mississauga, ON L5N 8P7</div>
               </div>
-              <a class="map-link" href="https://maps.google.com/?q=123+King+St+W,+Toronto" target="_blank" rel="noopener">
+              <a class="map-link" href="https://maps.google.com/?q=3095+Argentia+Rd+Suite+30,+Mississauga,+ON+L5N+8P7" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 Maps
               </a>
             </div>
             <div class="map-frame">
               <iframe class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                src="https://www.google.com/maps?q=123%20King%20St%20W%2C%20Toronto&output=embed"
-                title="JP Studio location"></iframe>
+                src="https://www.google.com/maps?q=3095%20Argentia%20Rd%20Suite%2030%2C%20Mississauga%2C%20ON%20L5N%208P7&output=embed"
+                title="JP Barber Studio location"></iframe>
             </div>
             <div class="detail-row">
-              <div class="detail-item"><small>Hours</small><b>Mon - Sat</b><span>10am - 7pm</span></div>
-              <div class="detail-item"><small>Location</small><b>Downtown</b><span>Toronto</span></div>
-              <div class="detail-item"><small>Specialty</small><b>Fades &amp; Beard</b><span>Detail-forward</span></div>
+              <div class="detail-item"><small>Hours</small><b>By appointment</b><span>Check the live Booksy calendar</span></div>
+              <div class="detail-item"><small>Location</small><b>Suite #30</b><span>3095 Argentia Rd, Mississauga</span></div>
+              <div class="detail-item"><small>Availability</small><b>Live on Booksy</b><span>JP appointments only</span></div>
             </div>
-            <div class="map-quote">"No rush, no guessing. Tell me what you want &mdash; I'll make it fit."</div>
+            <div class="map-quote">"Book online, pull up to Argentia, and we&apos;ll take care of the rest."</div>
             <div class="map-copy">&copy; {% now "Y" %} JP Studio</div>
           </div>
 
@@ -1412,32 +1627,32 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
             <div class="book-box">
               <div class="book-label">Quick booking</div>
               <div class="book-title">Ready when you are.</div>
-              <p class="book-desc">Want a crisp lineup, a clean taper, or a full reset? Message me and I'll confirm a time.</p>
+              <p class="book-desc">Booksy is the live source of truth for openings, with JP appointments available at the studio.</p>
               <div class="book-buttons">
-                <a class="book-btn fill" href="tel:4165550123"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.88.37 1.89.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.92.33 1.93.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Call now</a>
-                <a class="book-btn ghost" href="sms:4165550123"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Text</a>
+                <a class="book-btn fill" href="https://booksy.com/en-ca/21963_jp-barber-studio_barbershop_870806_mississauga#ba_s=sh_1" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Book on Booksy</a>
+                <a class="book-btn ghost" href="https://maps.google.com/?q=3095+Argentia+Rd+Suite+30,+Mississauga,+ON+L5N+8P7" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Directions</a>
               </div>
             </div>
             <div class="action-list">
-              <a class="action-item" href="tel:4165550123">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.88.37 1.89.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.92.33 1.93.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-                <div class="action-text"><small>Phone</small><strong>(416) 555-0123</strong></div>
-                <span class="action-badge">Call</span>
+              <a class="action-item" href="https://booksy.com/en-ca/21963_jp-barber-studio_barbershop_870806_mississauga#ba_s=sh_1" target="_blank" rel="noopener">
+                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                <div class="action-text"><small>Booking</small><strong>Open the live Booksy calendar</strong></div>
+                <span class="action-badge">Booksy</span>
               </a>
-              <a class="action-item" href="sms:4165550123">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-                <div class="action-text"><small>Text</small><strong>Send a message</strong></div>
-                <span class="action-badge">SMS</span>
-              </a>
-              <a class="action-item" href="mailto:hello@northsidebarber.ca">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-                <div class="action-text"><small>Email</small><strong>hello@northsidebarber.ca</strong></div>
-                <span class="action-badge">Email</span>
-              </a>
-              <a class="action-item" href="https://maps.google.com/?q=123+King+St+W,+Toronto" target="_blank" rel="noopener">
+              <a class="action-item" href="https://maps.google.com/?q=3095+Argentia+Rd+Suite+30,+Mississauga,+ON+L5N+8P7" target="_blank" rel="noopener">
                 <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-                <div class="action-text"><small>Address</small><strong>123 King St W, Toronto</strong></div>
-                <span class="action-badge">Map</span>
+                <div class="action-text"><small>Address</small><strong>3095 Argentia Rd, Suite #30</strong></div>
+                <span class="action-badge">Maps</span>
+              </a>
+              <a class="action-item" href="https://booksy.com/en-ca/21963_jp-barber-studio_barbershop_870806_mississauga#ba_s=sh_1" target="_blank" rel="noopener">
+                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M6 12h12"/><path d="M8 17h8"/></svg></div>
+                <div class="action-text"><small>Amenities</small><strong>Parking, Wi-Fi, cards accepted</strong></div>
+                <span class="action-badge">Studio</span>
+              </a>
+              <a class="action-item" href="https://booksy.com/en-ca/21963_jp-barber-studio_barbershop_870806_mississauga#ba_s=sh_1" target="_blank" rel="noopener">
+                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75 18.18 21l-1.18-6.88L22 9.24l-6.91-1L12 2 8.91 8.24 2 9.24l5 4.88L5.82 21z"/></svg></div>
+                <div class="action-text"><small>Reviews</small><strong>5.0 from 113 Booksy reviews</strong></div>
+                <span class="action-badge">Top rated</span>
               </a>
               <a class="action-item" href="https://instagram.com/jpstudio" target="_blank" rel="noopener">
                 <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
@@ -1509,14 +1724,14 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
           <a href="https://instagram.com/jpstudio" target="_blank" rel="noopener" aria-label="Instagram">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
           </a>
-          <a href="tel:4165550123" aria-label="Phone">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.88.37 1.89.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.92.33 1.93.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <a href="https://maps.google.com/?q=3095+Argentia+Rd+Suite+30,+Mississauga,+ON+L5N+8P7" target="_blank" rel="noopener" aria-label="Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           </a>
-          <a href="mailto:hello@northsidebarber.ca" aria-label="Email">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <a href="https://booksy.com/en-ca/21963_jp-barber-studio_barbershop_870806_mississauga#ba_s=sh_1" target="_blank" rel="noopener" aria-label="Booksy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </a>
         </div>
-        <div class="footer-copy">&copy; {% now "Y" %} JP Studio &mdash; Toronto, Canada</div>
+        <div class="footer-copy">&copy; {% now "Y" %} JP Studio &mdash; Mississauga, Ontario</div>
       </div>
     </footer>
 
@@ -1565,16 +1780,22 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       <div class="gm-head">
         <div class="gm-titlewrap">
           <div class="gm-title" id="gmTitle">Gallery</div>
+          <div class="gm-service-info">
+            <span class="gm-price" id="gmPrice"></span>
+            <span class="gm-time" id="gmTime"></span>
+          </div>
           <div class="gm-counter" id="gmCounter">1 / 1</div>
         </div>
         <button class="gm-close" type="button" data-close aria-label="Close">&times;</button>
       </div>
       <div class="gm-body">
         <div class="gm-stage">
-          <div class="gm-frame"><img class="gm-image" id="gmImage" alt="Gallery image" /></div>
-          <div class="gm-controls" role="group" aria-label="Gallery navigation">
-            <button class="gm-nav left" type="button" id="gmPrev" aria-label="Previous">&#8249;</button>
-            <button class="gm-nav right" type="button" id="gmNext" aria-label="Next">&#8250;</button>
+          <div class="gm-frame">
+            <img class="gm-image" id="gmImage" alt="Gallery image" />
+            <div class="gm-controls" role="group" aria-label="Gallery navigation">
+              <button class="gm-nav left" type="button" id="gmPrev" aria-label="Previous">&#8249;</button>
+              <button class="gm-nav right" type="button" id="gmNext" aria-label="Next">&#8250;</button>
+            </div>
           </div>
         </div>
         <aside class="gm-side">
@@ -1593,11 +1814,11 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     <div class="booking-choice-panel">
       <button type="button" class="booking-close" data-booking-close aria-label="Close">&times;</button>
       <div class="booking-choice-title serif">Choose Your Booking Path</div>
-      <p class="booking-choice-sub">Booksy is the live booking backend. Use your in-house account page to review profile details and booking history before continuing.</p>
+      <p class="booking-choice-sub">Booksy is the live booking backend. In-house account access is temporarily unavailable right now.</p>
       <div class="booking-choice-actions">
-        <button type="button" class="book-path inhouse" id="continueInhouseBooking">
+        <button type="button" class="book-path inhouse is-disabled" id="continueInhouseBooking" disabled aria-disabled="true">
           <span>Open My Account</span>
-          <span class="book-note">Profile + booking history</span>
+          <span class="book-note">Temporarily unavailable</span>
         </button>
         <a class="book-path booksy booking-direct-link" id="continueBooksyBooking" href="{{ booksy_global_url }}" target="_blank" rel="noopener">
           <span>Book With Booksy</span>
@@ -1610,8 +1831,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
         </a>
         {% endif %}
       </div>
-      <div class="booking-meta">Booksy remains the source of truth for appointments. The in-house page handles sign-in, profile notes, and booking history before sending customers to Booksy or Google to finish the booking.</div>
-      <button type="button" class="book-account-link" id="openInhouseAccount">Open My In-House Login</button>
+      <div class="booking-meta">Booksy remains the source of truth for appointments. In-house login, profile notes, and booking history are temporarily unavailable on the site right now.</div>
+      <button type="button" class="book-account-link is-disabled" id="openInhouseAccount" disabled aria-disabled="true">Open My In-House Login</button>
+      <div class="feature-note">Use Booksy to complete bookings while the in-house account tools are disabled.</div>
     </div>
   </div>
 
@@ -1711,38 +1933,151 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   const modal=document.getElementById("galleryModal"),titleE=document.getElementById("gmTitle"),
     countE=document.getElementById("gmCounter"),imgE=document.getElementById("gmImage"),
     thumbs=document.getElementById("gmThumbs"),prevB=document.getElementById("gmPrev"),
-    nextB=document.getElementById("gmNext"),countLabel=document.getElementById("gmCountLabel");
+    nextB=document.getElementById("gmNext"),countLabel=document.getElementById("gmCountLabel"),
+    priceE=document.getElementById("gmPrice"),timeE=document.getElementById("gmTime");
   if(!modal||!titleE||!countE||!imgE||!thumbs||!prevB||!nextB||!countLabel)return;
 
-  let images=[],index=0;
+  let images=[],index=0,thumbButtons=[],thumbRenderFrame=0,dockPointerX=null,closeTimer=0;
+  const closeDuration=380;
   const parse=s=>(s||"").split("|").flatMap(x=>x.split(",")).map(x=>x.trim()).filter(Boolean);
-  const setOpen=open=>{modal.classList.toggle("is-open",open);modal.setAttribute("aria-hidden",!open);document.body.classList.toggle("modal-open",open)};
+  const clearCloseTimer=()=>{
+    if(closeTimer){
+      window.clearTimeout(closeTimer);
+      closeTimer=0;
+    }
+  };
+  const resetModalContent=()=>{
+    images=[];
+    thumbButtons=[];
+    thumbs.replaceChildren();
+    imgE.removeAttribute("src");
+    countE.textContent="0 / 0";
+    countLabel.textContent="0";
+  };
+  const setOpen=open=>{
+    clearCloseTimer();
+    modal.classList.toggle("is-open",open);
+    modal.classList.remove("is-closing");
+    modal.setAttribute("aria-hidden",!open);
+    document.body.classList.toggle("modal-open",open);
+    if(!open)resetModalContent();
+  };
+  const dockHoverMedia=window.matchMedia("(hover: hover) and (pointer: fine)");
+  const clearDockHover=()=>{
+    dockPointerX=null;
+    thumbButtons.forEach(button=>{
+      button.style.removeProperty("--dock-scale");
+      button.style.removeProperty("--dock-lift");
+      button.style.removeProperty("--dock-opacity");
+      button.style.removeProperty("--dock-shadow");
+      button.style.removeProperty("z-index");
+    });
+  };
+  const updateDockHover=clientX=>{
+    if(!dockHoverMedia.matches||window.innerWidth<=700){
+      clearDockHover();
+      return;
+    }
+    dockPointerX=clientX;
+    thumbButtons.forEach((button,buttonIndex)=>{
+      const rect=button.getBoundingClientRect();
+      const center=rect.left+(rect.width/2);
+      const distance=Math.abs(clientX-center);
+      const influence=Math.max(0,1-(distance/160));
+      const activeBias=buttonIndex===index ? .16 : 0;
+      const strength=Math.max(influence,activeBias);
+      const scale=1+(strength*.2);
+      const lift=0;
+      const opacity=.38+(strength*.62);
+      const shadowAlpha=(.18+(strength*.14)).toFixed(3);
+      const shadow=strength>.08?`0 ${Math.round(10+(strength*16))}px ${Math.round(18+(strength*18))}px rgba(0,0,0,${shadowAlpha})`:"none";
+      button.style.setProperty("--dock-scale",scale.toFixed(3));
+      button.style.setProperty("--dock-lift",`${lift.toFixed(1)}px`);
+      button.style.setProperty("--dock-opacity",opacity.toFixed(3));
+      button.style.setProperty("--dock-shadow",shadow);
+      button.style.zIndex=String(1+Math.round(strength*10));
+    });
+  };
+  const syncActiveThumb=()=>{
+    thumbButtons.forEach((button,buttonIndex)=>button.classList.toggle("is-active",buttonIndex===index));
+    if(dockPointerX!==null)updateDockHover(dockPointerX);
+  };
   const setImage=i=>{
     if(!images.length)return;index=Math.max(0,Math.min(i,images.length-1));
     imgE.classList.add("is-loading");imgE.src=images[index];
     imgE.alt=`Image ${index+1} of ${images.length}`;
     countE.textContent=`${index+1} / ${images.length}`;
-    thumbs.querySelectorAll(".gm-thumb").forEach((t,ti)=>t.classList.toggle("is-active",ti===index));
+    syncActiveThumb();
     prevB.disabled=nextB.disabled=images.length<=1;
   };
-  imgE.addEventListener("load",()=>imgE.classList.remove("is-loading"));
+  const panel=modal.querySelector(".gm-panel");
+  imgE.addEventListener("load",()=>{
+    imgE.classList.remove("is-loading");
+    if(panel){
+      const isPortrait=imgE.naturalHeight>imgE.naturalWidth;
+      panel.classList.toggle("is-portrait",isPortrait);
+      panel.classList.toggle("is-landscape",!isPortrait);
+    }
+  });
+  imgE.decoding="async";
 
-  const openModal=({title,gallery,fallbackSrc,startIndex=0})=>{
+  const renderThumbs=()=>{
+    thumbRenderFrame=0;
+    const fragment=document.createDocumentFragment();
+    thumbButtons=images.map((src,i)=>{
+      const button=document.createElement("button");
+      const thumbImg=document.createElement("img");
+      button.type="button";
+      button.className="gm-thumb";
+      thumbImg.src=src;
+      thumbImg.alt="";
+      thumbImg.loading="lazy";
+      thumbImg.decoding="async";
+      thumbImg.fetchPriority="low";
+      button.appendChild(thumbImg);
+      button.addEventListener("click",event=>{
+        event.preventDefault();
+        setImage(i);
+      });
+      fragment.appendChild(button);
+      return button;
+    });
+    thumbs.replaceChildren(fragment);
+    syncActiveThumb();
+  };
+  thumbs.addEventListener("mousemove",event=>updateDockHover(event.clientX));
+  thumbs.addEventListener("mouseleave",clearDockHover);
+  thumbs.addEventListener("touchstart",clearDockHover,{passive:true});
+
+  const openModal=({title,gallery,fallbackSrc,startIndex=0,price="",time=""})=>{
     const p=parse(gallery);images=p.length?p:fallbackSrc?[fallbackSrc]:[];
     if(!images.length)return;
+    clearCloseTimer();
     titleE.textContent=title||"Gallery";countLabel.textContent=images.length;
-    thumbs.innerHTML="";
-    images.forEach((src,i)=>{
-      const b=document.createElement("button");
-      b.type="button";b.className="gm-thumb";b.innerHTML=`<img src="${src}" alt="" loading="lazy">`;
-      b.addEventListener("click",e=>{e.preventDefault();setImage(i)});
-      thumbs.appendChild(b);
-    });
-    setOpen(true);setImage(startIndex);
+    if(priceE){priceE.textContent=price;priceE.style.display=price?"inline-block":"none"}
+    if(timeE){timeE.textContent=time;timeE.style.display=time?"inline-block":"none"}
+    if(thumbRenderFrame)cancelAnimationFrame(thumbRenderFrame);
+    thumbButtons=[];
+    thumbs.replaceChildren();
+    setOpen(true);
+    setImage(startIndex);
+    thumbRenderFrame=requestAnimationFrame(renderThumbs);
   };
   const closeModal=()=>{
-    setOpen(false);images=[];thumbs.innerHTML="";
-    imgE.removeAttribute("src");countE.textContent="0 / 0";countLabel.textContent="0";
+    if(!modal.classList.contains("is-open"))return;
+    if(thumbRenderFrame)cancelAnimationFrame(thumbRenderFrame);
+    thumbRenderFrame=0;
+    clearDockHover();
+    clearCloseTimer();
+    modal.classList.remove("is-open");
+    modal.classList.add("is-closing");
+    modal.setAttribute("aria-hidden","true");
+    closeTimer=window.setTimeout(()=>{
+      modal.classList.remove("is-closing");
+      document.body.classList.remove("modal-open");
+      resetModalContent();
+      closeTimer=0;
+    },closeDuration);
   };
   const prev=()=>{if(images.length>1)setImage((index-1+images.length)%images.length)};
   const next=()=>{if(images.length>1)setImage((index+1)%images.length)};
@@ -1779,7 +2114,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     openModal({
       title:d.name||"Gallery",
       gallery:d.gallery||"",
-      fallbackSrc:d.img||""
+      fallbackSrc:d.img||"",
+      price:d.price||"",
+      time:d.time||""
     });
   })}
 
@@ -1790,6 +2127,82 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   /* Click featured card → open gallery */
 
   /* ── Scroll root (used by multiple features) ── */
+  const prefersReducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+  const setupReviewLoop=loop=>{
+    const track=loop.querySelector(".review-loop-track");
+    const seedGroup=track?.querySelector(".review-loop-group");
+    if(!track||!seedGroup)return;
+
+    let frameId=0;
+    let lastTs=0;
+    let offset=0;
+    let loopDistance=0;
+    const isReverse=loop.classList.contains("review-loop--reverse");
+
+    const stop=()=>{
+      if(frameId)cancelAnimationFrame(frameId);
+      frameId=0;
+      lastTs=0;
+    };
+
+    const applyTransform=()=>{
+      const x=isReverse?(-loopDistance+offset):(-loopDistance-offset);
+      track.style.transform=`translate3d(${x}px,0,0)`;
+    };
+
+    const tick=ts=>{
+      if(!loopDistance)return;
+      if(!lastTs)lastTs=ts;
+      const dt=(ts-lastTs)/1000;
+      lastTs=ts;
+      const speedSeconds=Math.max(parseFloat(getComputedStyle(loop).getPropertyValue("--loop-speed"))||44,1);
+      const pxPerSecond=loopDistance/speedSeconds;
+      offset=(offset+(pxPerSecond*dt))%loopDistance;
+      applyTransform();
+      frameId=requestAnimationFrame(tick);
+    };
+
+    const rebuild=()=>{
+      stop();
+      offset=0;
+      track.replaceChildren();
+      const gap=parseFloat(getComputedStyle(track).columnGap||getComputedStyle(track).gap||0)||0;
+
+      const mainGroup=seedGroup.cloneNode(true);
+      mainGroup.removeAttribute("aria-hidden");
+
+      if(prefersReducedMotion.matches){
+        track.appendChild(mainGroup);
+        track.style.transform="none";
+        loopDistance=0;
+        return;
+      }
+
+      const leadClone=seedGroup.cloneNode(true);
+      leadClone.setAttribute("aria-hidden","true");
+      track.appendChild(leadClone);
+      track.appendChild(mainGroup);
+
+      loopDistance=mainGroup.getBoundingClientRect().width+gap;
+      while(track.scrollWidth<loop.clientWidth+(loopDistance*2)){
+        const clone=seedGroup.cloneNode(true);
+        clone.setAttribute("aria-hidden","true");
+        track.appendChild(clone);
+      }
+
+      applyTransform();
+      if(!prefersReducedMotion.matches)frameId=requestAnimationFrame(tick);
+    };
+
+    rebuild();
+
+    const onResize=()=>rebuild();
+    const onMotionChange=()=>rebuild();
+    window.addEventListener("resize",onResize);
+    prefersReducedMotion.addEventListener("change",onMotionChange);
+  };
+  document.querySelectorAll(".review-loop").forEach(setupReviewLoop);
+
   const scrollRoot=document.getElementById("scrollRoot");
   const sectionIds=["home","about","cuts","contact"];
   const sectionEls=sectionIds.map(id=>document.getElementById(id)).filter(Boolean);
@@ -1954,6 +2367,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
   const bookingChoiceModal = document.getElementById("bookingChoiceModal");
   const inhouseModal = document.getElementById("inhouseModal");
+  const barberModal = document.getElementById("barberModal");
   const continueInhouseBooking = document.getElementById("continueInhouseBooking");
   const continueBooksyBooking = document.getElementById("continueBooksyBooking");
   const openInhouseAccount = document.getElementById("openInhouseAccount");
@@ -2003,6 +2417,28 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     if (tone) el.classList.add(tone);
   }
 
+  function getCookie(name) {
+    const parts = document.cookie ? document.cookie.split("; ") : [];
+    for (const part of parts) {
+      const [key, ...valueParts] = part.split("=");
+      if (key === name) return decodeURIComponent(valueParts.join("="));
+    }
+    return "";
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function tokenClass(value) {
+    return String(value ?? "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  }
+
   function getMonday(dateObj) {
     const value = new Date(dateObj);
     const day = value.getDay();
@@ -2031,11 +2467,15 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   }
 
   async function apiCall(url, options = {}) {
+    const method = (options.method || "GET").toUpperCase();
     const config = {
       credentials: "same-origin",
       ...options,
       headers: {
         "Content-Type": "application/json",
+        ...(!["GET", "HEAD", "OPTIONS", "TRACE"].includes(method) && getCookie("csrftoken")
+          ? { "X-CSRFToken": getCookie("csrftoken") }
+          : {}),
         ...(options.headers || {}),
       },
     };
@@ -2046,7 +2486,15 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     return payload;
   }
 
+  function closeBarberModalIfOpen() {
+    if (!barberModal || !barberModal.classList.contains("is-open")) return;
+    barberModal.classList.remove("is-open");
+    barberModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("barber-modal-open");
+  }
+
   function openChoiceModal(booksyUrl) {
+    closeBarberModalIfOpen();
     state.selectedBooksyUrl = booksyUrl || BOOKSY_GLOBAL_URL;
     continueBooksyBooking.href = state.selectedBooksyUrl;
     bookingChoiceModal.classList.add("is-open");
@@ -2105,7 +2553,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       .map((option) => {
         const value = String(option[valueKey]);
         const selected = value === previous ? "selected" : "";
-        return `<option value="${value}" ${selected}>${labelBuilder(option)}</option>`;
+        return `<option value="${escapeHtml(value)}" ${selected}>${escapeHtml(labelBuilder(option))}</option>`;
       })
       .join("");
     if (!selectEl.value && options[0]) selectEl.value = String(options[0][valueKey]);
@@ -2205,8 +2653,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     const dateLabel = startDate.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
     return `
       <div class="booking-item" data-booking-id="${booking.id}">
-        <h5><span class="badge ${booking.status}">${booking.status}</span>${booking.service.name}</h5>
-        <p>${dateLabel} with ${booking.barber.name}</p>
+        <h5><span class="badge ${tokenClass(booking.status)}">${escapeHtml(booking.status)}</span>${escapeHtml(booking.service.name)}</h5>
+        <p>${escapeHtml(dateLabel)} with ${escapeHtml(booking.barber.name)}</p>
         ${showCancel && booking.can_cancel ? '<div class="row-actions"><button class="btn cancel-booking-btn">Cancel</button></div>' : ""}
       </div>
     `;
@@ -2388,6 +2836,18 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 {% if booksy_widget_script_url %}
 <script src="{{ booksy_widget_script_url }}"></script>
 {% endif %}
+
+<script>
+function openLightbox(src){
+  var lb=document.getElementById('galleryLightbox');
+  document.getElementById('lightboxImg').src=src;
+  lb.classList.add('active');
+}
+function closeLightbox(){
+  document.getElementById('galleryLightbox').classList.remove('active');
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox()});
+</script>
 
 </body>
 </html>

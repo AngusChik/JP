@@ -2,11 +2,13 @@ import json
 from datetime import datetime, time, timedelta
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .booking import bootstrap_reference_data
 from .models import Barber, Booking, CustomerAccount, Service, StaffProfile
+from .views import OTP_SEND_LIMIT
 
 @override_settings(
     STORAGES={
@@ -17,19 +19,20 @@ from .models import Barber, Booking, CustomerAccount, Service, StaffProfile
 )
 class BookingSystemTests(TestCase):
     def setUp(self):
+        cache.clear()
         bootstrap_reference_data()
         self.barber = Barber.objects.filter(is_active=True).first()
         self.service = Service.objects.filter(is_active=True).first()
         self.assertIsNotNone(self.barber)
         self.assertIsNotNone(self.service)
 
-    def _json_post(self, path, payload, client=None):
+    def _json_post(self, path, payload, client=None, headers=None):
         target = client or self.client
-        return target.post(path, data=json.dumps(payload), content_type="application/json")
+        return target.post(path, data=json.dumps(payload), content_type="application/json", headers=headers or {})
 
-    def _json_patch(self, path, payload, client=None):
+    def _json_patch(self, path, payload, client=None, headers=None):
         target = client or self.client
-        return target.patch(path, data=json.dumps(payload), content_type="application/json")
+        return target.patch(path, data=json.dumps(payload), content_type="application/json", headers=headers or {})
 
     def _authenticate_client(self, client, phone="+14165550123"):
         account, _ = CustomerAccount.objects.get_or_create(phone_e164=phone)
@@ -65,7 +68,7 @@ class BookingSystemTests(TestCase):
         self.assertContains(response, "Open My Account")
         self.assertContains(response, "Log In")
         self.assertContains(response, "21963_jp-barber-studio")
-        self.assertContains(response, "26938_milo-cuts")
+        self.assertNotContains(response, "26938_milo-cuts")
 
     def test_account_portal_renders(self):
         response = self.client.get("/account/")
@@ -100,6 +103,20 @@ class BookingSystemTests(TestCase):
         self.assertEqual(me_response.status_code, 200)
         self.assertEqual(me_response.json()["account"]["phone"], "+14165550123")
 
+    @override_settings(DEBUG=False)
+    def test_send_otp_does_not_expose_debug_code_when_debug_is_off(self):
+        response = self._json_post("/api/auth/send-otp", {"phone": "416-555-0999"})
+        self.assertEqual(response.status_code, 201)
+        self.assertNotIn("debug_code", response.json())
+
+    def test_send_otp_is_rate_limited(self):
+        for _ in range(OTP_SEND_LIMIT):
+            response = self._json_post("/api/auth/send-otp", {"phone": "416-555-0888"})
+            self.assertEqual(response.status_code, 201)
+
+        blocked_response = self._json_post("/api/auth/send-otp", {"phone": "416-555-0888"})
+        self.assertEqual(blocked_response.status_code, 429)
+
     def test_account_patch_updates_profile(self):
         self._authenticate_client(self.client)
         response = self._json_patch(
@@ -110,6 +127,27 @@ class BookingSystemTests(TestCase):
         payload = response.json()
         self.assertEqual(payload["account"]["full_name"], "Jordan Prince")
         self.assertEqual(payload["account"]["email"], "jordan@example.com")
+
+    def test_account_patch_requires_csrf_token_when_csrf_checks_are_enabled(self):
+        client = self.client_class(enforce_csrf_checks=True)
+        self._authenticate_client(client)
+
+        blocked_response = self._json_patch(
+            "/api/account/me",
+            {"full_name": "Jordan Prince", "email": "jordan@example.com"},
+            client=client,
+        )
+        self.assertEqual(blocked_response.status_code, 403)
+
+        client.get("/account/dashboard/")
+        csrf_token = client.cookies["csrftoken"].value
+        allowed_response = self._json_patch(
+            "/api/account/me",
+            {"full_name": "Jordan Prince", "email": "jordan@example.com"},
+            client=client,
+            headers={"X-CSRFToken": csrf_token},
+        )
+        self.assertEqual(allowed_response.status_code, 200)
 
     def test_booking_creation_sets_price_snapshot(self):
         slot_start = self._next_available_slot()
@@ -264,6 +302,28 @@ class BookingSystemTests(TestCase):
 
         ops_response = self.client.get("/ops/")
         self.assertEqual(ops_response.status_code, 200)
+
+    def test_staff_login_requires_csrf_token_when_csrf_checks_are_enabled(self):
+        User = get_user_model()
+        User.objects.create_user(username="frontdesk", password="secret123", is_staff=True)
+        client = self.client_class(enforce_csrf_checks=True)
+
+        blocked_response = self._json_post(
+            "/api/staff/login",
+            {"username": "frontdesk", "password": "secret123", "next": "/ops/"},
+            client=client,
+        )
+        self.assertEqual(blocked_response.status_code, 403)
+
+        client.get("/account/")
+        csrf_token = client.cookies["csrftoken"].value
+        allowed_response = self._json_post(
+            "/api/staff/login",
+            {"username": "frontdesk", "password": "secret123", "next": "/ops/"},
+            client=client,
+            headers={"X-CSRFToken": csrf_token},
+        )
+        self.assertEqual(allowed_response.status_code, 200)
 
     def test_ops_redirects_to_staff_mode_on_account_page(self):
         response = self.client.get("/ops/")
