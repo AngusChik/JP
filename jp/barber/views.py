@@ -442,8 +442,23 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "gallery": "|".join(
                 [
                     static("Cuts/HC.JPG"),
-                    static("Cuts/FD.JPG"),
-
+                    static("Cuts/HC2.JPG"),
+                    static("Cuts/HC2B.JPG"),
+                ]
+            ),
+        },
+        {
+            "name": "Classic Taper",
+            "time": "30-40 min",
+            "price": "$35",
+            "desc": "Timeless taper with clean shape through the sides and back for an easy everyday finish.",
+            "category": "Taper",
+            "image_url": static("Cuts/C2A.JPG"),
+            "gallery": "|".join(
+                [
+                    static("Cuts/C2A.JPG"),
+                    static("Cuts/HC2.JPG"),
+                    static("Cuts/HC2B.JPG"),
                 ]
             ),
         },
