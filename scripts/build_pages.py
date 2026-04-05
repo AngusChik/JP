@@ -24,6 +24,7 @@ def clean_site_dir() -> None:
 def build_index_html() -> None:
     sys.path.insert(0, str(DJANGO_PROJECT_DIR))
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jp.settings")
+    os.environ.setdefault("DEBUG", "True")
 
     import django  # pylint: disable=import-outside-toplevel
 

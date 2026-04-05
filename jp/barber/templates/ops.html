@@ -297,7 +297,7 @@
 
   <script>
     (() => {
-      const barbers = {{ barbers_json|safe }};
+      const barbers = JSON.parse("{{ barbers_json|escapejs }}");
       const state = { customers: [], selectedCustomerId: null, bookings: [], calendarBookings: [], calendarDate: new Date(), currentPage: "dashboard" };
       const $ = (id) => document.getElementById(id);
       const metricGrid = $("metricGrid");
@@ -353,9 +353,32 @@
         node.className = `msg ${tone || ""}`.trim();
       }
 
+      function getCookie(name) {
+        const parts = document.cookie ? document.cookie.split("; ") : [];
+        for (const part of parts) {
+          const [key, ...valueParts] = part.split("=");
+          if (key === name) return decodeURIComponent(valueParts.join("="));
+        }
+        return "";
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function tokenClass(value) {
+        return String(value ?? "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+      }
+
       function badge(value) {
         if (!value) return "";
-        return `<span class="badge ${value}">${String(value).replace(/_/g, " ")}</span>`;
+        const label = String(value).replace(/_/g, " ");
+        return `<span class="badge ${tokenClass(value)}">${escapeHtml(label)}</span>`;
       }
 
       function closeCustomerModal() {
@@ -397,11 +420,15 @@
       }
 
       async function api(url, opt = {}) {
+        const method = (opt.method || "GET").toUpperCase();
         const cfg = {
           credentials: "same-origin",
           ...opt,
           headers: {
             "Content-Type": "application/json",
+            ...(!["GET", "HEAD", "OPTIONS", "TRACE"].includes(method) && getCookie("csrftoken")
+              ? { "X-CSRFToken": getCookie("csrftoken") }
+              : {}),
             ...(opt.headers || {}),
           },
         };
@@ -413,7 +440,7 @@
       }
 
       function statPairs(node, rows) {
-        node.innerHTML = rows.map(([label, value]) => `<div><span class="l">${label}</span><span class="v">${value}</span></div>`).join("");
+        node.innerHTML = rows.map(([label, value]) => `<div><span class="l">${escapeHtml(label)}</span><span class="v">${escapeHtml(value)}</span></div>`).join("");
       }
 
       function chart(node, labels, values, color) {
@@ -427,17 +454,17 @@
       }
 
       function renderMetrics(summary) {
-        metricGrid.innerHTML = [["Upcoming", summary.upcoming_bookings], ["Revenue This Month", money(summary.monthly_revenue_cents)], ["Missed This Month", summary.missed_this_month], ["Flagged Clients", summary.flagged_customers]].map(([label, value]) => `<div class="metric"><small>${label}</small><strong>${value}</strong></div>`).join("");
+        metricGrid.innerHTML = [["Upcoming", summary.upcoming_bookings], ["Revenue This Month", money(summary.monthly_revenue_cents)], ["Missed This Month", summary.missed_this_month], ["Flagged Clients", summary.flagged_customers]].map(([label, value]) => `<div class="metric"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></div>`).join("");
       }
 
       function renderOverview(payload) {
         renderMetrics(payload.summary);
-        recentList.innerHTML = (payload.recent_bookings || []).length ? payload.recent_bookings.map((booking) => `<div class="item" data-booking-id="${booking.id}"><strong>${badge(booking.status)}${badge(booking.origin)}${badge(booking.sync_status)}${booking.service.name}</strong><p>${booking.customer.full_name || booking.customer.phone} with ${booking.barber.name}</p><p>${new Date(booking.start_time).toLocaleString()}</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">${(booking.status === "confirmed" || booking.status === "rescheduled") ? '<button class="btn complete">Complete</button><button class="btn missed">Mark Missed</button>' : ""}</div></div>`).join("") : `<div class="item"><p>No recent activity yet.</p></div>`;
-        barberStatsList.innerHTML = (payload.barber_stats || []).length ? payload.barber_stats.map((item) => `<div class="item"><strong>${item.barber_name}</strong><p>${item.completed_visits} completed visits this month</p><p>${money(item.revenue_cents)} collected</p></div>`).join("") : `<div class="item"><p>No barber data yet.</p></div>`;
+        recentList.innerHTML = (payload.recent_bookings || []).length ? payload.recent_bookings.map((booking) => `<div class="item" data-booking-id="${booking.id}"><strong>${badge(booking.status)}${badge(booking.origin)}${badge(booking.sync_status)}${escapeHtml(booking.service.name)}</strong><p>${escapeHtml(booking.customer.full_name || booking.customer.phone)} with ${escapeHtml(booking.barber.name)}</p><p>${escapeHtml(new Date(booking.start_time).toLocaleString())}</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">${(booking.status === "confirmed" || booking.status === "rescheduled") ? '<button class="btn complete">Complete</button><button class="btn missed">Mark Missed</button>' : ""}</div></div>`).join("") : `<div class="item"><p>No recent activity yet.</p></div>`;
+        barberStatsList.innerHTML = (payload.barber_stats || []).length ? payload.barber_stats.map((item) => `<div class="item"><strong>${escapeHtml(item.barber_name)}</strong><p>${escapeHtml(`${item.completed_visits} completed visits this month`)}</p><p>${escapeHtml(money(item.revenue_cents))} collected</p></div>`).join("") : `<div class="item"><p>No barber data yet.</p></div>`;
       }
 
       function renderBookings() {
-        bookingFeed.innerHTML = state.bookings.length ? state.bookings.map((booking) => `<div class="booking-card" data-booking-id="${booking.id}"><div class="meta">${badge(booking.status)}${badge(booking.origin)}${badge(booking.sync_status)}${badge(booking.payment_status)}</div><strong>${booking.service.name}</strong><p>${booking.customer.full_name || booking.customer.phone} with ${booking.barber.name}</p><p>${new Date(booking.start_time).toLocaleString()}</p><p>${booking.external_booking_id ? `External id: ${booking.external_booking_id}` : "No external id linked."}</p><small>${booking.last_synced_at ? `Last synced ${new Date(booking.last_synced_at).toLocaleString()}` : "No sync timestamp yet."}</small><div class="actions">${(booking.status === "confirmed" || booking.status === "rescheduled") ? '<button class="btn complete">Complete</button><button class="btn missed">Mark Missed</button>' : ""}</div></div>`).join("") : `<div class="item"><p>No bookings matched the current filters.</p></div>`;
+        bookingFeed.innerHTML = state.bookings.length ? state.bookings.map((booking) => `<div class="booking-card" data-booking-id="${booking.id}"><div class="meta">${badge(booking.status)}${badge(booking.origin)}${badge(booking.sync_status)}${badge(booking.payment_status)}</div><strong>${escapeHtml(booking.service.name)}</strong><p>${escapeHtml(booking.customer.full_name || booking.customer.phone)} with ${escapeHtml(booking.barber.name)}</p><p>${escapeHtml(new Date(booking.start_time).toLocaleString())}</p><p>${booking.external_booking_id ? `External id: ${escapeHtml(booking.external_booking_id)}` : "No external id linked."}</p><small>${booking.last_synced_at ? `Last synced ${escapeHtml(new Date(booking.last_synced_at).toLocaleString())}` : "No sync timestamp yet."}</small><div class="actions">${(booking.status === "confirmed" || booking.status === "rescheduled") ? '<button class="btn complete">Complete</button><button class="btn missed">Mark Missed</button>' : ""}</div></div>`).join("") : `<div class="item"><p>No bookings matched the current filters.</p></div>`;
       }
 
       function startOfWeek(date) {
@@ -498,7 +525,7 @@
           .filter((booking) => booking.status === "cancelled")
           .sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
         calendarDetailsList.innerHTML = cancelledBookings.length
-          ? cancelledBookings.map((booking) => `<div class="detail-item"><strong>${badge(booking.status)}${badge(booking.origin)}${booking.service.name}</strong><p>${new Date(booking.start_time).toLocaleString()} with ${booking.barber.name}</p><p>${booking.customer.full_name || booking.customer.phone}</p><small>${booking.cancellation_reason || "No cancellation reason provided."}</small></div>`).join("")
+          ? cancelledBookings.map((booking) => `<div class="detail-item"><strong>${badge(booking.status)}${badge(booking.origin)}${escapeHtml(booking.service.name)}</strong><p>${escapeHtml(new Date(booking.start_time).toLocaleString())} with ${escapeHtml(booking.barber.name)}</p><p>${escapeHtml(booking.customer.full_name || booking.customer.phone)}</p><small>${escapeHtml(booking.cancellation_reason || "No cancellation reason provided.")}</small></div>`).join("")
           : `<div class="detail-item"><p>No cancellations this week.</p></div>`;
 
         const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
@@ -512,7 +539,7 @@
             .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
           return `<div class="schedule-col">${hourSlots().map((slotLabel) => {
             const slotBookings = dayBookings.filter((booking) => slotLabelForBooking(booking) === slotLabel);
-            const slotCards = slotBookings.map((booking) => `<button type="button" class="schedule-card ${(booking.origin === "booksy" || booking.origin === "synced" || booking.sync_status === "synced") ? "booksy-linked" : ""}" data-booking-id="${booking.id}" data-customer-id="${booking.customer.id}"><div class="meta">${badge(booking.origin)}${badge(booking.sync_status)}</div><strong>${timeLabel(booking.start_time)} - ${timeLabel(booking.end_time)}</strong><p>${booking.customer.full_name || booking.customer.phone}</p><p>${booking.service.name} with ${booking.barber.name}</p></button>`).join("");
+            const slotCards = slotBookings.map((booking) => `<button type="button" class="schedule-card ${(booking.origin === "booksy" || booking.origin === "synced" || booking.sync_status === "synced") ? "booksy-linked" : ""}" data-booking-id="${booking.id}" data-customer-id="${booking.customer.id}"><div class="meta">${badge(booking.origin)}${badge(booking.sync_status)}</div><strong>${escapeHtml(`${timeLabel(booking.start_time)} - ${timeLabel(booking.end_time)}`)}</strong><p>${escapeHtml(booking.customer.full_name || booking.customer.phone)}</p><p>${escapeHtml(booking.service.name)} with ${escapeHtml(booking.barber.name)}</p></button>`).join("");
             return `<div class="schedule-slot">${slotCards}</div>`;
           }).join("")}</div>`;
         }).join("");
@@ -525,7 +552,7 @@
       }
 
       function renderCustomers() {
-        customerList.innerHTML = state.customers.map((customer) => `<button type="button" class="person ${state.selectedCustomerId === customer.id ? "on" : ""}" data-id="${customer.id}"><strong>${customer.is_inhouse_blocked ? '<span class="badge flagged">flagged</span>' : ""}${customer.full_name || "Unnamed client"}</strong><span>${customer.phone}</span><span>${customer.preferred_style || "No preferred style saved yet"}</span></button>`).join("");
+        customerList.innerHTML = state.customers.map((customer) => `<button type="button" class="person ${state.selectedCustomerId === customer.id ? "on" : ""}" data-id="${customer.id}"><strong>${customer.is_inhouse_blocked ? '<span class="badge flagged">flagged</span>' : ""}${escapeHtml(customer.full_name || "Unnamed client")}</strong><span>${escapeHtml(customer.phone)}</span><span>${escapeHtml(customer.preferred_style || "No preferred style saved yet")}</span></button>`).join("");
         customerList.querySelectorAll("[data-id]").forEach((button) => button.addEventListener("click", () => loadCustomer(Number(button.dataset.id))));
       }
 
@@ -541,9 +568,9 @@
         policyNote.value = customer.booking_policy_note || "";
         policyLabel.textContent = customer.is_inhouse_blocked ? "In-house booking is flagged." : "In-house booking is open.";
         policySummary.textContent = customer.is_inhouse_blocked ? (customer.booking_policy_note || "Client must contact the shop before booking in-house again.") : "If a client misses appointments, staff can flag them here so they must contact the shop before booking in-house again.";
-        recordBarber.innerHTML = [`<option value="">No preference</option>`].concat(barbers.map((barber) => `<option value="${barber.id}" ${(customer.preferred_barber && customer.preferred_barber.id === barber.id) ? "selected" : ""}>${barber.name}</option>`)).join("");
-        recordStats.innerHTML = [["Completed visits", customer.stats.completed_visits], ["Cancelled", customer.stats.cancelled_visits], ["Missed", customer.stats.missed_visits], ["Missed total", customer.stats.missed_appointments_count]].map(([label, value]) => `<div class="stat"><small>${label}</small><strong>${value}</strong></div>`).join("");
-        historyList.innerHTML = payload.bookings.length ? payload.bookings.map((booking) => `<div class="item"><strong>${badge(booking.status)}${badge(booking.origin)}${booking.service.name}</strong><p>${new Date(booking.start_time).toLocaleString()} with ${booking.barber.name}</p><p>${money(booking.amount_paid_cents)} collected${booking.notes ? ` | ${booking.notes}` : ""}</p></div>`).join("") : `<div class="item"><p>No visits yet for this client.</p></div>`;
+        recordBarber.innerHTML = [`<option value="">No preference</option>`].concat(barbers.map((barber) => `<option value="${escapeHtml(barber.id)}" ${(customer.preferred_barber && customer.preferred_barber.id === barber.id) ? "selected" : ""}>${escapeHtml(barber.name)}</option>`)).join("");
+        recordStats.innerHTML = [["Completed visits", customer.stats.completed_visits], ["Cancelled", customer.stats.cancelled_visits], ["Missed", customer.stats.missed_visits], ["Missed total", customer.stats.missed_appointments_count]].map(([label, value]) => `<div class="stat"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></div>`).join("");
+        historyList.innerHTML = payload.bookings.length ? payload.bookings.map((booking) => `<div class="item"><strong>${badge(booking.status)}${badge(booking.origin)}${escapeHtml(booking.service.name)}</strong><p>${escapeHtml(new Date(booking.start_time).toLocaleString())} with ${escapeHtml(booking.barber.name)}</p><p>${escapeHtml(`${money(booking.amount_paid_cents)} collected`)}${booking.notes ? ` | ${escapeHtml(booking.notes)}` : ""}</p></div>`).join("") : `<div class="item"><p>No visits yet for this client.</p></div>`;
       }
 
       function renderStaffProfile(profile) {
@@ -553,7 +580,7 @@
         $("staffPhone").value = profile.phone || "";
         $("staffTitle").value = profile.title || "";
         $("staffBio").value = profile.bio || "";
-        $("staffLinkedBarber").innerHTML = [`<option value="">No linked barber</option>`].concat(barbers.map((barber) => `<option value="${barber.id}" ${(profile.linked_barber && profile.linked_barber.id === barber.id) ? "selected" : ""}>${barber.name}</option>`)).join("");
+        $("staffLinkedBarber").innerHTML = [`<option value="">No linked barber</option>`].concat(barbers.map((barber) => `<option value="${escapeHtml(barber.id)}" ${(profile.linked_barber && profile.linked_barber.id === barber.id) ? "selected" : ""}>${escapeHtml(barber.name)}</option>`)).join("");
         $("staffIdentity").textContent = `${profile.full_name || profile.username}${profile.title ? `, ${profile.title}` : ""}`;
         $("staffMeta").textContent = `${profile.is_superuser ? "Superuser" : "Staff account"}${profile.last_login ? ` | Last login ${new Date(profile.last_login).toLocaleString()}` : ""}`;
       }

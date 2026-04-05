@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
   <style>
     :root{--bg:#090909;--panel:rgba(17,17,17,.88);--panel-soft:rgba(255,255,255,.03);--line:rgba(255,255,255,.08);--text:#ede9e0;--muted:#9b9286;--accent:#c9a96e;--accent-soft:rgba(201,169,110,.14);--ok:#95d1ab;--warn:#efc987;--bad:#f1a5a5;--blue:#99c5ff;--shadow:0 24px 60px rgba(0,0,0,.32)}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:"Inter",system-ui,sans-serif;background:linear-gradient(180deg,rgba(6,6,6,.6),rgba(6,6,6,.92)),radial-gradient(circle at top left,rgba(201,169,110,.18),transparent 30%),url("{% static 'Cuts/BG1.jpg' %}") center/cover fixed no-repeat}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:"Inter",system-ui,sans-serif;background:linear-gradient(180deg,rgba(6,6,6,.6),rgba(6,6,6,.92)),radial-gradient(circle at top left,rgba(201,169,110,.18),transparent 30%),url("{% static 'Cuts/BG1.JPG' %}") center/cover fixed no-repeat}
     a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button{cursor:pointer}
     .page{max-width:1280px;margin:0 auto;padding:24px}.hero,.panel{border:1px solid var(--line);border-radius:28px;background:linear-gradient(180deg,rgba(18,18,18,.88),rgba(10,10,10,.96));box-shadow:var(--shadow)}
     .hero{position:relative;overflow:hidden;padding:28px}.hero:after{content:"";position:absolute;inset:16px;border:1px solid rgba(255,255,255,.04);border-radius:22px;pointer-events:none}
@@ -141,12 +141,38 @@
         profileMsg.className = `state ${tone || ""}`.trim();
       }
 
+      function getCookie(name) {
+        const parts = document.cookie ? document.cookie.split("; ") : [];
+        for (const part of parts) {
+          const [key, ...valueParts] = part.split("=");
+          if (key === name) return decodeURIComponent(valueParts.join("="));
+        }
+        return "";
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function tokenClass(value) {
+        return String(value ?? "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+      }
+
       async function api(url, options = {}) {
+        const method = (options.method || "GET").toUpperCase();
         const config = {
           credentials: "same-origin",
           ...options,
           headers: {
             "Content-Type": "application/json",
+            ...(!["GET", "HEAD", "OPTIONS", "TRACE"].includes(method) && getCookie("csrftoken")
+              ? { "X-CSRFToken": getCookie("csrftoken") }
+              : {}),
             ...(options.headers || {}),
           },
         };
@@ -185,7 +211,7 @@
         BARBERS.forEach((barber) => {
           const selected = String(selectedId || "") === String(barber.id) ? " selected" : "";
           const title = barber.title ? ` - ${barber.title}` : "";
-          options.push(`<option value="${barber.id}"${selected}>${barber.name}${title}</option>`);
+          options.push(`<option value="${escapeHtml(barber.id)}"${selected}>${escapeHtml(barber.name)}${escapeHtml(title)}</option>`);
         });
         select.innerHTML = options.join("");
       }
@@ -235,7 +261,7 @@
           { label: "Upcoming", value: String(upcomingBookings.length), detail: nextBooking ? `Next: ${formatDate(nextBooking.start_time)}` : "No future visits booked yet." },
           { label: "Completed", value: String(completedBookings.length), detail: completedBookings.length ? `${completedBookings.length} finished appointments on record.` : "Your completed visits will appear here." },
           { label: "Saved Spend", value: money(spend), detail: spend ? "Total from completed appointments." : "Spend totals update after completed visits." },
-        ].map((item) => `<div class="fact"><span>${item.label}</span><strong>${item.value}</strong><small>${item.detail}</small></div>`).join("");
+        ].map((item) => `<div class="fact"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.value)}</strong><small>${escapeHtml(item.detail)}</small></div>`).join("");
       }
 
       function renderStatusGrid(account, upcomingBookings, historyBookings) {
@@ -262,7 +288,7 @@
         if (account.booking_policy_note) {
           cards.unshift({ title: "Booking policy note", body: account.booking_policy_note });
         }
-        document.getElementById("statusGrid").innerHTML = cards.map((item) => `<article class="status-card"><strong>${item.title}</strong><p>${item.body}</p></article>`).join("");
+        document.getElementById("statusGrid").innerHTML = cards.map((item) => `<article class="status-card"><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.body)}</p></article>`).join("");
       }
 
       function bookingCard(booking) {
@@ -273,23 +299,23 @@
             <div class="booking-head">
               <div class="booking-copy">
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                  <span class="badge ${booking.status}">${booking.status}</span>
-                  <span class="badge ${booking.payment_status}">${booking.payment_status}</span>
+                  <span class="badge ${tokenClass(booking.status)}">${escapeHtml(booking.status)}</span>
+                  <span class="badge ${tokenClass(booking.payment_status)}">${escapeHtml(booking.payment_status)}</span>
                 </div>
-                <strong>${booking.service.name}</strong>
-                <p>${formatDateTime(booking.start_time)} with ${booking.barber.name}</p>
+                <strong>${escapeHtml(booking.service.name)}</strong>
+                <p>${escapeHtml(formatDateTime(booking.start_time))} with ${escapeHtml(booking.barber.name)}</p>
               </div>
               ${cancelAction}
             </div>
             <div class="booking-grid">
-              <div class="booking-cell"><span>Service</span><strong>${booking.service.duration_minutes} minutes</strong></div>
-              <div class="booking-cell"><span>Price</span><strong>${money(booking.price_cents)}</strong></div>
-              <div class="booking-cell"><span>Recorded Payment</span><strong>${amountText}</strong></div>
+              <div class="booking-cell"><span>Service</span><strong>${escapeHtml(`${booking.service.duration_minutes} minutes`)}</strong></div>
+              <div class="booking-cell"><span>Price</span><strong>${escapeHtml(money(booking.price_cents))}</strong></div>
+              <div class="booking-cell"><span>Recorded Payment</span><strong>${escapeHtml(amountText)}</strong></div>
             </div>
-            <p class="booking-notes">${booking.notes || "No additional notes saved for this appointment."}</p>
+            <p class="booking-notes">${escapeHtml(booking.notes || "No additional notes saved for this appointment.")}</p>
             <div class="booking-foot">
-              <small>Booked on ${formatDate(booking.created_at)}</small>
-              ${booking.cancellation_reason ? `<small>Cancellation reason: ${booking.cancellation_reason}</small>` : ""}
+              <small>Booked on ${escapeHtml(formatDate(booking.created_at))}</small>
+              ${booking.cancellation_reason ? `<small>Cancellation reason: ${escapeHtml(booking.cancellation_reason)}</small>` : ""}
             </div>
           </article>
         `;
