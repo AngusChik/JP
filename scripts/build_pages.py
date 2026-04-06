@@ -37,8 +37,10 @@ def build_index_html() -> None:
     response = home(request)
     html = response.content.decode("utf-8")
     # GitHub Pages project URLs are served under /<repo>/, so absolute
-    # /static/... URLs would break. Rewrite to relative static/... paths.
-    html = html.replace('"/static/', '"static/').replace("'/static/", "'static/")
+    # /static/... URLs would break. Rewrite every app-root static path to
+    # a relative one, including multi-image gallery strings embedded in
+    # data attributes.
+    html = html.replace("/static/", "static/")
     (SITE_DIR / "index.html").write_text(html, encoding="utf-8")
 
 
