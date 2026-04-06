@@ -422,14 +422,14 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
         {
             "name": "Beard Outline",
             "time": "35 min",
-            "price": "$40",
+            "price": "$25",
             "desc": "Clean fade from skin up with a sharp, blended finish. Our most popular cut.",
             "category": "Fade",
             "image_url": static("Cuts/HC.JPG"),
             "gallery": "|".join(
                 [
+                    static("Cuts/HC.JPG"),
                     static("Cuts/FD.JPG"),
-                    static("Cuts/HC2.JPG"),
                     static("Cuts/HC2B.JPG"),
                 ]
             ),
@@ -437,7 +437,7 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
         {
             "name": "Precision Cut",
             "time": "50 min",
-            "price": "$25",
+            "price": "$50",
             "desc": "Simple, sharp, and low-maintenance. Even length all around with a crisp lineup.",
             "category": "Classic",
             "image_url": static("Cuts/FD.JPG"),
@@ -449,7 +449,7 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
         {
             "name": "Fade + Beard",
             "time": "1.5 hours",
-            "price": "$55",
+            "price": "$65",
             "desc": "Full fade with detailed beard shaping, lineup, and hot towel finish.",
             "category": "Combo",
             "image_url": static("Cuts/HCB3.JPG"),
