@@ -13,7 +13,7 @@
   <link rel="preload" as="image" href="{% static 'Cuts/FD.JPG' %}" />
   <link rel="preload" as="image" href="{% static 'Cuts/HC.JPG' %}" />
   <link rel="preload" as="image" href="{% static 'Cuts/HC2.JPG' %}" />
-  <link rel="preload" as="image" href="{% static 'Cuts/HC+B3.JPG' %}" />
+  <link rel="preload" as="image" href="{% static 'Cuts/HCB3.JPG' %}" />
 
   <style>
 :root{
@@ -115,11 +115,12 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .brand{display:flex;gap:10px;align-items:center;font-weight:700;font-size:15px;transition:transform .2s ease}
 .brand:hover{transform:scale(1.03)}
 .brand-mark{
-  width:32px;height:32px;border-radius:8px;background:var(--accent);
+  width:32px;height:32px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:13px;color:var(--bg);
+  overflow:hidden;
   transition:transform .3s var(--ease-out-expo);
 }
+.brand-mark img{width:100%;height:100%;display:block;object-fit:contain;border-radius:inherit}
 .brand:hover .brand-mark{transform:rotate(-6deg)}
 .nav-links{display:flex;gap:2px;align-items:center}
 .nav-links a{
@@ -685,7 +686,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .map-link:hover{background:rgba(201,169,110,.16)}
 .map-link svg{width:12px;height:12px}
 .map-frame{border-radius:12px;overflow:hidden;border:0;aspect-ratio:16/10;background:rgba(0,0,0,.28)}
-.map-embed{width:100%;height:100%;border:0;display:block}
+.map-embed{width:100%;height:100%;border:0;display:block;opacity:0;transition:opacity .25s ease}
+.map-embed.is-ready{opacity:1}
 .detail-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .detail-item{
   padding:10px;
@@ -1300,17 +1302,23 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 
 /* ── SHOP GALLERY ── */
-.shop-gallery{padding:60px 0}
+.shop-gallery{
+  min-height:auto;
+  align-items:flex-start;
+  padding:44px 0 6px;
+}
 .shop-gallery .section-label{margin-bottom:8px}
-.shop-gallery .section-title{margin-bottom:32px}
+.shop-gallery .section-title{margin-bottom:20px}
 .gallery-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
-  gap:12px;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 260px));
+  justify-content:center;
+  gap:14px;
 }
 .gallery-grid img{
   width:100%;
-  height:280px;
+  aspect-ratio:3/4;
+  height:auto;
   object-fit:cover;
   border-radius:10px;
   border:1px solid var(--border);
@@ -1356,7 +1364,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   <nav class="nav" id="mainNav">
     <div class="wrap nav-inner">
       <a class="brand" href="#home" aria-label="Home">
-        <div class="brand-mark">JP</div>
+        <div class="brand-mark"><img src="{% static 'bg/logo-white.PNG' %}" alt="JP Studio logo" /></div>
         <span>Studio</span>
       </a>
       <div class="nav-links" id="navLinks" role="navigation">
@@ -1611,7 +1619,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
             </div>
             <div class="map-frame">
               <iframe class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                src="https://www.google.com/maps?q=3095%20Argentia%20Rd%20Suite%2030%2C%20Mississauga%2C%20ON%20L5N%208P7&output=embed"
+                data-src="https://www.google.com/maps?q=3095%20Argentia%20Rd%20Suite%2030%2C%20Mississauga%2C%20ON%20L5N%208P7&output=embed"
                 title="JP Barber Studio location"></iframe>
             </div>
             <div class="detail-row">
@@ -1710,7 +1718,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     <footer class="site-footer">
       <div class="wrap footer-inner">
         <div class="footer-brand">
-          <div class="brand-mark">JP</div>
+          <div class="brand-mark"><img src="{% static 'bg/logo-white.PNG' %}" alt="JP Studio logo" /></div>
           <span>Studio</span>
         </div>
         <div class="footer-links">
@@ -2127,6 +2135,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   /* Click featured card → open gallery */
 
   /* ── Scroll root (used by multiple features) ── */
+  const scrollRoot=document.getElementById("scrollRoot");
   const prefersReducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
   const setupReviewLoop=loop=>{
     const track=loop.querySelector(".review-loop-track");
@@ -2137,12 +2146,18 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     let lastTs=0;
     let offset=0;
     let loopDistance=0;
+    let isVisible=!scrollRoot;
     const isReverse=loop.classList.contains("review-loop--reverse");
 
     const stop=()=>{
       if(frameId)cancelAnimationFrame(frameId);
       frameId=0;
       lastTs=0;
+    };
+
+    const start=()=>{
+      if(frameId||!loopDistance||prefersReducedMotion.matches||!isVisible)return;
+      frameId=requestAnimationFrame(tick);
     };
 
     const applyTransform=()=>{
@@ -2191,8 +2206,18 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       }
 
       applyTransform();
-      if(!prefersReducedMotion.matches)frameId=requestAnimationFrame(tick);
+      start();
     };
+
+    if(scrollRoot&&"IntersectionObserver" in window){
+      const visibilityObserver=new IntersectionObserver(entries=>{
+        const visible=entries.some(entry=>entry.isIntersecting);
+        isVisible=visible;
+        if(visible)start();
+        else stop();
+      },{root:scrollRoot,threshold:0.02});
+      visibilityObserver.observe(loop);
+    }
 
     rebuild();
 
@@ -2202,8 +2227,6 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     prefersReducedMotion.addEventListener("change",onMotionChange);
   };
   document.querySelectorAll(".review-loop").forEach(setupReviewLoop);
-
-  const scrollRoot=document.getElementById("scrollRoot");
   const sectionIds=["home","about","cuts","contact"];
   const sectionEls=sectionIds.map(id=>document.getElementById(id)).filter(Boolean);
 
@@ -2319,6 +2342,34 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     });
   },{root:scrollRoot,threshold:0.08});
   document.querySelectorAll(".fade-in").forEach(el=>fadeObs.observe(el));
+
+  const loadMapEmbed=iframe=>{
+    const src=iframe.dataset.src;
+    if(!src||iframe.dataset.loaded==="true")return;
+    iframe.dataset.loaded="true";
+    const activate=()=>{
+      iframe.addEventListener("load",()=>iframe.classList.add("is-ready"),{once:true});
+      iframe.src=src;
+      iframe.removeAttribute("data-src");
+    };
+    if("requestIdleCallback" in window)requestIdleCallback(activate,{timeout:450});
+    else setTimeout(activate,60);
+  };
+  const mapEmbeds=[...document.querySelectorAll(".map-embed[data-src]")];
+  if(mapEmbeds.length){
+    if(scrollRoot&&"IntersectionObserver" in window){
+      const mapObserver=new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+          if(!entry.isIntersecting)return;
+          loadMapEmbed(entry.target);
+          mapObserver.unobserve(entry.target);
+        });
+      },{root:scrollRoot,rootMargin:"180px 0px",threshold:0.01});
+      mapEmbeds.forEach(iframe=>mapObserver.observe(iframe));
+    }else{
+      mapEmbeds.forEach(loadMapEmbed);
+    }
+  }
 
   /* ── Barber profile modal ── */
   const bm=document.getElementById("barberModal");

@@ -421,60 +421,42 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
     cuts = [
         {
             "name": "Beard Outline",
-            "time": "30-40 min",
+            "time": "35 min",
             "price": "$40",
             "desc": "Clean fade from skin up with a sharp, blended finish. Our most popular cut.",
             "category": "Fade",
-            "image_url": static("Cuts/FD.JPG"),
+            "image_url": static("Cuts/HC.JPG"),
             "gallery": "|".join(
                 [
                     static("Cuts/FD.JPG"),
+                    static("Cuts/HC2.JPG"),
+                    static("Cuts/HC2B.JPG"),
                 ]
             ),
         },
         {
             "name": "Precision Cut",
-            "time": "15-25 min",
+            "time": "50 min",
             "price": "$25",
             "desc": "Simple, sharp, and low-maintenance. Even length all around with a crisp lineup.",
             "category": "Classic",
-            "image_url": static("Cuts/HC.JPG"),
+            "image_url": static("Cuts/FD.JPG"),
             "gallery": "|".join(
                 [
-                    static("Cuts/HC.JPG"),
-                    static("Cuts/HC2.JPG"),
-                    static("Cuts/HC2B.JPG"),
-                ]
-            ),
-        },
-        {
-            "name": "Classic Taper",
-            "time": "30-40 min",
-            "price": "$35",
-            "desc": "Timeless taper with clean shape through the sides and back for an easy everyday finish.",
-            "category": "Taper",
-            "image_url": static("Cuts/C2A.JPG"),
-            "gallery": "|".join(
-                [
-                    static("Cuts/C2A.JPG"),
-                    static("Cuts/HC2.JPG"),
-                    static("Cuts/HC2B.JPG"),
-                ]
+                    static("Cuts/FD.JPG"),                ]
             ),
         },
         {
             "name": "Fade + Beard",
-            "time": "45-55 min",
+            "time": "1.5 hours",
             "price": "$55",
             "desc": "Full fade with detailed beard shaping, lineup, and hot towel finish.",
             "category": "Combo",
-            "image_url": static("Cuts/HC+B3.JPG"),
+            "image_url": static("Cuts/HCB3.JPG"),
             "gallery": "|".join(
                 [
-                    static("Cuts/HC+B3.JPG"),
-                    static("Cuts/HC+B4.JPG"),
-                    static("Cuts/HC+B5.JPG"),
-                    static("Cuts/HC+B6.JPG"),
+                    static("Cuts/HCB3.JPG"),
+                    static("Cuts/HCB4.JPG"),
                 ]
             ),
         },

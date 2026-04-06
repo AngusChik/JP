@@ -19,7 +19,30 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:blog.furas.pl)",
       "WebFetch(domain:alpha.docs.booksy.net)",
-      "WebFetch(domain:www.postman.com)"
+      "WebFetch(domain:www.postman.com)",
+      "Bash(where pnpm:*)",
+      "Bash(corepack -v)",
+      "Bash(npm -v)",
+      "Bash(PATH=\"$PATH:/c/Users/Angus/AppData/Roaming/npm:/c/Users/Angus/AppData/Local/Programs/nodejs:/c/Program Files/nodejs\")",
+      "Bash(pnpm -v)",
+      "Bash(corepack enable:*)",
+      "Bash(corepack pnpm:*)",
+      "Bash(npm ls:*)",
+      "Read(//c/Users/Angus/AppData/Roaming/npm/**)",
+      "Read(//c/Users/Angus/AppData/Local/**)",
+      "Bash(npm install:*)",
+      "Bash(export PATH=\"/c/Users/Angus/AppData/Roaming/npm:$PATH\")",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm --filter @cardex/web build)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(where psql:*)",
+      "Bash(where supabase:*)",
+      "Bash(node scripts/run-migration.mjs \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkdnBpc2tjamd5cGJvZ2hlcmRxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDMyMzUyMiwiZXhwIjoyMDg5ODk5NTIyfQ.4ZxL2Be18QBO31Tv9pzs8hDKecZtX7mM89YnqIWFSKU\")",
+      "Bash(node scripts/run-migration-pg.mjs \"1scZKzEgm1TDnNrn\")",
+      "Bash(node -e \":*)",
+      "Bash(ls /c/Users/Angus/Documents/projects/cardex/node_modules/.bin/next*)",
+      "Bash(find /c/Users/Angus/Documents/projects/cardex -name next -path */bin/*)"
     ]
   }
 }
