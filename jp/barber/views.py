@@ -425,12 +425,11 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "price": "$25",
             "desc": "Clean fade from skin up with a sharp, blended finish. Our most popular cut.",
             "category": "Fade",
-            "image_url": static("Cuts/HC.JPG"),
+            "image_url": static("Cuts/B.webp"),
             "gallery": "|".join(
                 [
-                    static("Cuts/HC.JPG"),
-                    static("Cuts/FD.JPG"),
-                    static("Cuts/HC2B.JPG"),
+                    static("Cuts/B.webp"),
+                    static("Cuts/B2.webp"),
                 ]
             ),
         },
@@ -440,10 +439,12 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "price": "$50",
             "desc": "Simple, sharp, and low-maintenance. Even length all around with a crisp lineup.",
             "category": "Classic",
-            "image_url": static("Cuts/FD.JPG"),
+            "image_url": static("Cuts/PC.webp"),
             "gallery": "|".join(
                 [
-                    static("Cuts/FD.JPG"),                ]
+                    static("Cuts/PC.webp"),
+                    static("Cuts/PC2.webp"),
+                ]
             ),
         },
         {
@@ -452,11 +453,12 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "price": "$65",
             "desc": "Full fade with detailed beard shaping, lineup, and hot towel finish.",
             "category": "Combo",
-            "image_url": static("Cuts/HCB3.JPG"),
+            "image_url": static("Cuts/HCB.webp"),
             "gallery": "|".join(
                 [
-                    static("Cuts/HCB3.JPG"),
-                    static("Cuts/HCB4.JPG"),
+                    static("Cuts/HCB.webp"),
+                    static("Cuts/HCB3.webp"),
+                    static("Cuts/HCB4.webp"),
                 ]
             ),
         },
@@ -467,7 +469,7 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "id": "jp",
             "name": "JP",
             "title": "Owner / Lead Barber",
-            "photo_url": "https://picsum.photos/800/1100?random=30",
+            "photo_url": static("bg/JPPIC.webp"),
             "booksy_url": BOOKSY_GLOBAL_URL,
             "bio": "Started cutting hair at 16 out of my parents' basement. "
             "Fifteen years later, I'm still obsessed with getting every "
@@ -493,9 +495,30 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
     return cuts, barbers
 
 
+def _build_shop_media() -> list[dict]:
+    return [
+        {
+            "type": "image",
+            "src": static("bg/BG7.JPG"),
+            "alt": "JP Studio interior view",
+        },
+        {
+            "type": "image",
+            "src": static("bg/BG8.JPG"),
+            "alt": "JP Studio barber chair area",
+        },
+        {
+            "type": "image",
+            "src": static("bg/BG10.JPG"),
+            "alt": "JP Studio suite sign",
+        },
+    ]
+
+
 @ensure_csrf_cookie
 def home(request: HttpRequest) -> HttpResponse:
     cuts, barbers = _build_home_data()
+    shop_media = _build_shop_media()
 
     model_barbers = {}
     default_barber = None
@@ -531,6 +554,7 @@ def home(request: HttpRequest) -> HttpResponse:
         {
             "cuts": cuts,
             "barbers": barbers,
+            "shop_media": shop_media,
             "background_image": "",
             "booksy_global_url": BOOKSY_GLOBAL_URL,
             "booksy_widget_script_url": BOOKSY_WIDGET_SCRIPT_URL,

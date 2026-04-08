@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
   <style>
     :root{--bg:#090909;--panel:rgba(17,17,17,.88);--panel-soft:rgba(255,255,255,.03);--line:rgba(255,255,255,.08);--text:#ede9e0;--muted:#9b9286;--accent:#c9a96e;--accent-soft:rgba(201,169,110,.14);--ok:#95d1ab;--warn:#efc987;--bad:#f1a5a5;--blue:#99c5ff;--shadow:0 24px 60px rgba(0,0,0,.32)}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:"Inter",system-ui,sans-serif;background:linear-gradient(180deg,rgba(6,6,6,.6),rgba(6,6,6,.92)),radial-gradient(circle at top left,rgba(201,169,110,.18),transparent 30%),url("{% static 'bg/BG1.JPG' %}") center/cover fixed no-repeat}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;min-height:100svh;color:var(--text);font-family:"Inter",system-ui,sans-serif;background:linear-gradient(180deg,rgba(6,6,6,.6),rgba(6,6,6,.92)),radial-gradient(circle at top left,rgba(201,169,110,.18),transparent 30%),url("{% static 'bg/BG1.JPG' %}") center/cover fixed no-repeat}
     a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button{cursor:pointer}
     .page{max-width:1280px;margin:0 auto;padding:24px}.hero,.panel{border:1px solid var(--line);border-radius:28px;background:linear-gradient(180deg,rgba(18,18,18,.88),rgba(10,10,10,.96));box-shadow:var(--shadow)}
     .hero{position:relative;overflow:hidden;padding:28px}.hero:after{content:"";position:absolute;inset:16px;border:1px solid rgba(255,255,255,.04);border-radius:22px;pointer-events:none}
@@ -33,7 +33,8 @@
     .badge.confirmed,.badge.rescheduled,.badge.paid{background:rgba(149,209,171,.12);color:var(--ok)}.badge.completed{background:rgba(153,197,255,.12);color:var(--blue)}.badge.cancelled{background:rgba(241,165,165,.12);color:var(--bad)}.badge.missed,.badge.partial{background:rgba(239,201,135,.12);color:var(--warn)}.badge.unpaid{background:rgba(255,255,255,.06);color:#d8d0c2}
     .booking-empty{padding:22px;border-radius:22px;border:1px dashed rgba(255,255,255,.12);color:var(--muted);line-height:1.7;font-size:14px;background:rgba(255,255,255,.015)}
     @media (max-width:1120px){.hero-main,.layout{grid-template-columns:1fr}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media (max-width:760px){.page{padding:14px}.hero,.panel{padding:20px;border-radius:24px}.hero:after{inset:12px;border-radius:18px}.topbar,.panel-head,.booking-head,.booking-foot{grid-template-columns:1fr}.hero-actions,.tabs,.field-grid.two,.booking-grid,.facts{grid-auto-flow:row;grid-template-columns:1fr}.button,a.button{width:100%}h1{font-size:clamp(34px,11vw,48px)}}
+    @media (max-width:760px){body{background-attachment:scroll}.page{padding:14px;padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));padding-bottom:max(14px,env(safe-area-inset-bottom))}.hero,.panel{padding:20px;border-radius:24px}.hero:after{inset:12px;border-radius:18px}.topbar,.panel-head,.booking-head,.booking-foot{grid-template-columns:1fr}.hero-actions,.tabs,.field-grid.two,.booking-grid,.facts{grid-auto-flow:row;grid-template-columns:1fr}.button,a.button{width:100%}h1{font-size:clamp(34px,11vw,48px)}}
+    @media (max-width:560px){.page{padding:12px;padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));padding-bottom:max(12px,env(safe-area-inset-bottom))}.hero,.panel{padding:16px;border-radius:20px}.hero-main{gap:14px;margin-top:18px}.hero-actions{width:100%}.brand{justify-content:center;flex-wrap:wrap}.topbar{justify-items:stretch}.fact strong{font-size:22px}}
   </style>
 </head>
 <body>

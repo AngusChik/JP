@@ -31,6 +31,7 @@
     body{
       margin:0;
       min-height:100vh;
+      min-height:100svh;
       color:var(--text);
       font-family:"Inter",system-ui,sans-serif;
       background:
@@ -42,6 +43,7 @@
     button,input{font:inherit}
     .shell{
       min-height:100vh;
+      min-height:100svh;
       padding:20px;
       display:grid;
       place-items:center;
@@ -418,12 +420,17 @@
     @media (max-width:760px){
       .shell{
         padding:12px;
+        padding-left:max(12px,env(safe-area-inset-left));
+        padding-right:max(12px,env(safe-area-inset-right));
+        padding-bottom:max(12px,env(safe-area-inset-bottom));
       }
       .frame{
         border-radius:24px;
       }
       .utility{
         padding:14px 14px 0;
+        flex-direction:column-reverse;
+        align-items:stretch;
       }
       .story,.panel{
         padding:18px;
@@ -449,6 +456,29 @@
       .back-link{
         min-height:46px;
         padding:0 16px;
+        justify-content:center;
+      }
+      .brand{justify-content:center}
+    }
+    @media (max-width:560px){
+      body{
+        background-attachment:scroll;
+      }
+      .story,.panel{
+        padding:16px;
+      }
+      .panel-card{
+        padding:18px;
+        border-radius:20px;
+      }
+      .panel-card h2{
+        font-size:28px;
+      }
+      .mode-switch{
+        grid-template-columns:1fr;
+      }
+      .mode-button{
+        min-height:50px;
       }
     }
   </style>

@@ -43,7 +43,7 @@
     .customer-note p{margin:0;color:var(--muted);line-height:1.6}
     .customer-modal-msg{min-height:18px;font-size:12px}
     @media (max-width:1180px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--line)}.layout,.split,.report-grid,.metrics,.calendar-shell{grid-template-columns:1fr 1fr}.cards,.stats,.pairs,.filters,.form-grid,.calendar-grid{grid-template-columns:1fr 1fr}}
-    @media (max-width:760px){.main{padding:18px 14px 32px}.top,.metrics,.layout,.split,.report-grid,.cards,.stats,.pairs,.filters,.form-grid,.calendar-shell,.calendar-grid{grid-template-columns:1fr}.sidebar{padding:18px 14px}.btn,a.btn{width:100%}}
+    @media (max-width:760px){.main{padding:18px 14px 32px;padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));padding-bottom:max(18px,env(safe-area-inset-bottom))}.top,.metrics,.layout,.split,.report-grid,.cards,.stats,.pairs,.filters,.form-grid,.calendar-shell,.calendar-grid{grid-template-columns:1fr}.sidebar{padding:18px 14px}.btn,a.btn{width:100%}.customer-modal{padding:12px}.customer-dialog{border-radius:20px}}
     .icon{width:18px;height:18px;display:block;flex:0 0 18px}
     .app{transition:grid-template-columns .22s ease}
     body.sidebar-collapsed .app{grid-template-columns:88px minmax(0,1fr)}
@@ -74,6 +74,7 @@
     @media (max-width:1400px){.schedule-board{min-width:1040px}}
     @media (max-width:1180px){body.sidebar-collapsed .app{grid-template-columns:1fr}body.sidebar-collapsed .brand-copy,body.sidebar-collapsed .nav-label,body.sidebar-collapsed .action-label{opacity:1;max-width:none;overflow:visible;transform:none}body.sidebar-collapsed .nav button,body.sidebar-collapsed .side-actions .btn{justify-content:flex-start;padding-left:14px;padding-right:14px}.calendar-shell,body.rail-collapsed .calendar-shell{grid-template-columns:1fr 1fr}body.rail-collapsed #calendarSummaryPanel{display:grid}body.rail-collapsed .summary-toggle{position:static;writing-mode:horizontal-tb;height:auto;padding:11px 14px}}
     @media (max-width:760px){.calendar-shell,body.rail-collapsed .calendar-shell{grid-template-columns:1fr}.schedule-board{min-width:920px}.schedule-time,.schedule-slot{min-height:78px}.customer-grid{grid-template-columns:1fr}}
+    @media (max-width:560px){.main{padding:14px 12px 26px;padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));padding-bottom:max(14px,env(safe-area-inset-bottom))}.sidebar{padding:14px 12px}.calendar-head{align-items:start}.calendar-controls{width:100%}.calendar-controls .btn{min-width:0}.customer-dialog-head{padding:16px 16px 12px}.customer-dialog-body{padding:16px}.customer-dialog-head h4{font-size:24px}}
   </style>
 </head>
 <body>
