@@ -13,6 +13,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 DJANGO_PROJECT_DIR = ROOT_DIR / "jp"
 SITE_DIR = ROOT_DIR / "site"
 APP_STATIC_DIR = DJANGO_PROJECT_DIR / "barber" / "static"
+CUSTOM_DOMAIN = "jpstudio.com"
 
 
 def clean_site_dir() -> None:
@@ -53,6 +54,7 @@ def copy_static_assets() -> None:
 def write_pages_markers() -> None:
     # Prevent Jekyll processing so files are served exactly as built.
     (SITE_DIR / ".nojekyll").write_text("", encoding="utf-8")
+    (SITE_DIR / "CNAME").write_text(f"{CUSTOM_DOMAIN}\n", encoding="utf-8")
 
 
 def main() -> None:
