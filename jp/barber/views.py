@@ -469,13 +469,18 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "id": "jp",
             "name": "JP",
             "title": "Owner / Lead Barber",
-            "photo_url": static("bg/JPPIC.webp"),
+            "photo_url": static("bg/JPPIC.jpg"),
             "booksy_url": BOOKSY_GLOBAL_URL,
-            "bio": "Started cutting hair at 16 out of my parents' basement. "
-            "Fifteen years later, I'm still obsessed with getting every "
-            "fade, lineup, and taper right. I built this shop to be the "
-            "kind of place I always wanted to walk into \u2014 no ego, no rush, "
-            "just sharp work and good conversation.",
+            "bio": "I started cutting hair in high school just for fun, but in 2019 "
+            "I decided to take it seriously and go all in. What started as a "
+            "hobby turned into something I really love doing every day.\n\n"
+            "Barbering lets me be creative while helping people feel good about "
+            "themselves. Whether it's a fresh fade, a clean lineup, or just "
+            "tightening things up, I enjoy the whole process and take pride in "
+            "getting every detail right.\n\n"
+            "I've always liked the idea of being my own boss and building "
+            "something of my own. This shop is exactly that \u2014 a space with "
+            "good vibes, no pressure, and quality work every time.",
             "reviews": [
                 {
                     "author": "Marcus T.",
