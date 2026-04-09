@@ -13,7 +13,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 DJANGO_PROJECT_DIR = ROOT_DIR / "jp"
 SITE_DIR = ROOT_DIR / "site"
 APP_STATIC_DIR = DJANGO_PROJECT_DIR / "barber" / "static"
-CUSTOM_DOMAIN = "jpstudio.com"
+CUSTOM_DOMAIN = "jpstudios.ca"
 
 
 def clean_site_dir() -> None:
