@@ -2,3 +2,5 @@ site/
 **/__pycache__/
 *.pyc
 jp/.django_secret_key
+.claude/
+jp/.claude/
