@@ -677,8 +677,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .value-pillar{
   position:relative;padding:clamp(18px,2.5vw,28px);
   border-radius:14px;
-  background:linear-gradient(135deg,rgba(18,18,18,.72),rgba(18,18,18,.56));
-  border:1px solid rgba(201,169,110,.1);
+  background:linear-gradient(135deg,rgba(20,20,20,.46),rgba(20,20,20,.24));
+  border:1px solid rgba(255,255,255,.08);
   display:flex;flex-direction:column;gap:12px;
   transition:border-color .35s ease,transform .4s var(--ease-out-expo),box-shadow .4s ease;
   overflow:hidden;
@@ -691,9 +691,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 .value-pillar:hover::before{transform:scaleX(1)}
 .value-pillar:hover{
-  border-color:rgba(201,169,110,.2);
+  border-color:rgba(201,169,110,.16);
   transform:translateY(-4px);
-  box-shadow:0 12px 32px rgba(0,0,0,.25);
+  box-shadow:0 12px 32px rgba(0,0,0,.18);
 }
 .value-icon{
   width:44px;height:44px;border-radius:12px;
@@ -703,11 +703,11 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 .value-pillar:hover .value-icon{transform:scale(1.08) rotate(-3deg);background:rgba(201,169,110,.18)}
 .value-icon svg{width:20px;height:20px;color:var(--accent)}
-.value-pillar h3{font-size:15px;font-weight:700;letter-spacing:-.2px;color:rgba(255,255,255,.96);text-shadow:0 1px 10px rgba(0,0,0,.22)}
-.value-pillar p{font-size:13px;color:rgba(255,255,255,.9);line-height:1.6;text-shadow:0 1px 10px rgba(0,0,0,.2)}
+.value-pillar h3{font-size:15px;font-weight:700;letter-spacing:-.2px;color:rgba(255,255,255,.98);text-shadow:0 1px 12px rgba(0,0,0,.18)}
+.value-pillar p{font-size:13px;color:rgba(255,255,255,.94);line-height:1.6;text-shadow:0 1px 10px rgba(0,0,0,.14)}
 .value-detail{
   margin-top:auto;padding-top:10px;
-  border-top:1px solid rgba(201,169,110,.1);
+  border-top:1px solid rgba(255,255,255,.08);
   font-size:11px;color:var(--accent);font-weight:600;
   text-transform:uppercase;letter-spacing:.8px;
   display:flex;align-items:center;gap:6px;
@@ -726,8 +726,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   color:var(--accent);letter-spacing:-.5px;line-height:1;
 }
 .stat-label{
-  font-size:11px;font-weight:500;color:var(--muted);
+  font-size:11px;font-weight:600;color:rgba(255,255,255,.88);
   text-transform:uppercase;letter-spacing:1px;margin-top:6px;
+  text-shadow:0 1px 10px rgba(0,0,0,.28);
 }
 .stat-divider{width:1px;height:36px;background:var(--border)}
 @media(max-width:700px){
