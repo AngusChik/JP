@@ -572,6 +572,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   display:flex;padding:clamp(12px,2vw,32px);
   align-items:center;justify-content:center;
   pointer-events:none;visibility:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
 }
 .barber-modal.is-open,
 .barber-modal.is-closing{pointer-events:auto;visibility:visible}
@@ -585,6 +588,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .barber-modal-panel{
   position:relative;z-index:1;
   width:min(1060px,100%);
+  height:min(820px,calc(100vh - 48px));
+  height:min(820px,calc(100dvh - 48px));
   max-height:calc(100vh - 48px);
   max-height:calc(100dvh - 48px);
   border-radius:24px;overflow:hidden;
@@ -596,6 +601,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   transition:transform .45s var(--ease-out-expo),opacity .35s ease;
   will-change:transform,opacity;
   contain:layout paint;
+  min-height:0;
 }
 .barber-modal.is-open .barber-modal-panel{transform:translateY(0) scale(1);opacity:1}
 .barber-modal-close{
@@ -617,6 +623,10 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .barber-modal-info{
   padding:clamp(28px,4vw,48px);overflow-y:auto;
   display:flex;flex-direction:column;gap:18px;
+  min-height:0;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
 }
 .barber-name{font-family:'Playfair Display',Georgia,serif;font-size:clamp(28px,3.5vw,38px);font-weight:600;letter-spacing:-.3px}
 .barber-title{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
@@ -1334,13 +1344,20 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .bg-contact{background-position:56% center}
 }
 @media(max-width:700px){
+  .barber-modal{
+    align-items:flex-start;
+    padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom));
+  }
   .barber-modal-panel{
     grid-template-columns:1fr;
-    grid-template-rows:240px 1fr;
-    max-height:calc(100vh - 32px);
-    max-height:calc(100dvh - 32px);
+    grid-template-rows:minmax(220px,32dvh) minmax(0,1fr);
+    width:100%;
+    height:auto;
+    max-height:none;
+    min-height:calc(100vh - 16px);
+    min-height:calc(100dvh - 16px);
   }
-  .barber-modal-photo{max-height:240px}
+  .barber-modal-photo{max-height:none;min-height:220px}
   .barber-modal-photo::after{background:linear-gradient(to bottom,transparent 75%,var(--surface))}
   .barber-modal-info{padding:24px}
   .barber-book{width:100%;justify-content:center}
