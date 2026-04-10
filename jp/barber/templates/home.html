@@ -896,15 +896,21 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     --loop-gap:10px;
     --loop-speed:38s;
     margin-top:16px;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
     mask-image:none;
     -webkit-mask-image:none;
   }
+  .review-loop-track{width:max-content;padding:0 14px}
   .review-loop--reverse{--loop-speed:44s}
   .review-card{
     min-width:74vw;
     max-width:74vw;
     border-radius:12px;
     padding:12px 13px;
+    scroll-snap-align:start;
   }
   .review-card p{font-size:12px}
 }
@@ -1305,8 +1311,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .gm-panel.is-portrait .gm-body,.gm-panel.is-landscape .gm-body,
   .gm-body{grid-template-rows:minmax(0,1fr) auto}
   .gm-stage{
-    --gm-stage-pad:8px;
-    --gm-frame-pad:8px;
+    --gm-stage-pad:14px;
+    --gm-frame-pad:14px;
     padding:var(--gm-stage-pad) var(--gm-stage-pad) 0;
     place-items:center;
   }
@@ -1315,7 +1321,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     padding:0;
     max-width:100%;
   }
-  .gm-image,.gm-video{max-width:min(100%,calc(100vw - 36px));max-height:calc(100vh - 250px);max-height:calc(100dvh - 250px);border-radius:12px}
+  .gm-image,.gm-video{max-width:min(100%,calc(100vw - 84px));max-height:calc(100vh - 290px);max-height:calc(100dvh - 290px);border-radius:12px}
   .gm-nav{
     width:46px;
     height:46px;
@@ -1395,8 +1401,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   .gm-title{font-size:20px}
   .gm-counter{display:none}
   .gm-close{width:36px;height:36px;border-radius:10px}
-  .gm-controls{left:10px;right:10px}
-  .gm-nav{width:42px;height:42px;font-size:20px}
+  .gm-controls{left:-52px;right:-52px}
+  .gm-nav{width:40px;height:40px;font-size:18px}
+  .gm-frame{max-width:calc(100% - 84px)}
   .gm-thumbs{padding:10px 10px calc(8px + env(safe-area-inset-bottom))}
   .gm-thumb{width:84px;height:56px;margin:0}
   .hero{min-height:calc(100vh - var(--nav-h));min-height:calc(100svh - var(--nav-h))}
@@ -1442,6 +1449,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   transition:opacity .3s ease,transform .3s var(--ease-out-expo);
 }
 .fixed-buttons.is-visible{opacity:1;transform:translateY(0);pointer-events:auto}
+.fixed-buttons-right{display:flex;gap:10px;align-items:center}
 .leave-review{
   display:flex;align-items:center;gap:7px;
   padding:10px 16px;border-radius:12px;
@@ -1467,31 +1475,30 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .back-to-top:active{transform:translateY(0)}
 .back-to-top svg{width:18px;height:18px}
 
-/* ── FLOATING BOOK (mobile) ── */
+/* ── FLOATING BOOK (mobile only) ── */
 .float-book{
-  display:none;position:fixed;
-  bottom:max(14px,env(safe-area-inset-bottom));
-  left:max(12px,env(safe-area-inset-left));
-  z-index:80;
-  transform:translateY(80px);
-  padding:12px 20px;border-radius:50px;
+  display:none;
+  padding:10px 18px;border-radius:12px;
   background:var(--accent);color:var(--bg);
-  font-weight:700;font-size:14px;
-  border:none;cursor:pointer;
+  font-weight:700;font-size:13px;
+  border:none;cursor:pointer;text-decoration:none;
   box-shadow:0 6px 24px var(--accent-glow);
-  transition:transform .4s var(--ease-out-expo),box-shadow .2s ease;
+  transition:box-shadow .2s ease,transform .3s var(--ease-out-expo);
   white-space:nowrap;
   align-items:center;gap:8px;
 }
-.float-book.is-visible{transform:translateY(0)}
-.float-book:hover{box-shadow:0 8px 32px rgba(201,169,110,.35)}
+.float-book:hover{box-shadow:0 8px 32px rgba(201,169,110,.35);transform:translateY(-2px)}
 @media(max-width:560px){
   .float-book{display:inline-flex}
   .fixed-buttons{
     right:max(12px,env(safe-area-inset-right));
-    bottom:calc(max(14px,env(safe-area-inset-bottom)) + 62px);
+    left:auto;
+    bottom:max(14px,env(safe-area-inset-bottom));
+    width:auto;
+    align-items:center;
   }
-  .leave-review{padding:10px;font-size:0}
+  .fixed-buttons-right{display:flex;flex-direction:row;gap:10px;align-items:center}
+  .leave-review{padding:10px 14px;font-size:12px}
   .leave-review svg{width:18px;height:18px}
 }
 
@@ -2221,22 +2228,22 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
   </div>
 
-  <!-- BACK TO TOP + LEAVE REVIEW -->
+  <!-- FIXED BOTTOM BUTTONS -->
   <div class="fixed-buttons" id="fixedButtons">
-    <a class="leave-review" href="{{ google_review_url }}" target="_blank" rel="noopener" aria-label="Leave a Google Review">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75 18.18 21l-1.18-6.88L22 9.24l-6.91-1L12 2 8.91 8.24 2 9.24l5 4.88L5.82 21z"/></svg>
-      Leave a Review
+    <a class="float-book" id="floatBook" href="{{ booksy_global_url }}" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Book Now
     </a>
-    <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-    </button>
+    <div class="fixed-buttons-right">
+      <a class="leave-review" href="{{ google_review_url }}" target="_blank" rel="noopener" aria-label="Leave a Google Review">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75 18.18 21l-1.18-6.88L22 9.24l-6.91-1L12 2 8.91 8.24 2 9.24l5 4.88L5.82 21z"/></svg>
+        Leave a Review
+      </a>
+      <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+    </div>
   </div>
-
-  <!-- FLOATING BOOK (mobile) -->
-  <a class="float-book" id="floatBook" href="{{ booksy_global_url }}" target="_blank" rel="noopener">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    Book Now
-  </a>
 
   <!-- BARBER MODAL -->
   <div class="barber-modal" id="barberModal" aria-hidden="true" role="dialog">
@@ -2766,6 +2773,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     let loopDistance=0;
     let isVisible=!scrollRoot;
     const isReverse=loop.classList.contains("review-loop--reverse");
+    const manualScrollMedia=window.matchMedia("(max-width: 700px)");
 
     const stop=()=>{
       if(frameId)cancelAnimationFrame(frameId);
@@ -2804,7 +2812,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       const mainGroup=seedGroup.cloneNode(true);
       mainGroup.removeAttribute("aria-hidden");
 
-      if(prefersReducedMotion.matches){
+      if(prefersReducedMotion.matches||manualScrollMedia.matches){
         track.appendChild(mainGroup);
         track.style.transform="none";
         loopDistance=0;
@@ -2841,8 +2849,12 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
     const onResize=()=>rebuild();
     const onMotionChange=()=>rebuild();
+    const onManualScrollChange=()=>rebuild();
     window.addEventListener("resize",onResize);
-    prefersReducedMotion.addEventListener("change",onMotionChange);
+    if(prefersReducedMotion.addEventListener)prefersReducedMotion.addEventListener("change",onMotionChange);
+    else prefersReducedMotion.addListener(onMotionChange);
+    if(manualScrollMedia.addEventListener)manualScrollMedia.addEventListener("change",onManualScrollChange);
+    else manualScrollMedia.addListener(onManualScrollChange);
   };
   document.querySelectorAll(".review-loop").forEach(setupReviewLoop);
   const sectionIds=["home","about","cuts","contact"];
@@ -2853,10 +2865,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   const mainNav=document.getElementById("mainNav");
   const fixedButtons=document.getElementById("fixedButtons");
   const backToTop=document.getElementById("backToTop");
-  const floatBook=document.getElementById("floatBook");
   if(scrollRoot){
     let ticking=false;
-    let navScrolled=false,topVisible=false,bookVisible=false;
+    let navScrolled=false,topVisible=false;
     const renderScrollState=()=>{
       const st=scrollRoot.scrollTop;
       const sh=scrollRoot.scrollHeight-scrollRoot.clientHeight;
@@ -2866,11 +2877,8 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       const shouldNav=st>40;
       if(mainNav&&shouldNav!==navScrolled){mainNav.classList.toggle("is-scrolled",shouldNav);navScrolled=shouldNav}
 
-      const shouldTop=st>400;
+      const shouldTop=st>300;
       if(fixedButtons&&shouldTop!==topVisible){fixedButtons.classList.toggle("is-visible",shouldTop);topVisible=shouldTop}
-
-      const shouldBook=st>300;
-      if(floatBook&&shouldBook!==bookVisible){floatBook.classList.toggle("is-visible",shouldBook);bookVisible=shouldBook}
     };
     renderScrollState();
     scrollRoot.addEventListener("scroll",()=>{
