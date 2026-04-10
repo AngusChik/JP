@@ -425,11 +425,11 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "price": "$25",
             "desc": "Clean fade from skin up with a sharp, blended finish. Our most popular cut.",
             "category": "Fade",
-            "image_url": static("Cuts/B.webp"),
+            "image_url": static("Cuts/BO.jpeg"),
             "gallery": "|".join(
                 [
-                    static("Cuts/B.webp"),
-                    static("Cuts/B2.webp"),
+                    static("Cuts/BO.jpeg"),
+                    static("Cuts/BO2.jpeg"),
                 ]
             ),
         },
@@ -443,7 +443,9 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "gallery": "|".join(
                 [
                     static("Cuts/PC.webp"),
-                    static("Cuts/PC2.webp"),
+                    static("Cuts/PC3.webp"),
+                    static("Cuts/PC4.webp"),
+                    static("Cuts/PC5.webp"),
                 ]
             ),
         },
@@ -453,12 +455,11 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "price": "$65",
             "desc": "Full fade with detailed beard shaping, lineup, and hot towel finish.",
             "category": "Combo",
-            "image_url": static("Cuts/HCB.webp"),
+            "image_url": static("Cuts/HCB2.webp"),
             "gallery": "|".join(
                 [
-                    static("Cuts/HCB.webp"),
-                    static("Cuts/HCB3.webp"),
-                    static("Cuts/HCB4.webp"),
+                    static("Cuts/HCB2.webp"),
+                    static("Cuts/HCB1.webp"),
                 ]
             ),
         },
