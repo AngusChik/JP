@@ -14,7 +14,9 @@ def _env_flag(name: str, default: bool = False) -> bool:
     return value.lower() in {"true", "1", "yes", "on"}
 
 
-DEBUG = _env_flag("DEBUG", False)
+# Default to True locally, False on Render (which always sets RENDER_EXTERNAL_HOSTNAME)
+_on_render = bool(os.environ.get("RENDER_EXTERNAL_HOSTNAME"))
+DEBUG = _env_flag("DEBUG", not _on_render)
 
 
 def _load_secret_key() -> str:
