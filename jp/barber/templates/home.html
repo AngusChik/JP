@@ -614,12 +614,33 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 .barber-modal-close:hover{background:rgba(0,0,0,.75);transform:scale(1.05)}
 .barber-modal-photo{overflow:hidden;min-height:0;position:relative}
-.barber-modal-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.barber-modal-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .3s ease}
 .barber-modal-photo::after{
   content:"";position:absolute;inset:0;
   background:linear-gradient(to right,transparent 85%,var(--surface));
-  pointer-events:none;
+  pointer-events:none;z-index:1;
 }
+.bm-nav{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+  width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.15);
+  background:rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:#fff;font-size:24px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s ease,transform .2s ease,opacity .2s ease;
+  opacity:.7;
+}
+.bm-nav:hover{background:rgba(0,0,0,.7);opacity:1;transform:translateY(-50%) scale(1.08)}
+.bm-prev{left:12px}
+.bm-next{right:12px}
+.bm-dots{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:2;
+  display:flex;gap:8px;
+}
+.bm-dot{
+  width:8px;height:8px;border-radius:50%;border:none;padding:0;
+  background:rgba(255,255,255,.4);cursor:pointer;transition:background .2s ease,transform .2s ease;
+}
+.bm-dot.active{background:var(--accent);transform:scale(1.25)}
 .barber-modal-info{
   padding:clamp(28px,4vw,48px);overflow-y:auto;
   display:flex;flex-direction:column;gap:18px;
@@ -2199,6 +2220,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
       <button class="barber-modal-close" type="button" data-barber-close aria-label="Close">&times;</button>
       <div class="barber-modal-photo">
         <img id="bmPhoto" src="" alt="" />
+        <button class="bm-nav bm-prev" type="button" aria-label="Previous photo">&#8249;</button>
+        <button class="bm-nav bm-next" type="button" aria-label="Next photo">&#8250;</button>
+        <div class="bm-dots" id="bmDots"></div>
       </div>
       <div class="barber-modal-info">
         <div>
@@ -2951,8 +2975,10 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
   /* ── Barber profile modal ── */
   const bm=document.getElementById("barberModal");
-  const bmPhoto=document.getElementById("bmPhoto"),bmName=document.getElementById("bmName");
+  const bmPhoto=document.getElementById("bmPhoto"),bmDots=document.getElementById("bmDots");
+  const bmName=document.getElementById("bmName");
   const bmTitle=document.getElementById("bmTitle"),bmBio=document.getElementById("bmBio");
+  let bmGallery=[],bmGalIdx=0;
   const bmReviews=document.getElementById("bmReviews");
   const bmBooksy=document.getElementById("bmBooksy"),bmBookName=document.getElementById("bmBookName");
   let barberCloseTimer=0;
@@ -2968,7 +2994,11 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     let data={};
     try{data=JSON.parse(script.textContent)}catch(e){return}
     clearBarberCloseTimer();
-    bmPhoto.src=data.photo||"";bmPhoto.alt=data.name||"";
+    bmGallery=data.gallery&&data.gallery.length?data.gallery:[data.photo||""];
+    bmGalIdx=bmGallery.length>1?1:0;
+    bmPhoto.src=bmGallery[bmGalIdx]||"";bmPhoto.alt=data.name||"";
+    bmDots.innerHTML=bmGallery.map((_,i)=>`<button class="bm-dot${i===bmGalIdx?" active":""}" data-idx="${i}"></button>`).join("");
+    bm.querySelectorAll(".bm-nav").forEach(b=>b.style.display=bmGallery.length>1?"flex":"none");
     bmName.textContent=data.name||"";
     bmTitle.textContent=data.title||"";
     bmBio.textContent=data.bio||"";
@@ -2997,9 +3027,19 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   document.querySelectorAll(".barber-card").forEach(card=>{
     card.addEventListener("click",()=>openBarber(card));
   });
+  const bmSetPhoto=idx=>{
+    bmGalIdx=((idx%bmGallery.length)+bmGallery.length)%bmGallery.length;
+    bmPhoto.src=bmGallery[bmGalIdx];
+    bmDots.querySelectorAll(".bm-dot").forEach((d,i)=>d.classList.toggle("active",i===bmGalIdx));
+  };
+  bm.querySelector(".bm-prev").addEventListener("click",e=>{e.stopPropagation();bmSetPhoto(bmGalIdx-1)});
+  bm.querySelector(".bm-next").addEventListener("click",e=>{e.stopPropagation();bmSetPhoto(bmGalIdx+1)});
+  bmDots.addEventListener("click",e=>{const d=e.target.closest(".bm-dot");if(d){e.stopPropagation();bmSetPhoto(+d.dataset.idx)}});
   bm.addEventListener("click",e=>{if(e.target.hasAttribute("data-barber-close"))closeBarber()});
   window.addEventListener("keydown",e=>{
     if(bm.classList.contains("is-open")&&e.key==="Escape"){e.preventDefault();closeBarber()}
+    if(bm.classList.contains("is-open")&&e.key==="ArrowLeft"){e.preventDefault();bmSetPhoto(bmGalIdx-1)}
+    if(bm.classList.contains("is-open")&&e.key==="ArrowRight"){e.preventDefault();bmSetPhoto(bmGalIdx+1)}
   });
 
 })();

@@ -470,7 +470,12 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "id": "jp",
             "name": "JP",
             "title": "Owner / Lead Barber",
-            "photo_url": static("bg/JPPIC.jpg"),
+            "photo_url": static("profile/jppic-main.jpg"),
+            "gallery": [
+                static("profile/jppic5.jpg"),
+                static("profile/jppic-main.jpg"),
+                static("profile/jppic4.jpg"),
+            ],
             "booksy_url": BOOKSY_GLOBAL_URL,
             "bio": "I started cutting hair in high school just for fun, but in 2019 "
             "I decided to take it seriously and go all in. What started as a "
@@ -546,6 +551,7 @@ def home(request: HttpRequest) -> HttpResponse:
         barber["data_json"] = json.dumps(
             {
                 "photo": barber["photo_url"],
+                "gallery": barber.get("gallery", []),
                 "name": barber["name"],
                 "title": barber["title"],
                 "bio": barber["bio"],

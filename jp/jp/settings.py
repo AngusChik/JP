@@ -14,7 +14,7 @@ def _env_flag(name: str, default: bool = False) -> bool:
     return value.lower() in {"true", "1", "yes", "on"}
 
 
-DEBUG = _env_flag("DEBUG", True)
+DEBUG = _env_flag("DEBUG", False)
 
 
 def _load_secret_key() -> str:
@@ -45,6 +45,7 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 ALLOWED_HOSTS.extend(["testserver", "localhost", "127.0.0.1"])
+ALLOWED_HOSTS.extend(["jpstudios.ca", "www.jpstudios.ca"])
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
@@ -55,6 +56,7 @@ CSRF_TRUSTED_ORIGINS = [
     for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+CSRF_TRUSTED_ORIGINS.extend(["https://jpstudios.ca", "https://www.jpstudios.ca"])
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
