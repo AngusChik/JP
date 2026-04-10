@@ -38,6 +38,7 @@ from .models import (
 BOOKSY_GLOBAL_URL = getattr(settings, "BOOKSY_GLOBAL_URL", "https://booksy.com/your-link")
 BOOKSY_WIDGET_SCRIPT_URL = getattr(settings, "BOOKSY_WIDGET_SCRIPT_URL", "")
 GOOGLE_BOOKING_URL = getattr(settings, "GOOGLE_BOOKING_URL", "")
+GOOGLE_REVIEW_URL = getattr(settings, "GOOGLE_REVIEW_URL", "")
 PUBLIC_BARBER_SLUG = "jp"
 SESSION_ACCOUNT_KEY = "customer_account_id"
 OTP_PURPOSE_LOGIN = "login"
@@ -571,6 +572,7 @@ def home(request: HttpRequest) -> HttpResponse:
             "booksy_global_url": BOOKSY_GLOBAL_URL,
             "booksy_widget_script_url": BOOKSY_WIDGET_SCRIPT_URL,
             "google_booking_url": GOOGLE_BOOKING_URL,
+            "google_review_url": GOOGLE_REVIEW_URL,
             "account_portal_url": "/account/",
             "booking_defaults_json": json.dumps(
                 {

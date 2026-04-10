@@ -180,6 +180,8 @@ BOOKSY_WIDGET_SCRIPT_URL = os.environ.get(
     'https://booksy.com/widget/code.js?id=21963&country=ca&lang=en',
 )
 GOOGLE_BOOKING_URL = os.environ.get('GOOGLE_BOOKING_URL', '')
+GOOGLE_REVIEW_PLACE_ID = os.environ.get('GOOGLE_REVIEW_PLACE_ID', 'ChIJ2Wk9VFNrK4gRQXTXHonbmik')
+GOOGLE_REVIEW_URL = f'https://search.google.com/local/writereview?placeid={GOOGLE_REVIEW_PLACE_ID}'
 
 
 # Static files (CSS, JavaScript, Images)
