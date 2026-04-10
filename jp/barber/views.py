@@ -470,7 +470,7 @@ def _build_home_data() -> tuple[list[dict], list[dict]]:
             "id": "jp",
             "name": "JP",
             "title": "Owner / Lead Barber",
-            "photo_url": static("profile/jppic-main.jpg"),
+            "photo_url": static("profile/jppic-card.jpg"),
             "gallery": [
                 static("profile/jppic5.jpg"),
                 static("profile/jppic-main.jpg"),
