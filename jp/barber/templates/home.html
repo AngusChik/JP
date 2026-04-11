@@ -15,6 +15,9 @@
   <link rel="preload" as="image" href="{% static 'Cuts/BO2.jpeg' %}" />
   <link rel="preload" as="image" href="{% static 'Cuts/HCB1.webp' %}" />
   <link rel="preload" as="image" href="{% static 'bg/BG (1 of 4).webp' %}" />
+  <link rel="preload" as="image" href="{% static 'bg/BG (2 of 4).jpg' %}" />
+  <link rel="preload" as="image" href="{% static 'bg/BG3b.JPG' %}" />
+  <link rel="preload" as="image" href="{% static 'bg/BG (4 of 4).JPG' %}" />
 
   <style>
 :root{
@@ -56,7 +59,10 @@ a{color:inherit;text-decoration:none}
   position:absolute;inset:0;
   opacity:0;
   transition:opacity .55s var(--ease-out-quart);
-  will-change:opacity;
+  will-change:opacity,transform;
+  transform:translate3d(0,0,0);
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
   background-position:center;
   background-repeat:no-repeat;
   background-size:100% auto;
@@ -1444,34 +1450,34 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 /* ── BACK TO TOP + REVIEW BUTTON ── */
 .fixed-buttons{
   position:fixed;bottom:24px;right:24px;z-index:80;
-  display:flex;gap:10px;align-items:center;
+  display:flex;gap:10px;align-items:flex-end;
   opacity:0;transform:translateY(10px);pointer-events:none;
   transition:opacity .3s ease,transform .3s var(--ease-out-expo);
 }
 .fixed-buttons.is-visible{opacity:1;transform:translateY(0);pointer-events:auto}
-.fixed-buttons-right{display:flex;gap:10px;align-items:center}
+.fixed-buttons-right{display:flex;gap:10px;align-items:flex-end}
 .leave-review{
   display:flex;align-items:center;gap:7px;
   padding:10px 16px;border-radius:12px;
   background:var(--surface2);color:var(--text);
   border:1px solid var(--border);cursor:pointer;
   font-size:13px;font-weight:600;letter-spacing:-.1px;
+  min-height:44px;
+  line-height:1;
   text-decoration:none;white-space:nowrap;
-  transition:background .2s ease,box-shadow .2s ease,transform .3s var(--ease-out-expo);
-  box-shadow:0 4px 16px rgba(0,0,0,.3);
+  transition:background .2s ease,transform .3s var(--ease-out-expo),border-color .2s ease;
 }
-.leave-review:hover{background:var(--accent);color:var(--bg);box-shadow:0 6px 24px var(--accent-glow);transform:translateY(-2px)}
+.leave-review:hover{background:var(--accent);color:var(--bg);border-color:transparent;transform:translateY(-2px)}
 .leave-review:active{transform:translateY(0)}
 .leave-review svg{width:16px;height:16px;flex-shrink:0}
 .back-to-top{
   width:44px;height:44px;border-radius:12px;
   background:var(--accent);color:var(--bg);
-  border:none;cursor:pointer;
+  border:1px solid transparent;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  transition:box-shadow .2s ease,transform .3s var(--ease-out-expo);
-  box-shadow:0 4px 16px var(--accent-glow);
+  transition:transform .3s var(--ease-out-expo),background .2s ease,border-color .2s ease;
 }
-.back-to-top:hover{box-shadow:0 6px 24px var(--accent-glow);transform:translateY(-2px)}
+.back-to-top:hover{background:#d4b475;border-color:transparent;transform:translateY(-2px)}
 .back-to-top:active{transform:translateY(0)}
 .back-to-top svg{width:18px;height:18px}
 
@@ -1481,13 +1487,14 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   padding:10px 18px;border-radius:12px;
   background:var(--accent);color:var(--bg);
   font-weight:700;font-size:13px;
-  border:none;cursor:pointer;text-decoration:none;
-  box-shadow:0 6px 24px var(--accent-glow);
-  transition:box-shadow .2s ease,transform .3s var(--ease-out-expo);
+  min-height:44px;
+  line-height:1;
+  border:1px solid transparent;cursor:pointer;text-decoration:none;
+  transition:transform .3s var(--ease-out-expo),background .2s ease,border-color .2s ease;
   white-space:nowrap;
   align-items:center;gap:8px;
 }
-.float-book:hover{box-shadow:0 8px 32px rgba(201,169,110,.35);transform:translateY(-2px)}
+.float-book:hover{background:#d4b475;border-color:transparent;transform:translateY(-2px)}
 @media(max-width:560px){
   .float-book{display:inline-flex}
   .fixed-buttons{
@@ -1495,9 +1502,9 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
     left:auto;
     bottom:max(14px,env(safe-area-inset-bottom));
     width:auto;
-    align-items:center;
+    align-items:flex-end;
   }
-  .fixed-buttons-right{display:flex;flex-direction:row;gap:10px;align-items:center}
+  .fixed-buttons-right{display:flex;flex-direction:row;gap:10px;align-items:flex-end}
   .leave-review{padding:10px 14px;font-size:12px}
   .leave-review svg{width:18px;height:18px}
 }
@@ -1752,7 +1759,7 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 }
 /* lightbox */
 .gallery-lightbox{
-  display:flex;position:fixed;inset:0;z-index:200;
+  display:flex;position:fixed;inset:0;z-index:11000;
   background:rgba(0,0,0,.85);
   align-items:center;justify-content:center;
   cursor:pointer;
@@ -1762,6 +1769,43 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
   transition:opacity .24s ease,visibility .24s ease;
 }
 .gallery-lightbox.active{opacity:1;visibility:visible;pointer-events:auto}
+.gallery-lightbox-close{
+  position:fixed;
+  top:max(18px,calc(18px + env(safe-area-inset-top)));
+  right:max(18px,calc(18px + env(safe-area-inset-right)));
+  min-width:52px;
+  height:52px;
+  padding:0 16px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;
+  background:rgba(12,12,12,.94);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  cursor:pointer;
+  box-shadow:0 12px 32px rgba(0,0,0,.38);
+  transition:transform .2s ease,background .2s ease,opacity .2s ease;
+  z-index:11010;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.01em;
+  -webkit-tap-highlight-color:transparent;
+}
+.gallery-lightbox-close:hover{
+  background:rgba(26,26,26,.98);
+  transform:translateY(-1px);
+}
+.gallery-lightbox-close svg{
+  width:18px;
+  height:18px;
+  flex:0 0 auto;
+}
+.gallery-lightbox-close-label{
+  display:inline-block;
+  line-height:1;
+}
 .gallery-lightbox-media{
   display:none;
   max-width:min(90vw,1200px);max-height:90vh;
@@ -1773,15 +1817,48 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 .gallery-lightbox video{background:#000}
 @media (max-width:700px){
   .gallery-lightbox{
-    padding:12px;
-    padding-bottom:calc(12px + env(safe-area-inset-bottom));
+    padding:20px 18px calc(24px + env(safe-area-inset-bottom));
     align-items:center;
   }
+  .gallery-lightbox-close{
+    top:max(14px,calc(14px + env(safe-area-inset-top)));
+    right:max(14px,calc(14px + env(safe-area-inset-right)));
+    min-width:50px;
+    height:50px;
+    padding:0 14px;
+  }
   .gallery-lightbox-media{
-    max-width:calc(100vw - 24px);
-    max-height:calc(100dvh - 24px);
+    max-width:min(82vw,420px);
+    max-height:calc(100dvh - 150px);
     border-radius:14px;
   }
+}
+@media (max-width:560px){
+  .gallery-lightbox{
+    padding:22px 18px calc(28px + env(safe-area-inset-bottom));
+  }
+  .gallery-lightbox-close{
+    min-width:48px;
+    height:48px;
+    padding:0 12px;
+    top:max(14px,calc(14px + env(safe-area-inset-top)));
+    right:max(14px,calc(14px + env(safe-area-inset-right)));
+    font-size:12px;
+  }
+  .gallery-lightbox-media{
+    max-width:min(78vw,360px);
+    max-height:calc(100dvh - 170px);
+  }
+}
+
+.overlay-open .nav,
+.overlay-open .scroll-progress,
+.overlay-open .fixed-buttons{
+  pointer-events:none;
+}
+.overlay-open .nav,
+.overlay-open .scroll-progress{
+  opacity:0;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -2079,6 +2156,10 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
     <!-- Lightbox -->
     <div class="gallery-lightbox" id="galleryLightbox" onclick="closeLightbox()">
+      <button class="gallery-lightbox-close" type="button" aria-label="Close gallery" onclick="event.stopPropagation();closeLightbox()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span class="gallery-lightbox-close-label">Close</span>
+      </button>
       <img class="gallery-lightbox-media" id="lightboxImg" src="" alt="Gallery preview" onclick="event.stopPropagation()" />
       <video class="gallery-lightbox-media" id="lightboxVideo" playsinline controls preload="metadata" onclick="event.stopPropagation()"></video>
     </div>
@@ -2430,6 +2511,23 @@ body[data-active-section="contact"] .bg-contact{opacity:1}
 
 <script>
 (() => {
+  const backgroundImageUrls = [
+    "{% static 'bg/BG (1 of 4).webp' %}",
+    "{% static 'bg/BG (2 of 4).jpg' %}",
+    "{% static 'bg/BG3b.JPG' %}",
+    "{% static 'bg/BG (4 of 4).JPG' %}",
+  ];
+  const preloadBackgrounds = () => {
+    backgroundImageUrls.forEach(src => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+      if (typeof img.decode === "function") img.decode().catch(() => {});
+    });
+  };
+  if ("requestIdleCallback" in window) requestIdleCallback(preloadBackgrounds, { timeout: 250 });
+  else window.setTimeout(preloadBackgrounds, 0);
+
   const BUSINESS_HOURS = [
     { day: "Sunday", short: "Sun", ranges: [] },
     { day: "Monday", short: "Mon", ranges: [] },
